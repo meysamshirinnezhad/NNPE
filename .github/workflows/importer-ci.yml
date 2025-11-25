@@ -1,0 +1,24 @@
+name: importer-ci
+on: [push, pull_request]
+jobs:
+  test-importer:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: nppe
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd="pg_isready -U postgres" --health-interval=5s
+          --health-timeout=5s --health-retries=20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version: "1.22.x" }
+      - run: go build -o import_qbank ./back/cmd/import_qbank
+      - run: psql postgresql://postgres:postgres@localhost:5432/nppe -f back/migrations/002_question_import_constraints.sql
+      - run: ./import_qbank --dry-run questions/ethics.qbank.md
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/nppe?sslmode=disable

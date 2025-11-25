@@ -1,0 +1,2249 @@
+{
+  "question_bank": {
+    "name": "NPPE Mock Exam Question Bank",
+    "version": "1.0",
+    "total_questions": 64,
+    "questions": [
+      {
+        "id": 1,
+        "slug": "how-are-the-definitions-and-interpretations-of-pro-1",
+        "type": "multiple_choice_single",
+        "difficulty": "easy",
+        "topic": "Professionalism",
+        "subtopic": "I.1",
+        "syllabus_area": "I.1",
+        "reference_source": "Ethics, 6th ed., p. 14",
+        "content": "How are the definitions and interpretations of professionalism and professional status for engineers in Canada regulated?",
+        "hint": "Consider how the government delegates authority for admissions, discipline, and standards of practice to the professional associations.",
+        "options": [
+          {
+            "text": "Regulated by the government",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Deregulated",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Self-regulated",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "Regulated by incentives\nHint: Consider how the government delegates authority for admissions, discipline, and standards of practice to the professional associations.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: In Canada, the engineering and geoscience professions are self-regulated. The government delegates the responsibility for setting standards of practice, admissions, and discipline to the professional associations in each province and territory.\n•\tDifficulty: 1 (EASY)\n•\tNPPE Syllabus Area: I.1\n•\tSource Reference: Ethics, 6th ed., p. 14\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "In Canada, the engineering and geoscience professions are self-regulated. The government delegates the responsibility for setting standards of practice, admissions, and discipline to the professional associations in each province and territory."
+      },
+      {
+        "id": 2,
+        "slug": "a-professional-has-duties-to-their-employer-client-2",
+        "type": "multiple_choice_single",
+        "difficulty": "hard",
+        "topic": "Professionalism",
+        "subtopic": "I.2",
+        "syllabus_area": "I.2",
+        "reference_source": "Ethics, 6th ed., p. 219-220",
+        "content": "A professional has duties to their employer, clients, the profession, and the public. They also have a \"duty to themselves.\" Which of the following actions falls outside the acceptable scope of this \"duty to themselves\"?",
+        "hint": "Recall the hierarchy of a professional's duties. Which duty is considered paramount, and how does the \"duty to oneself\" fit within that framework?",
+        "options": [
+          {
+            "text": "Insisting on all rights under the Charter of Rights and Freedoms",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Insisting on a satisfactory work environment",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Insisting that their own best interest is a priority",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "Insisting on adequate payment from a client or employer.\nHint: Recall the hierarchy of a professional's duties. Which duty is considered paramount, and how does the \"duty to oneself\" fit within that framework?\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: A professional's paramount duty is to the public welfare. While professionals have a duty to themselves (e.g., ensuring a safe workplace, fair compensation, and basic rights), this duty does not override their duties to the public, employer, or client. Insisting that their own best interest is the top priority would violate this established hierarchy of duties.\n•\tDifficulty: 3 (DIFFICULT)\n•\tNPPE Syllabus Area: I.2\n•\tSource Reference: Ethics, 6th ed., p. 219-220\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "A professional's paramount duty is to the public welfare. While professionals have a duty to themselves (e.g., ensuring a safe workplace, fair compensation, and basic rights), this duty does not override their duties to the public, employer, or client. Insisting that their own best interest is the top priority would violate this established hierarchy of duties."
+      },
+      {
+        "id": 3,
+        "slug": "when-multiple-contractors-are-on-a-project-site-oc-3",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Professionalism",
+        "subtopic": "I.2",
+        "syllabus_area": "I.2",
+        "reference_source": "Ethics, 6th ed., p. 145",
+        "content": "When multiple contractors are on a project site, Occupational Health and Safety (OHS) legislation specifies a single role to coordinate overall site safety. What is the title of this individual, and what is their primary responsibility?",
+        "hint": "When multiple employers are on a worksite, OHS legislation defines a single, specific role to coordinate and take responsibility for overall safety.",
+        "options": [
+          {
+            "text": "Prime contractor; responsible for the safety of employees and the public",
+            "correct": true,
+            "position": 1
+          },
+          {
+            "text": "Health and Safety Coordinator; responsible for the safety of employees and the public",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Project Lead; responsible for the safety of employees",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "Director of Public Safety; responsible for the safety of the public.\nHint: When multiple employers are on a worksite, OHS legislation defines a single, specific role to coordinate and take responsibility for overall safety.\nAnswer Key & Details:\n•\tCorrect Answer: A\n•\tRationale: OHS legislation defines the role of a \"prime contractor\" who is responsible for the health and safety of all employees and the public on a worksite with multiple employers. If the owner does not designate a prime contractor in the contract, the owner assumes this responsibility by default.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: I.2\n•\tSource Reference: Ethics, 6th ed., p. 145\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "OHS legislation defines the role of a \"prime contractor\" who is responsible for the health and safety of all employees and the public on a worksite with multiple employers. If the owner does not designate a prime contractor in the contract, the owner assumes this responsibility by default."
+      },
+      {
+        "id": 4,
+        "slug": "according-to-occupational-health-and-safety-ohs-la-4",
+        "type": "multiple_choice_single",
+        "difficulty": "easy",
+        "topic": "Professionalism",
+        "subtopic": "I.2",
+        "syllabus_area": "I.2",
+        "reference_source": "Occupational Health and Safety Act, Part 1, section 5",
+        "content": "According to Occupational Health and Safety (OHS) laws, what fundamental right is every Canadian entitled to in their workplace, and who has the primary duty to provide it?",
+        "hint": "Think about the fundamental right of a worker and the primary legal obligation placed on the party who controls the work environment.",
+        "options": [
+          {
+            "text": "A private workplace; the employer",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "A safe workplace; the employer",
+            "correct": true,
+            "position": 2
+          },
+          {
+            "text": "A private workplace; the employee",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "A safe workplace; the employee\nHint: Think about the fundamental right of a worker and the primary legal obligation placed on the party who controls the work environment.\nAnswer Key & Details:\n•\tCorrect Answer: B\n•\tRationale: OHS laws across Canada establish that every worker is entitled to a safe workplace. The legal duty to provide and maintain this safe environment rests primarily with the employer.\n•\tDifficulty: 1 (EASY)\n•\tNPPE Syllabus Area: I.2\n•\tSource Reference: Occupational Health and Safety Act, Part 1, section 5\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "OHS laws across Canada establish that every worker is entitled to a safe workplace. The legal duty to provide and maintain this safe environment rests primarily with the employer."
+      },
+      {
+        "id": 5,
+        "slug": "comparing-the-client-professional-and-employer-pro-5",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Professionalism",
+        "subtopic": "I.1",
+        "syllabus_area": "I.1",
+        "reference_source": "APEGA, Concepts of Professionalism, Section 3.6",
+        "content": "Comparing the client-professional and employer-professional relationship models, which one typically allows the professional more technical autonomy?",
+        "hint": "Consider which relationship model allows the professional to have more direct control over service conditions, such as which clients to serve and how much to charge.",
+        "options": [
+          {
+            "text": "Both offer an equal amount of autonomy",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "The employer-professional relationship",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "The client-professional relationship",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "Neither offers the professional any autonomy.\nHint: Consider which relationship model allows the professional to have more direct control over service conditions, such as which clients to serve and how much to charge.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: In a client-professional relationship (e.g., a consultant), the professional typically has greater autonomy. They have more control over selecting clients, setting fees, and defining other service conditions compared to an employee, whose employer often dictates these terms.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: I.1\n•\tSource Reference: APEGA, Concepts of Professionalism, Section 3.6\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "In a client-professional relationship (e.g., a consultant), the professional typically has greater autonomy. They have more control over selecting clients, setting fees, and defining other service conditions compared to an employee, whose employer often dictates these terms."
+      },
+      {
+        "id": 6,
+        "slug": "what-is-the-legal-instrument-that-establishes-self-6",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Professionalism",
+        "subtopic": "I.3",
+        "syllabus_area": "I.3",
+        "reference_source": "Ethics, 6th ed., p. 28, 51-52",
+        "content": "What is the legal instrument that establishes self-governing professional associations, and what power does it grant them?",
+        "hint": "Think about the formal legal instrument used to create laws and the specific power it grants to an association to govern its members.",
+        "options": [
+          {
+            "text": "Legislation, which grants authorization to issue licences and self-regulate",
+            "correct": true,
+            "position": 1
+          },
+          {
+            "text": "Laws, which grant permission to issue licences and self-regulate",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Guidelines, which grant the option to issue licences and self-regulate",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "Statutes, which grant capacity to issue licences and self-regulate.\nHint: Think about the formal legal instrument used to create laws and the specific power it grants to an association to govern its members.\nAnswer Key & Details:\n•\tCorrect Answer: A\n•\tRationale: Provincial and territorial legislatures enact specific legislation (Acts) that establishes the legal basis for the engineering and geoscience professions. This legislation gives formal authorization to each association to govern its members, including issuing licences and enforcing standards.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: I.3\n•\tSource Reference: Ethics, 6th ed., p. 28, 51-52\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "Provincial and territorial legislatures enact specific legislation (Acts) that establishes the legal basis for the engineering and geoscience professions. This legislation gives formal authorization to each association to govern its members, including issuing licences and enforcing standards."
+      },
+      {
+        "id": 7,
+        "slug": "once-a-provincial-or-territorial-act-establishes-a-7",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Professionalism",
+        "subtopic": "I.1",
+        "syllabus_area": "I.1",
+        "reference_source": "Ethics, 6th ed., p. 33",
+        "content": "Once a provincial or territorial Act establishes a profession as self-regulating, which of the following is NOT true of its association?",
+        "hint": "Self-regulation implies that the members of the profession play a key role in its governance. Consider how the governing council is formed.",
+        "options": [
+          {
+            "text": "The provincial government appoints all Association Council members",
+            "correct": true,
+            "position": 1
+          },
+          {
+            "text": "Licensed members elect most of the Association's Council members",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "The Association is responsible for enforcing standards, ethics, and discipline",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "The Association can only discipline its own members.\nHint: Self-regulation implies that the members of the profession play a key role in its governance. Consider how the governing council is formed.\nAnswer Key & Details:\n•\tCorrect Answer: A\n•\tRationale: In a self-regulating association, the licensed members elect most of the council members, ensuring the profession is governed by its peers. While the government typically appoints a few public representatives to the council to represent the public interest, it does not appoint all members.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: I.1\n•\tSource Reference: Ethics, 6th ed., p. 33\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "In a self-regulating association, the licensed members elect most of the council members, ensuring the profession is governed by its peers. While the government typically appoints a few public representatives to the council to represent the public interest, it does not appoint all members."
+      },
+      {
+        "id": 8,
+        "slug": "in-canada-engineering-is-a-self-regulating-profess-8",
+        "type": "multiple_choice_single",
+        "difficulty": "easy",
+        "topic": "Professionalism",
+        "subtopic": "I.1",
+        "syllabus_area": "I.1",
+        "reference_source": "Ethics, 6th ed., p. 27-29",
+        "content": "In Canada, engineering is a \"self-regulating\" profession. What is the correct meaning of this term?",
+        "hint": "Self-regulation is a formal legal structure, not an informal agreement. Consider the legislative basis that grants this privilege.",
+        "options": [
+          {
+            "text": "An association ensures its members follow bylaws, pay dues, and keeps the public informed about upcoming projects",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Interprovincial teams police the decisions of their members",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Each province or territory has passed an Act creating an Association that is empowered to regulate the profession",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "A group of people who informally review each other's work for correctness.\nHint: Self-regulation is a formal legal structure, not an informal agreement. Consider the legislative basis that grants this privilege.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: The term \"self-regulating\" means that the authority to regulate the profession is delegated by the government to a professional association through a specific legislative Act. This association is then responsible for licensing, discipline, and setting standards of practice to protect the public.\n•\tDifficulty: 1 (EASY)\n•\tNPPE Syllabus Area: I.1\n•\tSource Reference: Ethics, 6th ed., p. 27-29\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "The term \"self-regulating\" means that the authority to regulate the profession is delegated by the government to a professional association through a specific legislative Act. This association is then responsible for licensing, discipline, and setting standards of practice to protect the public."
+      },
+      {
+        "id": 9,
+        "slug": "the-collapses-of-the-quebec-bridge-in-1907-and-191-9",
+        "type": "multiple_choice_single",
+        "difficulty": "easy",
+        "topic": "Professionalism",
+        "subtopic": "I.3",
+        "syllabus_area": "I.3",
+        "reference_source": "Ethics, 6th ed., p. 18-24",
+        "content": "The collapses of the Quebec Bridge in 1907 and 1916 were pivotal events in Canadian engineering history. What was the most significant regulatory outcome of these disasters?",
+        "hint": "Think about the systemic regulatory changes that would be implemented to prevent such tragedies from recurring by ensuring professional competence and accountability.",
+        "options": [
+          {
+            "text": "The use of steel in bridge construction was outlawed",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "The engineering program at the University of Quebec was shut down",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Stricter criminal penalties for engineering failures were implemented",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "The first Acts to license professional engineers were passed.\nHint: Think about the systemic regulatory changes that would be implemented to prevent such tragedies from recurring by ensuring professional competence and accountability.\nAnswer Key & Details:\n•\tCorrect Answer: D\n•\tRationale: The Quebec Bridge disasters highlighted the critical need for competent professionals and clear accountability. In response, provincial governments began passing the first Acts to license and regulate professional engineers in Canada, establishing the foundation of the self-regulating system.\n•\tDifficulty: 1 (EASY)\n•\tNPPE Syllabus Area: I.3\n•\tSource Reference: Ethics, 6th ed., p. 18-24\n--------------------------------------------------------------------------------",
+            "correct": true,
+            "position": 4
+          }
+        ],
+        "explanation": "The Quebec Bridge disasters highlighted the critical need for competent professionals and clear accountability. In response, provincial governments began passing the first Acts to license and regulate professional engineers in Canada, establishing the foundation of the self-regulating system."
+      },
+      {
+        "id": 10,
+        "slug": "the-bre-x-mining-fraud-of-1997-where-core-samples--10",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Professionalism",
+        "subtopic": "I.3",
+        "syllabus_area": "I.3",
+        "reference_source": "Ethics, 6th ed., p. 28-30",
+        "content": "The Bre-X mining fraud of 1997, where core samples were falsified, led the Canadian Securities Administrators (CSA) to issue National Instrument 43-101. What does this instrument regulate?",
+        "hint": "The core of the Bre-X fraud was falsified information about ore discoveries that misled investors. Consider what kind of regulation would directly address this problem.",
+        "options": [
+          {
+            "text": "The certifications required for geologists to practice in Canada",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "The disclosure of scientific and technical information about mineral projects to the public",
+            "correct": true,
+            "position": 2
+          },
+          {
+            "text": "The criminal charges available for mining-related fraud offences",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "The price of precious metal stocks on the Canadian stock market.\nHint: The core of the Bre-X fraud was falsified information about ore discoveries that misled investors. Consider what kind of regulation would directly address this problem.\nAnswer Key & Details:\n•\tCorrect Answer: B\n•\tRationale: National Instrument 43-101 was created to prevent a repeat of the Bre-X fraud by regulating the public disclosure of information related to mineral projects. It mandates that only a \"Qualified Person\" (QP), such as a licensed professional engineer or geoscientist, can make public statements on such discoveries, ensuring accountability and protecting investors.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: I.3\n•\tSource Reference: Ethics, 6th ed., p. 28-30\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "National Instrument 43-101 was created to prevent a repeat of the Bre-X fraud by regulating the public disclosure of information related to mineral projects. It mandates that only a \"Qualified Person\" (QP), such as a licensed professional engineer or geoscientist, can make public statements on such discoveries, ensuring accountability and protecting investors."
+      },
+      {
+        "id": 11,
+        "slug": "engineers-and-geoscientists-work-with-a-variety-of-11",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Professionalism",
+        "subtopic": "I.3",
+        "syllabus_area": "I.3",
+        "reference_source": "Ethics, 6th ed., p. 16",
+        "content": "Engineers and geoscientists work with a variety of other regulated professionals, including architects. Which statement is most true about architects in Canada?",
+        "hint": "While architects may design buildings and have specific knowledge, focus on the single attribute that grants them the legal right to practice and defines them as a regulated profession.",
+        "options": [
+          {
+            "text": "They work under the supervision of engineers",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "They possess exceptional seismic knowledge",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "They must hold a licence in order to practice",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "They exclusively design buildings.\nHint: While architects may design buildings and have specific knowledge, focus on the single attribute that grants them the legal right to practice and defines them as a regulated profession.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: Like engineering and geoscience, architecture is a self-regulating profession in Canada. The most universally true statement is that an individual must be licensed under a provincial or territorial Architects Act to have the legal right to practice architecture. The other options may be true in some contexts but are not defining characteristics.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: I.3\n•\tSource Reference: Ethics, 6th ed., p. 16\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "Like engineering and geoscience, architecture is a self-regulating profession in Canada. The most universally true statement is that an individual must be licensed under a provincial or territorial Architects Act to have the legal right to practice architecture. The other options may be true in some contexts but are not defining characteristics."
+      },
+      {
+        "id": 12,
+        "slug": "at-what-point-in-a-project-is-a-letter-of-assuranc-12",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Professionalism",
+        "subtopic": "I.3",
+        "syllabus_area": "I.3",
+        "reference_source": "Ethics, 6th ed., p. 100",
+        "content": "At what point in a project is a letter of assurance submitted, and what is its purpose?",
+        "hint": "Consider the purpose of this document. Is it a promise about future work or a certification of completed work relative to the original plans?",
+        "options": [
+          {
+            "text": "At the end, to assure the government that there is no future potential for failure",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "At the start, to assure the government that the project will be completed on time",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "At the end, to certify that the work was constructed in accordance with the plans",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "At the start, to certify that all professionals on the project are licensed.\nHint: Consider the purpose of this document. Is it a promise about future work or a certification of completed work relative to the original plans?\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: A letter of assurance is a formal document submitted at the end of a project. Its primary purpose is for the professional to certify that, to the best of their knowledge, the completed construction conforms to the original sealed plans and specifications. It is a declaration of accountability for the finished product.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: I.3\n•\tSource Reference: Ethics, 6th ed., p. 100\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "A letter of assurance is a formal document submitted at the end of a project. Its primary purpose is for the professional to certify that, to the best of their knowledge, the completed construction conforms to the original sealed plans and specifications. It is a declaration of accountability for the finished product."
+      },
+      {
+        "id": 13,
+        "slug": "sealing-a-drawing-is-a-fundamental-act-of-professi-13",
+        "type": "multiple_choice_single",
+        "difficulty": "easy",
+        "topic": "Professionalism",
+        "subtopic": "I.3",
+        "syllabus_area": "I.3",
+        "reference_source": "Ethics, 6th ed., p. 48",
+        "content": "Sealing a drawing is a fundamental act of professional communication. What does the act of sealing a drawing primarily communicate?",
+        "hint": "The act of sealing a document is a formal declaration of accountability for its contents.",
+        "options": [
+          {
+            "text": "The professional has liability insurance",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "The professional may need to make edits later",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "The professional has checked the work and takes responsibility for it",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "The professional has confirmed the drawing exceeds codes and standards.\nHint: The act of sealing a document is a formal declaration of accountability for its contents.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: The professional seal is a mark of reliance. It communicates to others that a qualified professional has prepared, reviewed, and/or approved the document's technical content and accepts professional responsibility and accountability for it.\n•\tDifficulty: 1 (EASY)\n•\tNPPE Syllabus Area: I.3\n•\tSource Reference: Ethics, 6th ed., p. 48\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "The professional seal is a mark of reliance. It communicates to others that a qualified professional has prepared, reviewed, and/or approved the document's technical content and accepts professional responsibility and accountability for it."
+      },
+      {
+        "id": 14,
+        "slug": "on-a-large-complex-design-drawing-involving-multip-14",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Professionalism",
+        "subtopic": "I.3",
+        "syllabus_area": "I.3",
+        "reference_source": "Ethics, 6th ed., p. 99",
+        "content": "On a large, complex design drawing involving multiple disciplines (e.g., structural, geotechnical, electrical), how should the drawing be sealed?",
+        "hint": "When multiple areas of professional responsibility are present on a single drawing, consider how accountability for each specific area is demonstrated.",
+        "options": [
+          {
+            "text": "A professional from each discipline involved must seal the drawing, in addition to an approving professional",
+            "correct": true,
+            "position": 1
+          },
+          {
+            "text": "Every individual who contributed to the project should seal the drawing",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "A maximum of five professionals may seal the drawing",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "Only one lead professional should seal the entire drawing.\nHint: When multiple areas of professional responsibility are present on a single drawing, consider how accountability for each specific area is demonstrated.\nAnswer Key & Details:\n•\tCorrect Answer: A\n•\tRationale: When a drawing contains work from multiple disciplines, a qualified professional from each of those disciplines must apply their seal to take responsibility for their respective portion of the work. Often, an approving professional with overall project responsibility will also seal the document. This ensures clear accountability for all technical content.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: I.3\n•\tSource Reference: Ethics, 6th ed., p. 99\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "When a drawing contains work from multiple disciplines, a qualified professional from each of those disciplines must apply their seal to take responsibility for their respective portion of the work. Often, an approving professional with overall project responsibility will also seal the document. This ensures clear accountability for all technical content."
+      },
+      {
+        "id": 15,
+        "slug": "a-qualified-person-qp-is-responsible-for-calculati-15",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Professionalism",
+        "subtopic": "I.3",
+        "syllabus_area": "I.3",
+        "reference_source": "Ethics, 6th ed., p. 35",
+        "content": "A Qualified Person (QP) is responsible for calculating a project's \"factor of safety.\" How is the factor of safety typically calculated?",
+        "hint": "The factor of safety is a fundamental engineering calculation that compares a system's strength to the demands that will be placed upon it.",
+        "options": [
+          {
+            "text": "Ratio of societal benefits to potential societal risks",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Total project cost plus the cost of damage and injury insurance",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Total cost of added safety measures plus the cost of insurance",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "Ratio of the system's load capacity to its expected service load.\nHint: The factor of safety is a fundamental engineering calculation that compares a system's strength to the demands that will be placed upon it.\nAnswer Key & Details:\n•\tCorrect Answer: D\n•\tRationale: The factor of safety is a core engineering calculation that determines how much stronger a system is than it needs to be for its intended load. It is calculated as the ratio of the ultimate load a structure or system can sustain to the maximum load it is expected to experience in service.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: I.3\n•\tSource Reference: Ethics, 6th ed., p. 35\n--------------------------------------------------------------------------------",
+            "correct": true,
+            "position": 4
+          }
+        ],
+        "explanation": "The factor of safety is a core engineering calculation that determines how much stronger a system is than it needs to be for its intended load. It is calculated as the ratio of the ultimate load a structure or system can sustain to the maximum load it is expected to experience in service."
+      },
+      {
+        "id": 16,
+        "slug": "as-self-governing-bodies-associations-are-responsi-16",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Professionalism",
+        "subtopic": "I.3",
+        "syllabus_area": "I.3",
+        "reference_source": "Law, 3rd ed., p. 11",
+        "content": "As self-governing bodies, associations are responsible for two key regulatory processes. What are the terms for charging a member for misconduct and for charging a non-member for illegal practice, respectively?",
+        "hint": "Differentiate between the process for dealing with licensed members who act improperly and the process for dealing with non-members who are practicing illegally or using protected titles.",
+        "options": [
+          {
+            "text": "Discipline; enforcement",
+            "correct": true,
+            "position": 1
+          },
+          {
+            "text": "Internal reviews; discipline",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Enforcement; public reviews",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "Internal reviews; public reviews\nHint: Differentiate between the process for dealing with licensed members who act improperly and the process for dealing with non-members who are practicing illegally or using protected titles.\nAnswer Key & Details:\n•\tCorrect Answer: A\n•\tRationale: \"Discipline\" is the formal process used by an association to investigate and charge a licensed member for incompetence, professional misconduct, or unethical behaviour. \"Enforcement\" is the process of taking legal action against an unlicensed person or company for illegally practising the profession or using protected professional titles.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: I.3\n•\tSource Reference: Law, 3rd ed., p. 11\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "\"Discipline\" is the formal process used by an association to investigate and charge a licensed member for incompetence, professional misconduct, or unethical behaviour. \"Enforcement\" is the process of taking legal action against an unlicensed person or company for illegally practising the profession or using protected professional titles."
+      },
+      {
+        "id": 17,
+        "slug": "an-engineering-graduate-decides-not-to-participate-17",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Professionalism",
+        "subtopic": "I.3",
+        "syllabus_area": "I.3",
+        "reference_source": "Ethics, 6th ed., p. 441-442",
+        "content": "An engineering graduate decides not to participate in the iron ring ceremony for personal reasons but does receive their degree. Which statement about their ability to practice engineering is correct?",
+        "hint": "The iron ring ceremony is a voluntary tradition and a personal choice. Consider how this relates to the legal requirements for licensure.",
+        "options": [
+          {
+            "text": "They can practice, but only under the supervision of someone who did participate",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "They can become a licensed engineer and practice with the same rights as someone who participated",
+            "correct": true,
+            "position": 2
+          },
+          {
+            "text": "They cannot become a licensed engineer, as the ceremony is mandatory",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "They must participate in an alternative ceremony to take a professional oath.\nHint: The iron ring ceremony is a voluntary tradition and a personal choice. Consider how this relates to the legal requirements for licensure.\nAnswer Key & Details:\n•\tCorrect Answer: B\n•\tRationale: The iron ring ceremony is a voluntary tradition symbolizing a personal commitment to ethical conduct; it is not a legal requirement for licensure. An individual who does not participate can still meet all the legal requirements for licensure set by the provincial or territorial association and practice engineering without restriction.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: I.3\n•\tSource Reference: Ethics, 6th ed., p. 441-442\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "The iron ring ceremony is a voluntary tradition symbolizing a personal commitment to ethical conduct; it is not a legal requirement for licensure. An individual who does not participate can still meet all the legal requirements for licensure set by the provincial or territorial association and practice engineering without restriction."
+      },
+      {
+        "id": 18,
+        "slug": "what-does-the-voluntary-act-of-wearing-an-iron-rin-18",
+        "type": "multiple_choice_single",
+        "difficulty": "easy",
+        "topic": "Professionalism",
+        "subtopic": "I.3",
+        "syllabus_area": "I.3",
+        "reference_source": "Ethics, 6th ed., p. 49",
+        "content": "What does the voluntary act of wearing an iron ring or earth science ring signify?",
+        "hint": "The ring symbolizes a personal and voluntary commitment made during a specific ceremony, separate from academic or licensing milestones.",
+        "options": [
+          {
+            "text": "The wearer has taken an oath to maintain high standards in their profession",
+            "correct": true,
+            "position": 1
+          },
+          {
+            "text": "The wearer has received a bachelor's degree in engineering or geoscience",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "The wearer is employed by an engineering or geoscience firm",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "The wearer is fully licensed by their provincial or territorial association.\nHint: The ring symbolizes a personal and voluntary commitment made during a specific ceremony, separate from academic or licensing milestones.\nAnswer Key & Details:\n•\tCorrect Answer: A\n•\tRationale: The iron ring (for engineers) and earth science ring (for geoscientists) are symbols that the wearer has voluntarily participated in a ceremony and has taken a personal oath to uphold high standards of ethics and professionalism in their practice. It is not a symbol of academic achievement, licensure, or employment status.\n•\tDifficulty: 1 (EASY)\n•\tNPPE Syllabus Area: I.3\n•\tSource Reference: Ethics, 6th ed., p. 49\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "The iron ring (for engineers) and earth science ring (for geoscientists) are symbols that the wearer has voluntarily participated in a ceremony and has taken a personal oath to uphold high standards of ethics and professionalism in their practice. It is not a symbol of academic achievement, licensure, or employment status."
+      },
+      {
+        "id": 19,
+        "slug": "under-the-canadian-governments-agreement-on-intern-19",
+        "type": "multiple_choice_single",
+        "difficulty": "easy",
+        "topic": "Professionalism",
+        "subtopic": "I.3",
+        "syllabus_area": "I.3",
+        "reference_source": "Ethics, 6th ed., p. 46",
+        "content": "Under the Canadian government's Agreement on Internal Trade (AIT), where can a licensed professional in good standing be easily licensed if they wish to relocate and practice within Canada?",
+        "hint": "The AIT is a federal law designed to facilitate labour mobility across the entire country for qualified workers.",
+        "options": [
+          {
+            "text": "Only in Alberta, British Columbia, Nunavut, and Nova Scotia",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "In all territories, but not in the provinces",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "In all provinces, but not in the territories",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "In all of Canada's provinces and territories.\nHint: The AIT is a federal law designed to facilitate labour mobility across the entire country for qualified workers.\nAnswer Key & Details:\n•\tCorrect Answer: D\n•\tRationale: The Agreement on Internal Trade (AIT) is a federal law that facilitates labour mobility across Canada. It ensures that a worker qualified for an occupation in one province or territory is recognized and can be easily licensed to practice in any other Canadian province or territory, provided they are a member in good standing.\n•\tDifficulty: 1 (EASY)\n•\tNPPE Syllabus Area: I.3\n•\tSource Reference: Ethics, 6th ed., p. 46\n--------------------------------------------------------------------------------",
+            "correct": true,
+            "position": 4
+          }
+        ],
+        "explanation": "The Agreement on Internal Trade (AIT) is a federal law that facilitates labour mobility across Canada. It ensures that a worker qualified for an occupation in one province or territory is recognized and can be easily licensed to practice in any other Canadian province or territory, provided they are a member in good standing."
+      },
+      {
+        "id": 20,
+        "slug": "societal-concerns-over-peak-oil-and-climate-change-20",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Professionalism",
+        "subtopic": "I.1",
+        "syllabus_area": "I.1",
+        "reference_source": "Ethics, 6th ed., p. 12",
+        "content": "Societal concerns over peak oil and climate change are expected to influence future employment for engineers and geoscientists. In which primary way does this influence job opportunities?",
+        "hint": "Consider how societal challenges like climate change create demand for new solutions and technologies, which in turn drives economic activity in related professional fields.",
+        "options": [
+          {
+            "text": "These concerns discourage investors, leaving more opportunities open",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "These concerns drive demand for increased energy efficiency and reduced pollution, stimulating research, investment, and job creation",
+            "correct": true,
+            "position": 2
+          },
+          {
+            "text": "These concerns make the public feel helpless, creating a vacuum of opportunity for professionals",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "These concerns drive companies to only rebuild existing structures, limiting new design work.\nHint: Consider how societal challenges like climate change create demand for new solutions and technologies, which in turn drives economic activity in related professional fields.\nAnswer Key & Details:\n•\tCorrect Answer: B\n•\tRationale: Challenges like climate change and resource scarcity drive innovation. Growing consumer and regulatory demand for energy efficiency, sustainable development, and pollution reduction stimulates significant research, investment, and the creation of new job opportunities for engineers and geoscientists who can develop and implement solutions.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: I.1\n•\tSource Reference: Ethics, 6th ed., p. 12\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "Challenges like climate change and resource scarcity drive innovation. Growing consumer and regulatory demand for energy efficiency, sustainable development, and pollution reduction stimulates significant research, investment, and the creation of new job opportunities for engineers and geoscientists who can develop and implement solutions."
+      },
+      {
+        "id": 21,
+        "slug": "many-professionals-choose-a-career-in-consulting-w-21",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Professionalism",
+        "subtopic": "I.4",
+        "syllabus_area": "I.4",
+        "reference_source": "Ethics, 6th ed., p. 106",
+        "content": "Many professionals choose a career in consulting. Which of the following is NOT a typical characteristic of a consulting career?",
+        "hint": "Think about the nature of project-based work. How does income flow when projects are abundant versus when they are scarce?",
+        "options": [
+          {
+            "text": "The expertise needed is hard to acquire but is often highly compensated",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "It often requires travel, which can be seen as either a benefit or a drawback",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "It often provides a high degree of control over one's own career path",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "It provides a stable and predictable income with minimal monthly variance.\nHint: Think about the nature of project-based work. How does income flow when projects are abundant versus when they are scarce?\nAnswer Key & Details:\n•\tCorrect Answer: D\n•\tRationale: A career in consulting is characterized by project-based work, which often leads to variable and less stable income compared to salaried employment. Income can be high when projects are plentiful but can drop significantly during periods with less work. The other options are all common characteristics of a consulting career.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: I.4\n•\tSource Reference: Ethics, 6th ed., p. 106\n--------------------------------------------------------------------------------",
+            "correct": true,
+            "position": 4
+          }
+        ],
+        "explanation": "A career in consulting is characterized by project-based work, which often leads to variable and less stable income compared to salaried employment. Income can be high when projects are plentiful but can drop significantly during periods with less work. The other options are all common characteristics of a consulting career."
+      },
+      {
+        "id": 22,
+        "slug": "which-of-the-following-is-not-an-example-of-a-majo-22",
+        "type": "multiple_choice_single",
+        "difficulty": "easy",
+        "topic": "Professionalism",
+        "subtopic": "I.3",
+        "syllabus_area": "I.3",
+        "reference_source": "Ethics, 6th ed., p. 2-5",
+        "content": "Which of the following is NOT an example of a major Canadian engineering or geoscience achievement?",
+        "hint": "Three of these are significant Canadian technological achievements. One is associated with the Soviet space program.",
+        "options": [
+          {
+            "text": "The Luna 3 probe photographing the far side of the moon",
+            "correct": true,
+            "position": 1
+          },
+          {
+            "text": "The Alouette-I Orbiting Research Satellite",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "The transcontinental railway network",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "The CANDU nuclear power system.\nHint: Three of these are significant Canadian technological achievements. One is associated with the Soviet space program.\nAnswer Key & Details:\n•\tCorrect Answer: A\n•\tRationale: The Alouette-I satellite, the transcontinental railway, and the CANDU nuclear reactor are all landmark Canadian engineering achievements. The Luna 3 probe was a mission of the Soviet Union's space program in 1959.\n•\tDifficulty: 1 (EASY)\n•\tNPPE Syllabus Area: I.3\n•\tSource Reference: Ethics, 6th ed., p. 2-5\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "The Alouette-I satellite, the transcontinental railway, and the CANDU nuclear reactor are all landmark Canadian engineering achievements. The Luna 3 probe was a mission of the Soviet Union's space program in 1959."
+      },
+      {
+        "id": 23,
+        "slug": "a-professional-seal-or-stamp-issued-by-a-canadian--23",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Professionalism",
+        "subtopic": "I.3",
+        "syllabus_area": "I.3",
+        "reference_source": "Ethics, 6th ed., p. 94-95",
+        "content": "A professional seal or stamp issued by a Canadian association must contain specific identifiers. Which of the following four identifiers are required?",
+        "hint": "A professional seal must contain specific information to uniquely identify the practitioner and their jurisdiction. The practitioner adds their signature and date separately.",
+        "options": [
+          {
+            "text": "The professional's name, licence number, signature line, and province name",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "The professional's name, licence number, licence type, and association logo",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "The professional's name, licence number, licence type, and province name",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "The professional's signature line, licence number, licence type, and association logo.\nHint: A professional seal must contain specific information to uniquely identify the practitioner and their jurisdiction. The practitioner adds their signature and date separately.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: A professional seal must contain four key identifiers to be valid: the name of the province or territory, the licence type (e.g., \"Licensed Professional Engineer\"), the name of the licence holder, and the unique licence number. The signature and date are added by the professional separately at the time of sealing.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: I.3\n•\tSource Reference: Ethics, 6th ed., p. 94-95\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "A professional seal must contain four key identifiers to be valid: the name of the province or territory, the licence type (e.g., \"Licensed Professional Engineer\"), the name of the licence holder, and the unique licence number. The signature and date are added by the professional separately at the time of sealing."
+      },
+      {
+        "id": 24,
+        "slug": "in-the-hierarchy-of-a-professionals-duties-how-mus-24",
+        "type": "multiple_choice_single",
+        "difficulty": "easy",
+        "topic": "Ethics",
+        "subtopic": "II.1",
+        "syllabus_area": "II.1",
+        "reference_source": "Ethics, 6th ed., p. 219",
+        "content": "In the hierarchy of a professional's duties, how must the duty to the public be considered?",
+        "hint": "All professional Codes of Ethics establish a clear hierarchy of duties. Recall which duty sits at the very top of this hierarchy.",
+        "options": [
+          {
+            "text": "As important as the duty to the employer",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Less important than the duty to oneself",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Less important than the duty to the profession",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "As the most important duty.\nHint: All professional Codes of Ethics establish a clear hierarchy of duties. Recall which duty sits at the very top of this hierarchy.\nAnswer Key & Details:\n•\tCorrect Answer: D\n•\tRationale: The Code of Ethics in every jurisdiction establishes that the professional's duty to the public (to safeguard life, health, property, and the public welfare) is paramount. It must be held above all other duties, including those to clients, employers, or oneself.\n•\tDifficulty: 1 (EASY)\n•\tNPPE Syllabus Area: II.1\n•\tSource Reference: Ethics, 6th ed., p. 219\n--------------------------------------------------------------------------------",
+            "correct": true,
+            "position": 4
+          }
+        ],
+        "explanation": "The Code of Ethics in every jurisdiction establishes that the professional's duty to the public (to safeguard life, health, property, and the public welfare) is paramount. It must be held above all other duties, including those to clients, employers, or oneself."
+      },
+      {
+        "id": 25,
+        "slug": "a-professional-is-part-of-a-team-making-purchasing-25",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Ethics",
+        "subtopic": "II.4",
+        "syllabus_area": "II.4",
+        "reference_source": "Ethics, 6th ed., p. 264",
+        "content": "A professional is part of a team making purchasing decisions for their company. They personally hold stock in one of the potential supplier companies. What is the professional's obligation regarding this stock ownership?",
+        "hint": "The professional's duty regarding conflicts of interest is a core ethical principle, independent of company policy or the monetary value involved.",
+        "options": [
+          {
+            "text": "There is no obligation, as one individual cannot alter a stock's value",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Disclosure is only required if the company has a specific conflict of interest policy",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "The Code of Ethics requires the professional to disclose all conflicts of interest",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "Disclosure is only necessary for large stock holdings and substantial contracts.\nHint: The professional's duty regarding conflicts of interest is a core ethical principle, independent of company policy or the monetary value involved.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: Every association's Code of Ethics requires professionals to promptly disclose any real, potential, or perceived conflict of interest to the relevant parties (such as an employer). This duty is absolute and does not depend on the value of the interest or the existence of a corporate policy.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: II.4\n•\tSource Reference: Ethics, 6th ed., p. 264\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "Every association's Code of Ethics requires professionals to promptly disclose any real, potential, or perceived conflict of interest to the relevant parties (such as an employer). This duty is absolute and does not depend on the value of the interest or the existence of a corporate policy."
+      },
+      {
+        "id": 26,
+        "slug": "mills-utilitarianism-kants-formalism-lockes-rights-26",
+        "type": "multiple_choice_single",
+        "difficulty": "easy",
+        "topic": "Ethics",
+        "subtopic": "II.2",
+        "syllabus_area": "II.2",
+        "reference_source": "Ethics, 6th ed., p. 206",
+        "content": "Mill's utilitarianism, Kant's formalism, Locke's rights ethics, and Aristotle's virtue ethics are all examples of what?",
+        "hint": "These frameworks provide different ways to analyze and resolve moral dilemmas. What is the general term for such frameworks?",
+        "options": [
+          {
+            "text": "Ethical theories",
+            "correct": true,
+            "position": 1
+          },
+          {
+            "text": "Metaphysics",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Logic",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "Epistemology\nHint: These frameworks provide different ways to analyze and resolve moral dilemmas. What is the general term for such frameworks?\nAnswer Key & Details:\n•\tCorrect Answer: A\n•\tRationale: These are all major ethical theories from the field of philosophy. They provide distinct frameworks for moral reasoning. Metaphysics, logic, and epistemology are other branches of philosophy not directly focused on moral dilemmas.\n•\tDifficulty: 1 (EASY)\n•\tNPPE Syllabus Area: II.2\n•\tSource Reference: Ethics, 6th ed., p. 206\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "These are all major ethical theories from the field of philosophy. They provide distinct frameworks for moral reasoning. Metaphysics, logic, and epistemology are other branches of philosophy not directly focused on moral dilemmas."
+      },
+      {
+        "id": 27,
+        "slug": "who-is-responsible-for-writing-and-enforcing-the-c-27",
+        "type": "multiple_choice_single",
+        "difficulty": "easy",
+        "topic": "Ethics",
+        "subtopic": "II.3",
+        "syllabus_area": "II.3",
+        "reference_source": "Ethics, 6th ed., p. 219",
+        "content": "Who is responsible for writing and enforcing the Code of Ethics that governs licensed engineers and geoscientists in a given province or territory?",
+        "hint": "As self-regulating bodies, professional associations have the authority to establish and uphold the standards of conduct for their members.",
+        "options": [
+          {
+            "text": "The federal government",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "The professional association itself",
+            "correct": true,
+            "position": 2
+          },
+          {
+            "text": "Judges of the Provincial Court",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "The provincial government\nHint: As self-regulating bodies, professional associations have the authority to establish and uphold the standards of conduct for their members.\nAnswer Key & Details:\n•\tCorrect Answer: B\n•\tRationale: As part of their self-regulating mandate, each provincial and territorial association is empowered by its respective Act to establish, maintain, and enforce a Code of Ethics that all its members must follow.\n•\tDifficulty: 1 (EASY)\n•\tNPPE Syllabus Area: II.3\n•\tSource Reference: Ethics, 6th ed., p. 219\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "As part of their self-regulating mandate, each provincial and territorial association is empowered by its respective Act to establish, maintain, and enforce a Code of Ethics that all its members must follow."
+      },
+      {
+        "id": 28,
+        "slug": "which-of-the-following-activities-is-not-a-princip-28",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Ethics",
+        "subtopic": "II.3",
+        "syllabus_area": "II.3",
+        "reference_source": "PEO, O. Reg. 941, s. 77",
+        "content": "Which of the following activities is NOT a principle of conduct mandated by most professional Codes of Ethics?",
+        "hint": "While all listed activities might be encouraged, consider which one is not a mandatory ethical duty enshrined in the Code of Ethics.",
+        "options": [
+          {
+            "text": "Holding paramount the safety, health, and welfare of the public",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Participating in association voting activities",
+            "correct": true,
+            "position": 2
+          },
+          {
+            "text": "Ensuring appropriate and adequate compensation for professional work",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "Staying informed to maintain competence in one's field.\nHint: While all listed activities might be encouraged, consider which one is not a mandatory ethical duty enshrined in the Code of Ethics.\nAnswer Key & Details:\n•\tCorrect Answer: B\n•\tRationale: The duty to the public, the duty to maintain competence, and the principle of fair compensation are all core tenets of most Codes of Ethics. While participation in association activities like voting is strongly encouraged, it is not a mandatory ethical duty.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: II.3\n•\tSource Reference: PEO, O. Reg. 941, s. 77\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "The duty to the public, the duty to maintain competence, and the principle of fair compensation are all core tenets of most Codes of Ethics. While participation in association activities like voting is strongly encouraged, it is not a mandatory ethical duty."
+      },
+      {
+        "id": 29,
+        "slug": "what-was-the-ultimate-cause-of-the-algo-centre-mal-29",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Ethics",
+        "subtopic": "II.3",
+        "syllabus_area": "II.3",
+        "reference_source": "Report of the Elliot Lake Commission of Inquiry",
+        "content": "What was the ultimate cause of the Algo Centre Mall collapse in Elliot Lake, and what primary duty did the professionals involved fail to uphold?",
+        "hint": "The investigation found that although rusting steel was the physical cause, the failure of professionals to act on known issues was the root cause. This relates to their most paramount duty.",
+        "options": [
+          {
+            "text": "Material failure; duty to the profession",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Material failure; duty to society",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Human error; duty to the profession",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "Human error; duty to society\nHint: The investigation found that although rusting steel was the physical cause, the failure of professionals to act on known issues was the root cause. This relates to their most paramount duty.\nAnswer Key & Details:\n•\tCorrect Answer: D\n•\tRationale: The official inquiry concluded that while physical rusting caused the structural failure, the root cause was human error. Engineers involved acted negligently during inspections and failed to uphold their paramount duty to protect the health and welfare of the public (society), prioritizing other interests instead.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: II.3\n•\tSource Reference: Report of the Elliot Lake Commission of Inquiry\n--------------------------------------------------------------------------------",
+            "correct": true,
+            "position": 4
+          }
+        ],
+        "explanation": "The official inquiry concluded that while physical rusting caused the structural failure, the root cause was human error. Engineers involved acted negligently during inspections and failed to uphold their paramount duty to protect the health and welfare of the public (society), prioritizing other interests instead."
+      },
+      {
+        "id": 30,
+        "slug": "a-project-manager-discovers-a-slim-possibility-of--30",
+        "type": "multiple_choice_single",
+        "difficulty": "hard",
+        "topic": "Ethics",
+        "subtopic": "II.2",
+        "syllabus_area": "II.2",
+        "reference_source": "Ethics, 6th ed., p. 206-210",
+        "content": "A project manager discovers a slim possibility of a structural failure in a nearly finished project. Despite pressure to finish on time, the manager decides to delay the project to implement costly reinforcements, believing it is the right thing to do regardless of the consequences. This decision most closely aligns with which ethical theory?",
+        "hint": "This ethical theory emphasizes that certain actions are inherently right or wrong, regardless of their consequences. The decision is based on a sense of duty.",
+        "options": [
+          {
+            "text": "Aristotle's Virtue Ethics",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Mill's Utilitarianism",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Kant's Formalism (Duty-Based Ethics)",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "Locke's Rights Ethics\nHint: This ethical theory emphasizes that certain actions are inherently right or wrong, regardless of their consequences. The decision is based on a sense of duty.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: Kant's formalism, or duty-based ethics, posits that the morality of an action is based on whether the action itself is right or wrong under a series of rules, rather than based on the consequences. The project manager acted out of a sense of duty to do what is right (protect safety), irrespective of the negative consequences (delays, costs, angering people).\n•\tDifficulty: 3 (DIFFICULT)\n•\tNPPE Syllabus Area: II.2\n•\tSource Reference: Ethics, 6th ed., p. 206-210\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "Kant's formalism, or duty-based ethics, posits that the morality of an action is based on whether the action itself is right or wrong under a series of rules, rather than based on the consequences. The project manager acted out of a sense of duty to do what is right (protect safety), irrespective of the negative consequences (delays, costs, angering people)."
+      },
+      {
+        "id": 31,
+        "slug": "when-facing-an-ethical-deadlock-where-two-decision-31",
+        "type": "multiple_choice_single",
+        "difficulty": "hard",
+        "topic": "Ethics",
+        "subtopic": "II.1",
+        "syllabus_area": "II.1",
+        "reference_source": "Ethics, 6th ed., p. 224",
+        "content": "When facing an ethical deadlock where two decisions seem equally justifiable, professionals are advised to choose the solution that does not benefit them personally. Why does this guideline exist?",
+        "hint": "This practice is designed to uphold the integrity and honour of the profession in the public eye by removing any appearance of self-serving motives.",
+        "options": [
+          {
+            "text": "The Code of Ethics states that professionals cannot benefit financially from their work",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Professionals should be selfless in all decisions",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Avoiding personal benefit prevents public scrutiny and perceptions of bias",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "A professional's best interest should never be a priority.\nHint: This practice is designed to uphold the integrity and honour of the profession in the public eye by removing any appearance of self-serving motives.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: This guideline serves to protect the honour and integrity of the profession. By choosing the path that avoids personal gain, the professional demonstrates that their decision was made objectively and in the public or client's best interest, thereby preventing any perception of bias or self-serving motives.\n•\tDifficulty: 3 (DIFFICULT)\n•\tNPPE Syllabus Area: II.1\n•\tSource Reference: Ethics, 6th ed., p. 224\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "This guideline serves to protect the honour and integrity of the profession. By choosing the path that avoids personal gain, the professional demonstrates that their decision was made objectively and in the public or client's best interest, thereby preventing any perception of bias or self-serving motives."
+      },
+      {
+        "id": 32,
+        "slug": "according-to-most-provincial-and-territorial-codes-32",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Ethics",
+        "subtopic": "II.4",
+        "syllabus_area": "II.4",
+        "reference_source": "Ethics, 6th ed., p. 219-221",
+        "content": "According to most provincial and territorial Codes of Ethics, which action by a professional would be considered a breach of their duty to colleagues?",
+        "hint": "Ethical conduct toward colleagues requires transparency. Consider what action would violate this principle of open communication between professionals.",
+        "options": [
+          {
+            "text": "Demanding adequate compensation for professional work",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Giving proper credit for professional work",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Acting towards other practitioners with courtesy and good faith",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "Reviewing the work of another practitioner for the same employer without the other's knowledge.\nHint: Ethical conduct toward colleagues requires transparency. Consider what action would violate this principle of open communication between professionals.\nAnswer Key & Details:\n•\tCorrect Answer: D\n•\tRationale: A key ethical duty to colleagues is transparency and fairness. Reviewing a colleague's work for the same employer is permissible, but it must be done with the knowledge of the practitioner whose work is being reviewed (unless their connection to the work has been terminated). Doing so without their knowledge is a breach of ethics.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: II.4\n•\tSource Reference: Ethics, 6th ed., p. 219-221\n--------------------------------------------------------------------------------",
+            "correct": true,
+            "position": 4
+          }
+        ],
+        "explanation": "A key ethical duty to colleagues is transparency and fairness. Reviewing a colleague's work for the same employer is permissible, but it must be done with the knowledge of the practitioner whose work is being reviewed (unless their connection to the work has been terminated). Doing so without their knowledge is a breach of ethics."
+      },
+      {
+        "id": 33,
+        "slug": "what-do-most-associations-codes-of-ethics-state-re-33",
+        "type": "multiple_choice_single",
+        "difficulty": "easy",
+        "topic": "Ethics",
+        "subtopic": "II.3",
+        "syllabus_area": "II.3",
+        "reference_source": "Ethics, 6th ed., p. 219-221",
+        "content": "What do most associations' Codes of Ethics state regarding a professional's Duty to Colleagues?",
+        "hint": "The Code of Ethics specifies a standard of professional conduct that extends to interactions with fellow practitioners.",
+        "options": [
+          {
+            "text": "There is no specific section regarding the Duty to Colleagues",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Professionals must act with courtesy and good faith towards colleagues",
+            "correct": true,
+            "position": 2
+          },
+          {
+            "text": "Colleagues should be treated as one would like to be treated",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "Professionals must be civil, but their primary duty is to report any negligence.\nHint: The Code of Ethics specifies a standard of professional conduct that extends to interactions with fellow practitioners.\nAnswer Key & Details:\n•\tCorrect Answer: B\n•\tRationale: The duty to colleagues is a standard component of the Code of Ethics. It explicitly requires professionals to conduct themselves with fairness, courtesy, and good faith toward fellow practitioners and to give credit where it is due.\n•\tDifficulty: 1 (EASY)\n•\tNPPE Syllabus Area: II.3\n•\tSource Reference: Ethics, 6th ed., p. 219-221\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "The duty to colleagues is a standard component of the Code of Ethics. It explicitly requires professionals to conduct themselves with fairness, courtesy, and good faith toward fellow practitioners and to give credit where it is due."
+      },
+      {
+        "id": 34,
+        "slug": "an-alcohol-free-town-accepts-billboard-sponsorship-34",
+        "type": "multiple_choice_single",
+        "difficulty": "hard",
+        "topic": "Ethics",
+        "subtopic": "II.4",
+        "syllabus_area": "II.4",
+        "reference_source": "Ethics, 6th ed., p. 240-241",
+        "content": "An alcohol-free town accepts billboard sponsorship from a beverage company that currently advertises a soft drink but has reserved the right to promote its alcoholic beverages in the future. What category of conflict of interest does this best represent?",
+        "hint": "A potential conflict is a situation that is not a conflict now but could become one depending on future events.",
+        "options": [
+          {
+            "text": "An actual conflict of interest",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "A perceived conflict of interest",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "No conflict of interest",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "A potential conflict of interest.\nHint: A potential conflict is a situation that is not a conflict now but could become one depending on future events.\nAnswer Key & Details:\n•\tCorrect Answer: D\n•\tRationale: This is a potential conflict of interest. Currently, there is no conflict, as a soft drink is being advertised. However, a conflict between the town's alcohol-free policy and the company's interests could arise in the future if the company decides to exercise its right to advertise alcoholic products.\n•\tDifficulty: 3 (DIFFICULT)\n•\tNPPE Syllabus Area: II.4\n•\tSource Reference: Ethics, 6th ed., p. 240-241\n--------------------------------------------------------------------------------",
+            "correct": true,
+            "position": 4
+          }
+        ],
+        "explanation": "This is a potential conflict of interest. Currently, there is no conflict, as a soft drink is being advertised. However, a conflict between the town's alcohol-free policy and the company's interests could arise in the future if the company decides to exercise its right to advertise alcoholic products."
+      },
+      {
+        "id": 35,
+        "slug": "if-a-practitioner-reports-dishonest-or-unethical-c-35",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Ethics",
+        "subtopic": "II.4",
+        "syllabus_area": "II.4",
+        "reference_source": "Engineers Canada, Public Guideline on the Code of Ethics, tenet 10",
+        "content": "If a practitioner reports dishonest or unethical conduct by another practitioner, how would this action be characterized according to most Codes of Ethics?",
+        "hint": "Upholding the standards of the profession sometimes requires reporting those who fail to meet them. This action serves a higher professional duty.",
+        "options": [
+          {
+            "text": "As an act that injures the other practitioner's reputation",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "As a failure to act towards others with courtesy and good faith",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "As an action that maintains the honour and integrity of the profession",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "As an action showing a lack of professional integrity.\nHint: Upholding the standards of the profession sometimes requires reporting those who fail to meet them. This action serves a higher professional duty.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: The Code of Ethics obligates professionals to uphold the standards, honour, and integrity of their profession. Reporting known instances of unethical or dishonest conduct by another practitioner is a fulfillment of this duty, as it helps to maintain public trust and protect the profession's reputation.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: II.4\n•\tSource Reference: Engineers Canada, Public Guideline on the Code of Ethics, tenet 10\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "The Code of Ethics obligates professionals to uphold the standards, honour, and integrity of their profession. Reporting known instances of unethical or dishonest conduct by another practitioner is a fulfillment of this duty, as it helps to maintain public trust and protect the profession's reputation."
+      },
+      {
+        "id": 36,
+        "slug": "a-professional-engineer-relies-on-commercial-softw-36",
+        "type": "multiple_choice_single",
+        "difficulty": "hard",
+        "topic": "Professional Practice",
+        "subtopic": "III.7",
+        "syllabus_area": "III.7",
+        "reference_source": "Ethics, 6th ed., p. 166",
+        "content": "A professional engineer relies on commercial software for a project design. The design fails after implementation, causing injury. In a subsequent lawsuit, what question is a defence lawyer most likely to ask the engineer?",
+        "hint": "A professional cannot blindly trust the output of a software tool. They are responsible for demonstrating due diligence in confirming the results.",
+        "options": [
+          {
+            "text": "What tests were performed to verify the software was operating correctly?",
+            "correct": true,
+            "position": 1
+          },
+          {
+            "text": "Was this the best software available for the application?",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Did you read the software's operating manual?",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "Did the software company provide adequate training?\nHint: A professional cannot blindly trust the output of a software tool. They are responsible for demonstrating due diligence in confirming the results.\nAnswer Key & Details:\n•\tCorrect Answer: A\n•\tRationale: Professionals are ultimately responsible for their work, including results generated by software. In a lawsuit, demonstrating due diligence is key. A lawyer will focus on whether the engineer took reasonable steps to test and verify the software's output, rather than just accepting it, to ensure it was correct and appropriate for the application.\n•\tDifficulty: 3 (DIFFICULT)\n•\tNPPE Syllabus Area: III.7\n•\tSource Reference: Ethics, 6th ed., p. 166\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "Professionals are ultimately responsible for their work, including results generated by software. In a lawsuit, demonstrating due diligence is key. A lawyer will focus on whether the engineer took reasonable steps to test and verify the software's output, rather than just accepting it, to ensure it was correct and appropriate for the application."
+      },
+      {
+        "id": 37,
+        "slug": "sexual-harassment-is-defined-by-several-key-charac-37",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Professional Practice",
+        "subtopic": "III.1",
+        "syllabus_area": "III.1",
+        "reference_source": "Ethics, 6th ed., p. 190-191",
+        "content": "Sexual harassment is defined by several key characteristics. Which of the following is NOT a defining characteristic of sexual harassment?",
+        "hint": "While harassment can be physical, it is not limited to physical acts. One option describes an act that is legally defined as a criminal offense, distinct from the broader definition of harassment.",
+        "options": [
+          {
+            "text": "The behaviour is initiated by someone with more power than the victim",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "The behaviour is unwelcome",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "The behaviour must involve physical contact of a sexual nature",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "The behaviour is sexual or relates to the gender of the person.\nHint: While harassment can be physical, it is not limited to physical acts. One option describes an act that is legally defined as a criminal offense, distinct from the broader definition of harassment.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: Sexual harassment includes a wide range of unwelcome verbal, non-verbal, and physical behaviours of a sexual nature. It does not require physical contact. Physical contact of a sexual nature without consent is defined as sexual assault, which is a criminal offense and distinct from harassment.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: III.1\n•\tSource Reference: Ethics, 6th ed., p. 190-191\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "Sexual harassment includes a wide range of unwelcome verbal, non-verbal, and physical behaviours of a sexual nature. It does not require physical contact. Physical contact of a sexual nature without consent is defined as sexual assault, which is a criminal offense and distinct from harassment."
+      },
+      {
+        "id": 38,
+        "slug": "the-love-canal-environmental-disaster-in-niagara-f-38",
+        "type": "multiple_choice_single",
+        "difficulty": "easy",
+        "topic": "Professional Practice",
+        "subtopic": "III.6",
+        "syllabus_area": "III.6",
+        "reference_source": "Ethics, 6th ed., p. 343-344",
+        "content": "The Love Canal environmental disaster in Niagara Falls, New York, which caused widespread illness and birth defects in the 1970s, was found to be the direct consequence of what?",
+        "hint": "This landmark environmental disaster involved toxic chemicals leaching into a residential community from a former industrial site.",
+        "options": [
+          {
+            "text": "Improper disposal of toxic industrial waste",
+            "correct": true,
+            "position": 1
+          },
+          {
+            "text": "Low safety standards at a nearby nuclear power plant",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Mercury poisoning from a local river",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "An explosion at a chemical plant.\nHint: This landmark environmental disaster involved toxic chemicals leaching into a residential community from a former industrial site.\nAnswer Key & Details:\n•\tCorrect Answer: A\n•\tRationale: The Love Canal tragedy was caused by the improper disposal of thousands of tons of toxic chemical waste by a company decades earlier. The waste, buried in an abandoned canal, leached into the soil and water of the residential neighbourhood built on top of it, leading to severe health consequences for residents.\n•\tDifficulty: 1 (EASY)\n•\tNPPE Syllabus Area: III.6\n•\tSource Reference: Ethics, 6th ed., p. 343-344\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "The Love Canal tragedy was caused by the improper disposal of thousands of tons of toxic chemical waste by a company decades earlier. The waste, buried in an abandoned canal, leached into the soil and water of the residential neighbourhood built on top of it, leading to severe health consequences for residents."
+      },
+      {
+        "id": 39,
+        "slug": "in-which-jurisdictions-is-liability-insurance-also-39",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Professional Practice",
+        "subtopic": "III.5",
+        "syllabus_area": "III.5",
+        "reference_source": "Ethics, 6th ed., p. 108",
+        "content": "In which jurisdictions is liability insurance (also known as \"errors and omissions\" insurance) mandatory, and for which group of professionals is it most essential?",
+        "hint": "Consider who has direct contractual relationships with clients and thus bears the most direct liability. Also, note that insurance requirements vary by jurisdiction.",
+        "options": [
+          {
+            "text": "In some provinces/territories; for professionals in private practice",
+            "correct": true,
+            "position": 1
+          },
+          {
+            "text": "In all provinces/territories; for professionals in private practice",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "In some provinces/territories; for professionals employed by large corporations",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "In all provinces/territories; for professionals employed by large corporations.\nHint: Consider who has direct contractual relationships with clients and thus bears the most direct liability. Also, note that insurance requirements vary by jurisdiction.\nAnswer Key & Details:\n•\tCorrect Answer: A\n•\tRationale: Liability insurance requirements are not uniform across Canada; it is mandatory only in some jurisdictions. This type of insurance is most critical for professionals in private practice (e.g., consultants) because they bear direct liability and have a higher risk of being sued compared to employees of large firms, who are often covered by their employer's insurance.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: III.5\n•\tSource Reference: Ethics, 6th ed., p. 108\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "Liability insurance requirements are not uniform across Canada; it is mandatory only in some jurisdictions. This type of insurance is most critical for professionals in private practice (e.g., consultants) because they bear direct liability and have a higher risk of being sued compared to employees of large firms, who are often covered by their employer's insurance."
+      },
+      {
+        "id": 40,
+        "slug": "a-professional-member-posts-untrue-statements-abou-40",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Professional Practice",
+        "subtopic": "III.10",
+        "syllabus_area": "III.10",
+        "reference_source": "Law, 3rd ed., p. 288",
+        "content": "A professional member posts untrue statements about another person on an online forum, causing injury to that person's reputation and leading to financial loss. What are the legal implications of this action?",
+        "hint": "False statements that harm someone's reputation, regardless of the medium used to publish them, can have legal consequences under tort law.",
+        "options": [
+          {
+            "text": "It can result in an actionable tort claim for defamation",
+            "correct": true,
+            "position": 1
+          },
+          {
+            "text": "It cannot lead to any legal liability because it was online",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "It is more legally enforceable than defamation in other mediums",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "It is less legally enforceable than defamation in other mediums.\nHint: False statements that harm someone's reputation, regardless of the medium used to publish them, can have legal consequences under tort law.\nAnswer Key & Details:\n•\tCorrect Answer: A\n•\tRationale: Making false statements that injure another party's reputation is the tort of defamation (specifically, libel, as it is written). The medium of communication, whether print or online (cyber-libel), does not negate legal liability. Such actions can lead to a lawsuit and a claim for damages.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: III.10\n•\tSource Reference: Law, 3rd ed., p. 288\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "Making false statements that injure another party's reputation is the tort of defamation (specifically, libel, as it is written). The medium of communication, whether print or online (cyber-libel), does not negate legal liability. Such actions can lead to a lawsuit and a claim for damages."
+      },
+      {
+        "id": 41,
+        "slug": "in-the-context-of-standards-and-codes-of-practice--41",
+        "type": "multiple_choice_single",
+        "difficulty": "hard",
+        "topic": "Professional Practice",
+        "subtopic": "III.4",
+        "syllabus_area": "III.4",
+        "reference_source": "Practice PPE Exams, Finality",
+        "content": "In the context of standards and codes of practice, what do the terms \"finality\" and \"interpretation\" refer to?",
+        "hint": "Finality is the end-state of a professional document that makes it reliable for others. Interpretation is the process a professional uses to get it there.",
+        "options": [
+          {
+            "text": "Finality is the time taken to review drawings; interpretation allows compliance when needed",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Finality is the state a document reaches after evaluation; interpretation is the process of applying codes to achieve that state",
+            "correct": true,
+            "position": 2
+          },
+          {
+            "text": "Finality is the act of sealing a document; interpretation dictates how others will use the drawings",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "Finality is taking responsibility for work; interpretation allows a contractor to choose the construction method.\nHint: Finality is the end-state of a professional document that makes it reliable for others. Interpretation is the process a professional uses to get it there.\nAnswer Key & Details:\n•\tCorrect Answer: B\n•\tRationale: \"Interpretation\" refers to the professional's process of reviewing, understanding, and applying relevant codes and standards to their work. \"Finality\" is the state that work reaches once this process is complete, signifying that the document is reliable and can be used by others for its intended purpose.\n•\tDifficulty: 3 (DIFFICULT)\n•\tNPPE Syllabus Area: III.4\n•\tSource Reference: Practice PPE Exams, Finality\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "\"Interpretation\" refers to the professional's process of reviewing, understanding, and applying relevant codes and standards to their work. \"Finality\" is the state that work reaches once this process is complete, signifying that the document is reliable and can be used by others for its intended purpose."
+      },
+      {
+        "id": 42,
+        "slug": "which-of-the-following-statements-about-the-use-of-42",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Professional Practice",
+        "subtopic": "III.8",
+        "syllabus_area": "III.8",
+        "reference_source": "Ethics, 6th ed., p. 48, 99",
+        "content": "Which of the following statements about the use of a professional seal is TRUE?",
+        "hint": "The purpose of the professional seal is to authenticate technical work for which the professional takes responsibility. Consider what types of documents and what stage of completion this applies to.",
+        "options": [
+          {
+            "text": "The professional may seal a document that does not contain technical information",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "The professional may seal both preliminary and final drawings",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "The document that the professional seals must contain technical information",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "The professional must seal every page of a multi-page report.\nHint: The purpose of the professional seal is to authenticate technical work for which the professional takes responsibility. Consider what types of documents and what stage of completion this applies to.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: The professional seal is intended to authenticate and take responsibility for technical documents. Therefore, a seal should only be applied to documents containing technical information. It should only be applied to final documents, not preliminary ones, and sealing only the title page of a report is often sufficient.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: III.8\n•\tSource Reference: Ethics, 6th ed., p. 48, 99\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "The professional seal is intended to authenticate and take responsibility for technical documents. Therefore, a seal should only be applied to documents containing technical information. It should only be applied to final documents, not preliminary ones, and sealing only the title page of a report is often sufficient."
+      },
+      {
+        "id": 43,
+        "slug": "according-to-douglas-mcgregors-management-styles-w-43",
+        "type": "multiple_choice_single",
+        "difficulty": "easy",
+        "topic": "Professional Practice",
+        "subtopic": "III.1",
+        "syllabus_area": "III.1",
+        "reference_source": "Ethics, 6th ed., p. 102",
+        "content": "According to Douglas McGregor's management styles, what does the \"Theory Y\" style of management argue?",
+        "hint": "Theory \"Y\" represents a positive and optimistic view of employee motivation and behavior.",
+        "options": [
+          {
+            "text": "Managers should let employees make their own schedules without any framework",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Managers must profile their employees' personality types before managing them",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Employees are naturally inclined to work and will excel if properly motivated",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "Employees inherently dislike work and must be closely monitored and controlled.\nHint: Theory \"Y\" represents a positive and optimistic view of employee motivation and behavior.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: Theory Y is a management style based on the optimistic assumption that employees are naturally self-motivated, enjoy their work, and will perform well if they are committed to the objectives. This contrasts with Theory X, which assumes employees are inherently lazy and require close supervision.\n•\tDifficulty: 1 (EASY)\n•\tNPPE Syllabus Area: III.1\n•\tSource Reference: Ethics, 6th ed., p. 102\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "Theory Y is a management style based on the optimistic assumption that employees are naturally self-motivated, enjoy their work, and will perform well if they are committed to the objectives. This contrasts with Theory X, which assumes employees are inherently lazy and require close supervision."
+      },
+      {
+        "id": 44,
+        "slug": "after-acquiring-new-commercial-engineering-softwar-44",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Professional Practice",
+        "subtopic": "III.7",
+        "syllabus_area": "III.7",
+        "reference_source": "Ethics, 6th ed., p. 167",
+        "content": "After acquiring new commercial engineering software, what is a quick, inexpensive, and realistic first step to begin verifying its accuracy?",
+        "hint": "Think of a simple \"sanity check\" that can be performed to see if the software produces expected results for a basic, known scenario.",
+        "options": [
+          {
+            "text": "Perform a complete duplication of a complex computation using different software",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Inspect the software's source code for programming errors",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Perform a simple hand calculation of a known problem and compare the results",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "Test the software on different computer hardware configurations.\nHint: Think of a simple \"sanity check\" that can be performed to see if the software produces expected results for a basic, known scenario.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: Performing a simple hand calculation for a basic problem with a known answer is a fundamental \"sanity check.\" It's a fast and effective way to gain initial confidence that the software is producing reasonable results before relying on it for more complex, unknown problems.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: III.7\n•\tSource Reference: Ethics, 6th ed., p. 167\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "Performing a simple hand calculation for a basic problem with a known answer is a fundamental \"sanity check.\" It's a fast and effective way to gain initial confidence that the software is producing reasonable results before relying on it for more complex, unknown problems."
+      },
+      {
+        "id": 45,
+        "slug": "what-are-two-common-methods-used-to-combat-interne-45",
+        "type": "multiple_choice_single",
+        "difficulty": "easy",
+        "topic": "Professional Practice",
+        "subtopic": "III.7",
+        "syllabus_area": "III.7",
+        "reference_source": "Law, 3rd ed., p. 289",
+        "content": "What are two common methods used to combat internet-based threats such as hackers, viruses, and other malicious intrusions?",
+        "hint": "Consider the two primary types of protective software: one that acts as a barrier to unauthorized network access, and one that detects and removes malicious programs.",
+        "options": [
+          {
+            "text": "A firewall and cloud computing",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "A firewall and antivirus software",
+            "correct": true,
+            "position": 2
+          },
+          {
+            "text": "Antivirus software and an internet service provider",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "Antivirus software and data encryption.\nHint: Consider the two primary types of protective software: one that acts as a barrier to unauthorized network access, and one that detects and removes malicious programs.\nAnswer Key & Details:\n•\tCorrect Answer: B\n•\tRationale: A firewall acts as a barrier, monitoring and controlling incoming and outgoing network traffic to block unauthorized access. Antivirus software is designed to detect, prevent, and remove malicious software (malware) that has made its way onto a computer. Together, they form a primary layer of cybersecurity.\n•\tDifficulty: 1 (EASY)\n•\tNPPE Syllabus Area: III.7\n•\tSource Reference: Law, 3rd ed., p. 289\n-------------------------------------------------------------------------------- \n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "A firewall acts as a barrier, monitoring and controlling incoming and outgoing network traffic to block unauthorized access. Antivirus software is designed to detect, prevent, and remove malicious software (malware) that has made its way onto a computer. Together, they form a primary layer of cybersecurity."
+      },
+      {
+        "id": 46,
+        "slug": "what-is-a-key-legal-consideration-when-undertaking-46",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Law and Legal Concepts",
+        "subtopic": "IV.14",
+        "syllabus_area": "IV.14",
+        "reference_source": "Law, 3rd ed., p. 278",
+        "content": "What is a key legal consideration when undertaking projects on Indigenous reserve property in Canada?",
+        "hint": "Indigenous reserve land has a unique legal status as unpatented land, which affects how financial instruments like mortgages can be applied.",
+        "options": [
+          {
+            "text": "Corporations are required to form a joint venture with an Indigenous contractor",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Project revenue generated on the land is taxed at a higher rate",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Mortgages cannot be registered against the property",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "Consultation is required with all Indigenous peoples within a 25 km radius.\nHint: Indigenous reserve land has a unique legal status as unpatented land, which affects how financial instruments like mortgages can be applied.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: Indigenous reserve land is typically unpatented Crown land set aside for the use of a First Nation. Because it is not available for private ownership, standard financial instruments like mortgages cannot be registered against the property, which can complicate project financing.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: IV.14\n•\tSource Reference: Law, 3rd ed., p. 278\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "Indigenous reserve land is typically unpatented Crown land set aside for the use of a First Nation. Because it is not available for private ownership, standard financial instruments like mortgages cannot be registered against the property, which can complicate project financing."
+      },
+      {
+        "id": 47,
+        "slug": "environmental-law-applies-at-the-municipal-provinc-47",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Law and Legal Concepts",
+        "subtopic": "IV.11",
+        "syllabus_area": "IV.11",
+        "reference_source": "Law, 3rd ed., p. 272-273",
+        "content": "Environmental law applies at the municipal, provincial, and federal levels of government. Which of the following environmental regulations is typically an exclusive federal responsibility?",
+        "hint": "One of these activities is specifically regulated at the federal level due to its inter-provincial and international nature.",
+        "options": [
+          {
+            "text": "Environmental assessment requirements for local projects",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Establishment of offences for local pollution",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Regulation of conduct that is potentially harmful (e.g., local emissions)",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "Transportation of dangerous goods.\nHint: One of these activities is specifically regulated at the federal level due to its inter-provincial and international nature.\nAnswer Key & Details:\n•\tCorrect Answer: D\n•\tRationale: The Transportation of Dangerous Goods Act is federal legislation because the movement of such goods often crosses provincial and international borders, falling under federal jurisdiction for trade and commerce. The other items are typically managed at the provincial or municipal level, though federal oversight can also apply.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: IV.11\n•\tSource Reference: Law, 3rd ed., p. 272-273\n--------------------------------------------------------------------------------",
+            "correct": true,
+            "position": 4
+          }
+        ],
+        "explanation": "The Transportation of Dangerous Goods Act is federal legislation because the movement of such goods often crosses provincial and international borders, falling under federal jurisdiction for trade and commerce. The other items are typically managed at the provincial or municipal level, though federal oversight can also apply."
+      },
+      {
+        "id": 48,
+        "slug": "what-is-the-primary-obligation-of-a-professional-e-48",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Law and Legal Concepts",
+        "subtopic": "IV.8",
+        "syllabus_area": "IV.8",
+        "reference_source": "Law, 3rd ed., p. 169",
+        "content": "What is the primary obligation of a professional engineer or geoscientist when acting as an expert witness in court?",
+        "hint": "The primary duty of an expert witness is to the court, not to the party that hired them. This requires a specific stance.",
+        "options": [
+          {
+            "text": "To ensure they are paid a contingent fee based on the outcome",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "To review every fact of the case before taking the stand",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "To remain neutral and provide an independent opinion to the court",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "To restrict testimony to technical problems that are black and white.\nHint: The primary duty of an expert witness is to the court, not to the party that hired them. This requires a specific stance.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: An expert witness's paramount duty is to assist the court with an objective, independent, and impartial opinion in their area of expertise. They are not an advocate for the party who hired them. This neutrality is essential to their credibility and function in the legal process.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: IV.8\n•\tSource Reference: Law, 3rd ed., p. 169\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "An expert witness's paramount duty is to assist the court with an objective, independent, and impartial opinion in their area of expertise. They are not an advocate for the party who hired them. This neutrality is essential to their credibility and function in the legal process."
+      },
+      {
+        "id": 49,
+        "slug": "which-of-the-following-statements-about-intellectu-49",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Law and Legal Concepts",
+        "subtopic": "IV.7",
+        "syllabus_area": "IV.7",
+        "reference_source": "Law, 3rd ed., p. 30",
+        "content": "Which of the following statements about intellectual property in Canada is true?",
+        "hint": "One type of intellectual property protection comes into existence automatically the moment an original work is created in a fixed form.",
+        "options": [
+          {
+            "text": "Trademark ownership can only be granted through official registration",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Copyright protection is granted automatically upon the creation of an original work",
+            "correct": true,
+            "position": 2
+          },
+          {
+            "text": "A patent granted in Canada provides worldwide protection",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "Trade secrets are limited to secret formulas or business mysteries.\nHint: One type of intellectual property protection comes into existence automatically the moment an original work is created in a fixed form.\nAnswer Key & Details:\n•\tCorrect Answer: B\n•\tRationale: In Canada, copyright protection for an original literary, artistic, dramatic, or musical work arises automatically as soon as the work is created in a fixed form (e.g., written down, recorded). While registration provides additional benefits and proof of ownership, it is not required for the copyright to exist.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: IV.7\n•\tSource Reference: Law, 3rd ed., p. 30\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "In Canada, copyright protection for an original literary, artistic, dramatic, or musical work arises automatically as soon as the work is created in a fixed form (e.g., written down, recorded). While registration provides additional benefits and proof of ownership, it is not required for the copyright to exist."
+      },
+      {
+        "id": 50,
+        "slug": "which-of-the-following-statements-is-true-about-ar-50",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Law and Legal Concepts",
+        "subtopic": "IV.6",
+        "syllabus_area": "IV.6",
+        "reference_source": "Law, 3rd ed., p. 165-167",
+        "content": "Which of the following statements is true about arbitration as a method of dispute resolution?",
+        "hint": "Arbitration is a form of dispute resolution where the involved parties have significant control over the process itself.",
+        "options": [
+          {
+            "text": "Arbitrators are generally considered more biased than court judges",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "It is always cheaper than litigation",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "The involved parties set the procedural rules and choose the arbitrator",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "It is a more public process than a lawsuit.\nHint: Arbitration is a form of dispute resolution where the involved parties have significant control over the process itself.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: A key feature of arbitration is party autonomy. The parties involved in the dispute have significant control over the process, including agreeing on the rules of procedure and mutually selecting the arbitrator who will hear the case. Arbitration is private, and its cost can vary.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: IV.6\n•\tSource Reference: Law, 3rd ed., p. 165-167\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "A key feature of arbitration is party autonomy. The parties involved in the dispute have significant control over the process, including agreeing on the rules of procedure and mutually selecting the arbitrator who will hear the case. Arbitration is private, and its cost can vary."
+      },
+      {
+        "id": 51,
+        "slug": "canada-has-two-legal-systems-what-are-the-historic-51",
+        "type": "multiple_choice_single",
+        "difficulty": "easy",
+        "topic": "Law and Legal Concepts",
+        "subtopic": "IV.1",
+        "syllabus_area": "IV.1",
+        "reference_source": "Law, 3rd ed., p. 4",
+        "content": "Canada has two legal systems. What are the historical origins of the civil law system in Québec and the common law system used in the rest of the country, respectively?",
+        "hint": "Consider the historical colonial influences on the legal traditions of Quebec and the rest of Canada.",
+        "options": [
+          {
+            "text": "Belgian civil law; Indian common law",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Haitian civil law; American common law",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Spanish civil law; English common law",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "French civil law; British common law\nHint: Consider the historical colonial influences on the legal traditions of Quebec and the rest of Canada.\nAnswer Key & Details:\n•\tCorrect Answer: D\n•\tRationale: Quebec's legal system is based on the French civil law tradition, reflecting its history as a French colony. The rest of Canada operates under the British common law system, which is based on judicial precedent and was inherited from its history as a British colony.\n•\tDifficulty: 1 (EASY)\n•\tNPPE Syllabus Area: IV.1\n•\tSource Reference: Law, 3rd ed., p. 4\n--------------------------------------------------------------------------------",
+            "correct": true,
+            "position": 4
+          }
+        ],
+        "explanation": "Quebec's legal system is based on the French civil law tradition, reflecting its history as a French colony. The rest of Canada operates under the British common law system, which is based on judicial precedent and was inherited from its history as a British colony."
+      },
+      {
+        "id": 52,
+        "slug": "torts-are-civil-wrongs-that-are-divided-into-inten-52",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Law and Legal Concepts",
+        "subtopic": "IV.3",
+        "syllabus_area": "IV.3",
+        "reference_source": "Law, 3rd ed., p. 136",
+        "content": "Torts are civil wrongs that are divided into intentional and unintentional categories. Which of the following are all examples of intentional torts?",
+        "hint": "Identify which actions in the lists require a deliberate act or intent, as opposed to arising from carelessness or a failure to exercise due care.",
+        "options": [
+          {
+            "text": "Negligent misrepresentation, Trespass, Negligence",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Defamation, Negligence, Trespass",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Fraud, Trespass, and Defamation",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "Negligence, Defamation, Fraud\nHint: Identify which actions in the lists require a deliberate act or intent, as opposed to arising from carelessness or a failure to exercise due care.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: Fraud, trespass, and defamation are all intentional torts because they involve a deliberate action. Negligence and negligent misrepresentation are unintentional torts, as they arise from a failure to exercise a reasonable standard of care, not from an intent to cause harm.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: IV.3\n•\tSource Reference: Law, 3rd ed., p. 136\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "Fraud, trespass, and defamation are all intentional torts because they involve a deliberate action. Negligence and negligent misrepresentation are unintentional torts, as they arise from a failure to exercise a reasonable standard of care, not from an intent to cause harm."
+      },
+      {
+        "id": 53,
+        "slug": "for-a-contract-to-be-legally-enforceable-several-e-53",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Law and Legal Concepts",
+        "subtopic": "IV.2",
+        "syllabus_area": "IV.2",
+        "reference_source": "Law, 3rd ed., p. 47, 51, 53",
+        "content": "For a contract to be legally enforceable, several elements must be present. Which of the following is NOT a mandatory element for a valid contract?",
+        "hint": "For a contract to be valid, there must be an exchange of value, known as \"consideration.\" This value does not always have to be monetary.",
+        "options": [
+          {
+            "text": "The parties must exchange money",
+            "correct": true,
+            "position": 1
+          },
+          {
+            "text": "The parties must intend to create a legal relationship",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Verbal agreements can be binding",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "Minors generally cannot be bound by a contract.\nHint: For a contract to be valid, there must be an exchange of value, known as \"consideration.\" This value does not always have to be monetary.\nAnswer Key & Details:\n•\tCorrect Answer: A\n•\tRationale: A valid contract requires \"consideration,\" which is an exchange of something of value, but it does not have to be money. The value can be a service, a good, a promise, or the forbearance of a right. The other statements are true characteristics of enforceable contracts.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: IV.2\n•\tSource Reference: Law, 3rd ed., p. 47, 51, 53\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "A valid contract requires \"consideration,\" which is an exchange of something of value, but it does not have to be money. The value can be a service, a good, a promise, or the forbearance of a right. The other statements are true characteristics of enforceable contracts."
+      },
+      {
+        "id": 54,
+        "slug": "human-rights-legislation-prohibits-discrimination--54",
+        "type": "multiple_choice_single",
+        "difficulty": "hard",
+        "topic": "Law and Legal Concepts",
+        "subtopic": "IV.5",
+        "syllabus_area": "IV.5",
+        "reference_source": "Law, 3rd ed., p. 255",
+        "content": "Human rights legislation prohibits discrimination in hiring, but not all forms of discrimination are illegal. Discrimination may be acceptable under which of the following circumstances?",
+        "hint": "Discrimination may be permissible if it is based on a bona fide occupational requirement—a standard that is essential for performing the job safely and effectively.",
+        "options": [
+          {
+            "text": "It is based on a bona fide occupational requirement related to age",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "It is based on a customer's religious preference",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "It is based on a physical disability that is a bona fide occupational requirement",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "It is based on the gender of the applicant.\nHint: Discrimination may be permissible if it is based on a bona fide occupational requirement—a standard that is essential for performing the job safely and effectively.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: Discrimination is permissible if it is based on a \"bona fide occupational requirement\" (BFOR). For example, if a job requires a certain level of physical ability to be performed safely and effectively, discriminating on the basis of a physical disability that prevents the performance of that essential duty may be legally acceptable, provided the employer has met their duty to accommodate to the point of undue hardship.\n•\tDifficulty: 3 (DIFFICULT)\n•\tNPPE Syllabus Area: IV.5\n•\tSource Reference: Law, 3rd ed., p. 255\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "Discrimination is permissible if it is based on a \"bona fide occupational requirement\" (BFOR). For example, if a job requires a certain level of physical ability to be performed safely and effectively, discriminating on the basis of a physical disability that prevents the performance of that essential duty may be legally acceptable, provided the employer has met their duty to accommodate to the point of undue hardship."
+      },
+      {
+        "id": 55,
+        "slug": "what-is-the-primary-purpose-of-a-request-for-quali-55",
+        "type": "multiple_choice_single",
+        "difficulty": "easy",
+        "topic": "Law and Legal Concepts",
+        "subtopic": "IV.2",
+        "syllabus_area": "IV.2",
+        "reference_source": "Law, 3rd ed., p. 92",
+        "content": "What is the primary purpose of a Request for Qualifications (RFQ) in the procurement process?",
+        "hint": "An RFQ is a procurement tool used to pre-screen potential bidders based on their expertise, resources, and experience, rather than on cost.",
+        "options": [
+          {
+            "text": "To identify respondents who are located closest to the project site",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "To select the respondent who will provide the lowest price",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "To pre-screen and shortlist respondents who are capable of performing the required service",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "To determine which respondents are the most honest.\nHint: An RFQ is a procurement tool used to pre-screen potential bidders based on their expertise, resources, and experience, rather than on cost.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: An RFQ is used early in the procurement process to evaluate and shortlist potential service providers based on their qualifications, such as experience, personnel, and financial stability. It focuses on capability and competence, not on price, which is typically addressed later in the process (e.g., in a Request for Proposal or tender).\n•\tDifficulty: 1 (EASY)\n•\tNPPE Syllabus Area: IV.2\n•\tSource Reference: Law, 3rd ed., p. 92\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "An RFQ is used early in the procurement process to evaluate and shortlist potential service providers based on their qualifications, such as experience, personnel, and financial stability. It focuses on capability and competence, not on price, which is typically addressed later in the process (e.g., in a Request for Proposal or tender)."
+      },
+      {
+        "id": 56,
+        "slug": "the-supreme-courts-ruling-in-the-ron-engineering-c-56",
+        "type": "multiple_choice_single",
+        "difficulty": "hard",
+        "topic": "Law and Legal Concepts",
+        "subtopic": "IV.2",
+        "syllabus_area": "IV.2",
+        "reference_source": "Law, 3rd ed., p. 49",
+        "content": "The Supreme Court's ruling in the Ron Engineering case established the \"Contract A / Contract B\" framework for tendering. What is a key principle of this framework?",
+        "hint": "This landmark case established that the bidding process itself creates a contract (Contract A) with every compliant bidder, separate from the main construction contract (Contract B).",
+        "options": [
+          {
+            "text": "There are often multiple Contract B's formed for larger projects",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Contract A is formed with every bidder who submits a compliant bid",
+            "correct": true,
+            "position": 2
+          },
+          {
+            "text": "Contract A is another name for the main construction contract",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "Contract B is formed with one of the bidders upon the low bidder's acceptance.\nHint: This landmark case established that the bidding process itself creates a contract (Contract A) with every compliant bidder, separate from the main construction contract (Contract B).\nAnswer Key & Details:\n•\tCorrect Answer: B\n•\tRationale: The Ron Engineering decision established that the act of submitting a compliant bid in response to a call for tenders creates a preliminary contract, \"Contract A,\" between the owner and each compliant bidder. This contract governs the bidding process itself. \"Contract B,\" the main construction contract, is only formed later when the owner accepts one of the bids.\n•\tDifficulty: 3 (DIFFICULT)\n•\tNPPE Syllabus Area: IV.2\n•\tSource Reference: Law, 3rd ed., p. 49\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "The Ron Engineering decision established that the act of submitting a compliant bid in response to a call for tenders creates a preliminary contract, \"Contract A,\" between the owner and each compliant bidder. This contract governs the bidding process itself. \"Contract B,\" the main construction contract, is only formed later when the owner accepts one of the bids."
+      },
+      {
+        "id": 57,
+        "slug": "according-to-a-typical-engineers-and-geoscientists-57",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Regulation & Licensing",
+        "subtopic": "V.1",
+        "syllabus_area": "V.1",
+        "reference_source": "PEO, O. Reg. 941, s. 72(1)",
+        "content": "According to a typical Engineers and Geoscientists Act, a person with an expired registration who leads others to believe they are registered and in good standing is engaging in what?",
+        "hint": "This offense involves misrepresenting one's professional status, which falls under a specific category of misconduct within the Act.",
+        "options": [
+          {
+            "text": "Fraudulent registration",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Expired registration",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Professional misconduct",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "Unskilled practice\nHint: This offense involves misrepresenting one's professional status, which falls under a specific category of misconduct within the Act.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: Misrepresenting one's status as a licensed professional, including practicing with an expired licence or holding oneself out as licensed, is defined as professional misconduct under the regulations of the provincial and territorial Acts. This is a disciplinable offense.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: V.1\n•\tSource Reference: PEO, O. Reg. 941, s. 72(1)\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "Misrepresenting one's status as a licensed professional, including practicing with an expired licence or holding oneself out as licensed, is defined as professional misconduct under the regulations of the provincial and territorial Acts. This is a disciplinable offense."
+      },
+      {
+        "id": 58,
+        "slug": "an-engineering-graduate-danielle-includes-peng-aft-58",
+        "type": "multiple_choice_single",
+        "difficulty": "hard",
+        "topic": "Regulation & Licensing",
+        "subtopic": "V.1",
+        "syllabus_area": "V.1",
+        "reference_source": "Law, 3rd ed., p. 9",
+        "content": "An engineering graduate, Danielle, includes \"P.Eng.\" after her name on her resume, noting in small print that she is an applicant for the designation. Why is this a violation of the Professional Engineers Act?",
+        "hint": "The title \"P.Eng.\" is protected by law. Consider the distinction between an association's actions against non-members (enforcement) versus its actions against licensed members (discipline).",
+        "options": [
+          {
+            "text": "It is an offense subject to enforcement, as she has used the protected title \"P.Eng.\" without being a licensed member",
+            "correct": true,
+            "position": 1
+          },
+          {
+            "text": "It is an act of professional misconduct, and she will be disciplined by the association",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "It is permissible, as long as she has applied for the designation and indicates so on her resume",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "It is permissible, as she has graduated from an accredited engineering program.\nHint: The title \"P.Eng.\" is protected by law. Consider the distinction between an association's actions against non-members (enforcement) versus its actions against licensed members (discipline).\nAnswer Key & Details:\n•\tCorrect Answer: A\n•\tRationale: The title \"P.Eng.\" is legally reserved for individuals who are fully licensed by a professional engineering association. Using this protected title without a licence is an offense under the Act. Since Danielle is not yet a licensed member, the association's action against her would be \"enforcement\" (prosecuting a non-member), not \"discipline\" (action against a member).\n•\tDifficulty: 3 (DIFFICULT)\n•\tNPPE Syllabus Area: V.1\n•\tSource Reference: Law, 3rd ed., p. 9\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "The title \"P.Eng.\" is legally reserved for individuals who are fully licensed by a professional engineering association. Using this protected title without a licence is an offense under the Act. Since Danielle is not yet a licensed member, the association's action against her would be \"enforcement\" (prosecuting a non-member), not \"discipline\" (action against a member)."
+      },
+      {
+        "id": 59,
+        "slug": "a-homeowner-wishes-to-build-a-small-10-foot-bridge-59",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Regulation & Licensing",
+        "subtopic": "V.1",
+        "syllabus_area": "V.1",
+        "reference_source": "PEO, Professional Engineers Act, s. 12(2)",
+        "content": "A homeowner wishes to build a small 10-foot bridge over a stream on his private property for his own personal use (e.g., to drive a tractor to his barn). To what extent must a professional engineer be involved in this project?",
+        "hint": "Most provincial Acts contain exemptions for work done on one's own property, for one's own use, provided it does not impact public safety.",
+        "options": [
+          {
+            "text": "A P.Eng. must design and seal the plans, and also approve the final construction",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "The homeowner can design and build the bridge without the assistance of a professional engineer",
+            "correct": true,
+            "position": 2
+          },
+          {
+            "text": "A P.Eng. must design the bridge, but the homeowner can build it without final approval",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "The homeowner can design and build the bridge, but a P.Eng. must approve and seal it upon completion.\nHint: Most provincial Acts contain exemptions for work done on one's own property, for one's own use, provided it does not impact public safety.\nAnswer Key & Details:\n•\tCorrect Answer: B\n•\tRationale: Most provincial/territorial Engineering and Geoscience Acts include an exemption for individuals performing work on their own property for their sole use, as long as the work does not pose a risk to public safety. A small personal-use bridge on private land typically falls under this exemption.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: V.1\n•\tSource Reference: PEO, Professional Engineers Act, s. 12(2)\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "Most provincial/territorial Engineering and Geoscience Acts include an exemption for individuals performing work on their own property for their sole use, as long as the work does not pose a risk to public safety. A small personal-use bridge on private land typically falls under this exemption."
+      },
+      {
+        "id": 60,
+        "slug": "a-member-in-training-from-alberta-works-for-a-cana-60",
+        "type": "multiple_choice_single",
+        "difficulty": "hard",
+        "topic": "Regulation & Licensing",
+        "subtopic": "V.2",
+        "syllabus_area": "V.2",
+        "reference_source": "PEO, Experience Assessment",
+        "content": "A member-in-training from Alberta works for a Canadian mining company on a project in Australia for 12 months. Under what condition is this experience most likely to be accepted by their Canadian association for licensure?",
+        "hint": "The key requirement for work experience is that it is relevant to Canadian practice and can be properly supervised and validated by a Canadian professional.",
+        "options": [
+          {
+            "text": "Foreign work experience is never accepted",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "It is impossible for the association to assess foreign work experience",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "The experience will be accepted as long as the work involves applying Canadian laws, standards, codes, and practices",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "The experience will be accepted as long as the supervisor is a P.Eng. or P.Geo. registered in Canada.\nHint: The key requirement for work experience is that it is relevant to Canadian practice and can be properly supervised and validated by a Canadian professional.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: For foreign work experience to be considered acceptable for licensure in Canada, the applicant must demonstrate that the work was equivalent to what would be expected in a Canadian context. This includes applying principles and standards relevant to Canadian practice. While having a Canadian-licensed supervisor is beneficial, the nature of the work itself is the primary consideration.\n•\tDifficulty: 3 (DIFFICULT)\n•\tNPPE Syllabus Area: V.2\n•\tSource Reference: PEO, Experience Assessment\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "For foreign work experience to be considered acceptable for licensure in Canada, the applicant must demonstrate that the work was equivalent to what would be expected in a Canadian context. This includes applying principles and standards relevant to Canadian practice. While having a Canadian-licensed supervisor is beneficial, the nature of the work itself is the primary consideration."
+      },
+      {
+        "id": 61,
+        "slug": "to-become-a-licensed-professional-engineer-in-cana-61",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Regulation & Licensing",
+        "subtopic": "V.2",
+        "syllabus_area": "V.2",
+        "reference_source": "Engineers Canada, Overview of Licensing Process",
+        "content": "To become a licensed professional engineer in Canada, an applicant must meet several requirements. Which of the following is NOT one of these formal requirements?",
+        "hint": "While references are required to validate work experience, one of these options describes a requirement that is not part of the formal application process.",
+        "options": [
+          {
+            "text": "An academic requirement, typically a degree from a CEAB-accredited program",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "A professional practice exam requirement, such as passing the NPPE",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "A work experience requirement, typically four years of supervised work",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "A character requirement, involving personal reference letters from employers.\nHint: While references are required to validate work experience, one of these options describes a requirement that is not part of the formal application process.\nAnswer Key & Details:\n•\tCorrect Answer: D\n•\tRationale: The core requirements for licensure are academics, experience, and passing the professional practice exam. While applicants must demonstrate good character and provide references to verify their work experience, the submission of formal \"personal reference letters\" is not a distinct, standalone requirement in the same way as the other three.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: V.2\n•\tSource Reference: Engineers Canada, Overview of Licensing Process\n--------------------------------------------------------------------------------",
+            "correct": true,
+            "position": 4
+          }
+        ],
+        "explanation": "The core requirements for licensure are academics, experience, and passing the professional practice exam. While applicants must demonstrate good character and provide references to verify their work experience, the submission of formal \"personal reference letters\" is not a distinct, standalone requirement in the same way as the other three."
+      },
+      {
+        "id": 62,
+        "slug": "a-non-licensed-person-attempts-to-provide-engineer-62",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Regulation & Licensing",
+        "subtopic": "V.1",
+        "syllabus_area": "V.1",
+        "reference_source": "PEO, Report Unlicensed Practice",
+        "content": "A non-licensed person attempts to provide engineering services. Why does this pose a risk to public safety and the environment?",
+        "hint": "Practicing as an unregulated person means they are not bound by the professional standards and ethical obligations that are legally required of licensed members.",
+        "options": [
+          {
+            "text": "They do not carry the proper liability insurance",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "They may lack knowledge of, and are not bound by, the professional Code of Ethics",
+            "correct": true,
+            "position": 2
+          },
+          {
+            "text": "They have not been through the rigours of university",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "They are not able to pass a test.\nHint: Practicing as an unregulated person means they are not bound by the professional standards and ethical obligations that are legally required of licensed members.\nAnswer Key & Details:\n•\tCorrect Answer: B\n•\tRationale: Unlicensed individuals are not legally bound by the profession's Code of Ethics, which mandates that public safety be held paramount. They are not accountable to the professional association and have not been vetted for competence, character, or knowledge of their professional obligations, creating a significant risk to the public.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: V.1\n•\tSource Reference: PEO, Report Unlicensed Practice\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "Unlicensed individuals are not legally bound by the profession's Code of Ethics, which mandates that public safety be held paramount. They are not accountable to the professional association and have not been vetted for competence, character, or knowledge of their professional obligations, creating a significant risk to the public."
+      },
+      {
+        "id": 63,
+        "slug": "a-professional-engineer-licensed-with-engineers-no-63",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Regulation & Licensing",
+        "subtopic": "V.2",
+        "syllabus_area": "V.2",
+        "reference_source": "Ethics, 6th ed., p. 46",
+        "content": "A professional engineer licensed with Engineers Nova Scotia wishes to relocate and work in Alberta. They are a member in good standing with no history of professional misconduct. What agreement facilitates their ability to become licensed with APEGA?",
+        "hint": "This federal agreement facilitates the movement of qualified workers between all Canadian provinces and territories.",
+        "options": [
+          {
+            "text": "The Canada Engineering/Geoscience Mobility Agreement",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "The Inter-Provincial Mobility Agreement",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "The Agreement on Internal Trade (AIT)",
+            "correct": true,
+            "position": 3
+          },
+          {
+            "text": "The North American Free Trade Agreement (NAFTA)\nHint: This federal agreement facilitates the movement of qualified workers between all Canadian provinces and territories.\nAnswer Key & Details:\n•\tCorrect Answer: C\n•\tRationale: The Agreement on Internal Trade (AIT) is the overarching Canadian framework that ensures qualified professionals licensed in one province or territory can have their credentials recognized and become licensed in another with relative ease. This promotes labour mobility across the country.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: V.2\n•\tSource Reference: Ethics, 6th ed., p. 46\n--------------------------------------------------------------------------------",
+            "correct": false,
+            "position": 4
+          }
+        ],
+        "explanation": "The Agreement on Internal Trade (AIT) is the overarching Canadian framework that ensures qualified professionals licensed in one province or territory can have their credentials recognized and become licensed in another with relative ease. This promotes labour mobility across the country."
+      },
+      {
+        "id": 64,
+        "slug": "a-pgeo-accepts-a-project-in-an-unfamiliar-region-a-64",
+        "type": "multiple_choice_single",
+        "difficulty": "medium",
+        "topic": "Regulation & Licensing",
+        "subtopic": "V.1",
+        "syllabus_area": "V.1",
+        "reference_source": "PEO, O. Reg. 941, s. 72(1)",
+        "content": "A P.Geo. accepts a project in an unfamiliar region and fails to identify key soil instability indicators, resulting in significant damage. Most associations would find this P.Geo. acted incompetently, which is defined as a lack of knowledge, skill, or what other critical attribute?",
+        "hint": "The definition of this type of misconduct specifically includes a failure to apply appropriate knowledge, skill, or judgment in a professional situation.",
+        "options": [
+          {
+            "text": "Understanding",
+            "correct": false,
+            "position": 1
+          },
+          {
+            "text": "Experience",
+            "correct": false,
+            "position": 2
+          },
+          {
+            "text": "Good character",
+            "correct": false,
+            "position": 3
+          },
+          {
+            "text": "Judgment\nHint: The definition of this type of misconduct specifically includes a failure to apply appropriate knowledge, skill, or judgment in a professional situation.\nAnswer Key & Details:\n•\tCorrect Answer: D\n•\tRationale: Professional incompetence is typically defined in provincial Acts and regulations as a lack of knowledge, skill, or judgment of a nature or to an extent that demonstrates the member is unfit to practice. In this case, the P.Geo. failed to exercise sound judgment by proceeding without sufficient knowledge of the local conditions, leading to a negative outcome.\n•\tDifficulty: 2 (MODERATE)\n•\tNPPE Syllabus Area: V.1\n•\tSource Reference: PEO, O. Reg. 941, s. 72(1)",
+            "correct": true,
+            "position": 4
+          }
+        ],
+        "explanation": "Professional incompetence is typically defined in provincial Acts and regulations as a lack of knowledge, skill, or judgment of a nature or to an extent that demonstrates the member is unfit to practice. In this case, the P.Geo. failed to exercise sound judgment by proceeding without sufficient knowledge of the local conditions, leading to a negative outcome."
+      }
+    ]
+  }
+}

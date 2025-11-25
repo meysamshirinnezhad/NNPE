@@ -1,0 +1,5559 @@
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\api\client.ts
+---- CONTENT ----
+import axios, { AxiosError } from 'axios';
+import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+
+// API Base URL from environment
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+
+// Create axios instance with cookie-based authentication
+const apiClient: AxiosInstance = axios.create({
+  baseURL: `${API_BASE_URL}/api/v1`,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  timeout: 30000, // 30 seconds
+  withCredentials: true, // Enable sending/receiving cookies with requests
+});
+
+// Request interceptor - Add JWT token to Authorization header
+apiClient.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    // Add JWT token from localStorage if available
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    // Cookies are also sent with withCredentials: true
+    return config;
+  },
+  (error: AxiosError) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor - Handle 401 errors by redirecting to login
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error: AxiosError) => {
+    const originalRequest = error.config;
+    
+    // Handle 401/404 Unauthorized - Session expired or invalid
+    if (error.response?.status === 401 || error.response?.status === 404) {
+      // Don't redirect if this is the session validation endpoint
+      // A 401/404 on /auth/me just means "not logged in" which is normal
+      const isSessionValidation = originalRequest?.url?.includes('/auth/me');
+      
+      if (!isSessionValidation) {
+        // Clear all cached data including tokens
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('user');
+        
+        // Redirect to login page if not already there
+        if (!window.location.pathname.includes('/login')) {
+          window.location.href = '/login';
+        }
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+export default apiClient;
+
+// Helper function to handle API errors
+export const handleApiError = (error: unknown): string => {
+  if (axios.isAxiosError(error)) {
+    const axiosError = error as AxiosError<{ error?: string; message?: string }>;
+    return axiosError.response?.data?.error || 
+           axiosError.response?.data?.message || 
+           axiosError.message || 
+           'An unexpected error occurred';
+  }
+  return 'An unexpected error occurred';
+};
+
+// Export API base URL for direct use if needed
+export { API_BASE_URL };
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\api\index.ts
+---- CONTENT ----
+// Export API client and utilities
+export { default as apiClient, handleApiError, API_BASE_URL } from './client';
+
+// Export all types
+export * from './types';
+
+// Export all services
+export { default as authService } from './services/auth.service';
+export { default as userService } from './services/user.service';
+export { default as questionService } from './services/question.service';
+export { default as testService } from './services/test.service';
+export { default as dashboardService } from './services/dashboard.service';
+export { default as studyService } from './services/study.service';
+export { default as adminService } from './services/admin.service';
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\api\services\admin.service.ts
+---- CONTENT ----
+import apiClient, { handleApiError } from '../client';
+import type {
+  Question,
+  UserProfile,
+} from '../types';
+
+interface AdminStatistics {
+  total_users: number;
+  active_users: number;
+  total_questions: number;
+  total_tests: number;
+  revenue: number;
+  conversion_rate: number;
+}
+
+interface CreateQuestionRequest {
+  content: string;
+  question_type: 'multiple_choice' | 'true_false';
+  difficulty: 'easy' | 'medium' | 'hard';
+  topic_id: string;
+  sub_topic_id?: string;
+  province?: string;
+  explanation: string;
+  reference_source: string;
+  options: {
+    content: string;
+    is_correct: boolean;
+    position: number;
+  }[];
+}
+
+interface UpdateQuestionRequest extends Partial<CreateQuestionRequest> {
+  is_active?: boolean;
+}
+
+class AdminService {
+  /**
+   * Get platform statistics (admin only)
+   */
+  async getStatistics(): Promise<AdminStatistics> {
+    try {
+      const response = await apiClient.get<AdminStatistics>('/admin/statistics');
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Get all users (admin only)
+   */
+  async getUsers(params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+  }): Promise<{ users: UserProfile[]; total: number }> {
+    try {
+      const response = await apiClient.get<{ users: UserProfile[]; total: number }>(
+        '/admin/users',
+        { params }
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Create question (admin only)
+   */
+  async createQuestion(data: CreateQuestionRequest): Promise<Question> {
+    try {
+      const response = await apiClient.post<Question>('/admin/questions', data);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Update question (admin only)
+   */
+  async updateQuestion(questionId: string, data: UpdateQuestionRequest): Promise<Question> {
+    try {
+      const response = await apiClient.put<Question>(`/admin/questions/${questionId}`, data);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Delete question (admin only)
+   */
+  async deleteQuestion(questionId: string): Promise<{ message: string }> {
+    try {
+      const response = await apiClient.delete<{ message: string }>(`/admin/questions/${questionId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+}
+
+export default new AdminService();
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\api\services\auth.service.ts
+---- CONTENT ----
+import apiClient, { handleApiError } from '../client';
+import type {
+  LoginRequest,
+  RegisterRequest,
+  AuthResponse,
+  RefreshTokenRequest,
+  ForgotPasswordRequest,
+  ResetPasswordRequest,
+  User,
+} from '../types';
+
+class AuthService {
+  /**
+   * Register a new user
+   * Cookies are set automatically by the backend
+   */
+  async register(data: RegisterRequest): Promise<AuthResponse> {
+    try {
+      const response = await apiClient.post<AuthResponse>('/auth/register', data);
+      
+      // Store JWT tokens for header-based auth
+      if (response.data.access_token) {
+        localStorage.setItem('access_token', response.data.access_token);
+      }
+      if (response.data.refresh_token) {
+        localStorage.setItem('refresh_token', response.data.refresh_token);
+      }
+      
+      // Cache user data locally for quick access
+      if (response.data.user) {
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+      }
+      
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Login user
+   * Cookies are set automatically by the backend
+   */
+  async login(data: LoginRequest): Promise<AuthResponse> {
+    try {
+      const response = await apiClient.post<AuthResponse>('/auth/login', data);
+      
+      // Store JWT tokens for header-based auth
+      if (response.data.access_token) {
+        localStorage.setItem('access_token', response.data.access_token);
+      }
+      if (response.data.refresh_token) {
+        localStorage.setItem('refresh_token', response.data.refresh_token);
+      }
+      
+      // Cache user data locally for quick access
+      if (response.data.user) {
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+      }
+      
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Logout user - clears session cookie on backend
+   */
+  async logout(): Promise<void> {
+    try {
+      // Call backend to clear session cookie
+      await apiClient.post('/auth/logout');
+    } catch (error) {
+      // Continue with logout even if API call fails
+      console.error('Logout API call failed:', error);
+    } finally {
+      // Clear all cached data including tokens
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user');
+      
+      // Redirect to login page
+      window.location.href = '/login';
+    }
+  }
+
+  /**
+   * Validate current session with backend
+   * Returns current user if session is valid
+   */
+  async validateSession(): Promise<User> {
+    try {
+      const response = await apiClient.get<User>('/auth/me');
+      
+      // Update cached user data
+      if (response.data) {
+        localStorage.setItem('user', JSON.stringify(response.data));
+      }
+      
+      return response.data;
+    } catch (error) {
+      // Clear cached data on validation failure
+      localStorage.removeItem('user');
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Refresh session (if backend supports it)
+   * For cookie-based auth, this might not be needed as cookies auto-refresh
+   */
+  async refreshToken(data: RefreshTokenRequest): Promise<AuthResponse> {
+    try {
+      const response = await apiClient.post<AuthResponse>('/auth/refresh', data);
+      
+      // Update tokens
+      if (response.data.access_token) {
+        localStorage.setItem('access_token', response.data.access_token);
+      }
+      if (response.data.refresh_token) {
+        localStorage.setItem('refresh_token', response.data.refresh_token);
+      }
+      
+      // Update cached user data if provided
+      if (response.data.user) {
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+      }
+      
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Request password reset
+   */
+  async forgotPassword(data: ForgotPasswordRequest): Promise<{ message: string }> {
+    try {
+      const response = await apiClient.post<{ message: string }>('/auth/forgot-password', data);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Reset password with token
+   */
+  async resetPassword(data: ResetPasswordRequest): Promise<{ message: string }> {
+    try {
+      const response = await apiClient.post<{ message: string }>('/auth/reset-password', data);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Verify email
+   */
+  async verifyEmail(token: string): Promise<{ message: string }> {
+    try {
+      const response = await apiClient.get<{ message: string }>(`/auth/verify/${token}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Get cached user from localStorage
+   * Note: This may be stale; use validateSession() for fresh data
+   */
+  getCurrentUser(): User | null {
+    const userStr = localStorage.getItem('user');
+    return userStr ? JSON.parse(userStr) : null;
+  }
+
+  /**
+   * Check if user appears to be authenticated (based on cached data)
+   * Note: This doesn't validate the session; use validateSession() for that
+   */
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem('user');
+  }
+}
+
+export default new AuthService();
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\api\services\dashboard.service.ts
+---- CONTENT ----
+import apiClient, { handleApiError } from '../client';
+import type {
+  DashboardData,
+  AnalyticsData,
+  WeakTopic,
+} from '../types';
+
+class DashboardService {
+  /**
+   * Get dashboard statistics
+   */
+  async getDashboard(): Promise<DashboardData> {
+    try {
+      const response = await apiClient.get<DashboardData>('/users/me/dashboard');
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Get performance analytics
+   */
+  async getAnalytics(timeframe: '7d' | '30d' | '90d' | 'all' = '30d'): Promise<AnalyticsData> {
+    try {
+      const response = await apiClient.get<AnalyticsData>('/users/me/analytics', {
+        params: { timeframe },
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Get weakness report
+   */
+  async getWeaknesses(): Promise<{ weak_topics: WeakTopic[] }> {
+    try {
+      const response = await apiClient.get<{ weak_topics: WeakTopic[] }>('/users/me/weaknesses');
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+}
+
+export default new DashboardService();
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\api\services\question.service.ts
+---- CONTENT ----
+import apiClient, { handleApiError } from '../client';
+import type {
+  Question,
+  Topic,
+  GetQuestionsParams,
+  QuestionsResponse,
+  SubmitAnswerRequest,
+  AnswerResponse,
+} from '../types';
+
+class QuestionService {
+  /**
+   * Get questions with filters
+   */
+  async getQuestions(params?: GetQuestionsParams): Promise<QuestionsResponse> {
+    try {
+      const response = await apiClient.get<QuestionsResponse>('/questions', { params });
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Get single question by ID
+   */
+  async getQuestion(questionId: string): Promise<Question> {
+    try {
+      const response = await apiClient.get<Question>(`/questions/${questionId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Submit answer to a question
+   */
+  async submitAnswer(
+    questionId: string,
+    data: SubmitAnswerRequest
+  ): Promise<AnswerResponse> {
+    try {
+      const response = await apiClient.post<AnswerResponse>(
+        `/questions/${questionId}/answer`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Bookmark a question
+   */
+  async bookmarkQuestion(questionId: string): Promise<{ message: string }> {
+    try {
+      const response = await apiClient.post<{ message: string }>(
+        `/questions/${questionId}/bookmark`
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Remove bookmark from a question
+   */
+  async removeBookmark(questionId: string): Promise<{ message: string }> {
+    try {
+      const response = await apiClient.delete<{ message: string }>(
+        `/questions/${questionId}/bookmark`
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Get all topics
+   */
+  async getTopics(): Promise<Topic[]> {
+    try {
+      const response = await apiClient.get<Topic[]>('/topics');
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Get single topic by ID
+   */
+  async getTopic(topicId: string): Promise<Topic> {
+    try {
+      const response = await apiClient.get<Topic>(`/topics/${topicId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+}
+
+export default new QuestionService();
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\api\services\study.service.ts
+---- CONTENT ----
+import apiClient, { handleApiError } from '../client';
+import type {
+  StudyPath,
+  Module,
+  UpdateModuleProgressRequest,
+} from '../types';
+
+class StudyService {
+  /**
+   * Get user's study path
+   */
+  async getStudyPath(): Promise<StudyPath> {
+    try {
+      const response = await apiClient.get<StudyPath>('/users/me/study-path');
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Update module progress
+   */
+  async updateModuleProgress(
+    moduleId: string,
+    data: UpdateModuleProgressRequest
+  ): Promise<{ message: string }> {
+    try {
+      const response = await apiClient.put<{ message: string }>(
+        `/study-path/modules/${moduleId}/progress`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Mark module as complete
+   */
+  async completeModule(moduleId: string): Promise<{ message: string }> {
+    try {
+      const response = await apiClient.post<{ message: string }>(
+        `/study-path/modules/${moduleId}/complete`
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+}
+
+export default new StudyService();
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\api\services\test.service.ts
+---- CONTENT ----
+import apiClient, { handleApiError } from '../client';
+import type {
+  PracticeTest,
+  StartTestRequest,
+  StartTestResponse,
+  SubmitAnswerRequest,
+  TestResultResponse,
+} from '../types';
+
+class TestService {
+  /**
+   * Start a new practice test
+   */
+  async startTest(data: StartTestRequest): Promise<StartTestResponse> {
+    try {
+      const response = await apiClient.post<StartTestResponse>('/practice-tests', data);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Get practice test details
+   */
+  async getTest(testId: string): Promise<PracticeTest> {
+    try {
+      const response = await apiClient.get<PracticeTest>(`/practice-tests/${testId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Submit answer during test
+   */
+  async submitTestAnswer(
+    testId: string,
+    position: number,
+    data: SubmitAnswerRequest
+  ): Promise<{ message: string }> {
+    try {
+      const response = await apiClient.post<{ message: string }>(
+        `/practice-tests/${testId}/questions/${position}/answer`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Complete practice test
+   */
+  async completeTest(testId: string): Promise<TestResultResponse> {
+    try {
+      const response = await apiClient.post<TestResultResponse>(
+        `/practice-tests/${testId}/complete`
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Get test review (all questions with answers)
+   */
+  async reviewTest(testId: string): Promise<PracticeTest> {
+    try {
+      const response = await apiClient.get<PracticeTest>(
+        `/practice-tests/${testId}/review`
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Get user's test history
+   */
+  async getTestHistory(): Promise<PracticeTest[]> {
+    try {
+      const response = await apiClient.get<PracticeTest[]>('/users/me/practice-tests');
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+}
+
+export default new TestService();
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\api\services\user.service.ts
+---- CONTENT ----
+import apiClient, { handleApiError } from '../client';
+import type {
+  UserProfile,
+  UpdateProfileRequest,
+  Notification,
+  NotificationSettings,
+  Bookmark,
+  Subscription,
+  CreateSubscriptionRequest,
+} from '../types';
+
+class UserService {
+  /**
+   * Get current user profile
+   */
+  async getProfile(): Promise<UserProfile> {
+    try {
+      const response = await apiClient.get<UserProfile>('/users/me');
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Update user profile
+   */
+  async updateProfile(data: UpdateProfileRequest): Promise<UserProfile> {
+    try {
+      const response = await apiClient.put<UserProfile>('/users/me', data);
+      
+      // Update stored user data
+      const currentUser = localStorage.getItem('user');
+      if (currentUser) {
+        const user = JSON.parse(currentUser);
+        localStorage.setItem('user', JSON.stringify({ ...user, ...data }));
+      }
+      
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Upload avatar
+   */
+  async uploadAvatar(file: File): Promise<{ avatar_url: string }> {
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      
+      const response = await apiClient.post<{ avatar_url: string }>(
+        '/users/me/avatar',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Delete account
+   */
+  async deleteAccount(): Promise<{ message: string }> {
+    try {
+      const response = await apiClient.delete<{ message: string }>('/users/me');
+      
+      // Clear local storage
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user');
+      
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Get user bookmarks
+   */
+  async getBookmarks(): Promise<Bookmark[]> {
+    try {
+      const response = await apiClient.get<Bookmark[]>('/users/me/bookmarks');
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Get notifications
+   */
+  async getNotifications(): Promise<Notification[]> {
+    try {
+      const response = await apiClient.get<Notification[]>('/notifications');
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Mark notification as read
+   */
+  async markNotificationRead(notificationId: string): Promise<void> {
+    try {
+      await apiClient.put(`/notifications/${notificationId}/read`);
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Get notification settings
+   */
+  async getNotificationSettings(): Promise<NotificationSettings> {
+    try {
+      const response = await apiClient.get<NotificationSettings>('/users/me/notification-settings');
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Update notification settings
+   */
+  async updateNotificationSettings(data: Partial<NotificationSettings>): Promise<NotificationSettings> {
+    try {
+      const response = await apiClient.put<NotificationSettings>(
+        '/users/me/notification-settings',
+        data
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Get current subscription
+   */
+  async getSubscription(): Promise<Subscription> {
+    try {
+      const response = await apiClient.get<Subscription>('/subscriptions/current');
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Create subscription
+   */
+  async createSubscription(data: CreateSubscriptionRequest): Promise<Subscription> {
+    try {
+      const response = await apiClient.post<Subscription>('/subscriptions', data);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Cancel subscription
+   */
+  async cancelSubscription(): Promise<{ message: string }> {
+    try {
+      const response = await apiClient.delete<{ message: string }>('/subscriptions/current');
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+}
+
+export default new UserService();
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\api\types.ts
+---- CONTENT ----
+// Base types
+export interface ApiResponse<T> {
+  data?: T;
+  error?: string;
+  message?: string;
+}
+
+export interface PaginationMeta {
+  total: number;
+  page: number;
+  per_page: number;
+  total_pages: number;
+}
+
+// Auth types
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+  province: string;
+  exam_date?: string;
+}
+
+export interface AuthResponse {
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
+  user: User;
+}
+
+export interface RefreshTokenRequest {
+  refresh_token: string;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  password: string;
+}
+
+// User types
+export interface User {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  province: string;
+  exam_date?: string;
+  is_verified: boolean;
+  is_admin: boolean;
+  avatar_url?: string;
+  study_streak: number;
+  longest_streak: number;
+  subscription_id?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UserProfile extends User {
+  questions_completed: number;
+  practice_tests_taken: number;
+  subscription?: Subscription;
+}
+
+export interface UpdateProfileRequest {
+  first_name?: string;
+  last_name?: string;
+  province?: string;
+  exam_date?: string;
+}
+
+export interface UserStats {
+  questions_completed: number;
+  questions_correct: number;
+  practice_tests_taken: number;
+  average_test_score: number;
+  time_studied_hours: number;
+}
+
+// Question types
+export interface Topic {
+  id: string;
+  name: string;
+  code: string;
+  description: string;
+  weight: number;
+  order: number;
+}
+
+export interface SubTopic {
+  id: string;
+  topic_id: string;
+  name: string;
+  code: string;
+  description: string;
+  order: number;
+}
+
+export interface QuestionOption {
+  id: string;
+  question_id: string;
+  content: string;
+  is_correct: boolean;
+  position: number;
+}
+
+export interface Question {
+  id: string;
+  content: string;
+  question_type: 'multiple_choice' | 'true_false';
+  difficulty: 'easy' | 'medium' | 'hard';
+  topic_id: string;
+  topic?: Topic;
+  sub_topic_id?: string;
+  sub_topic?: SubTopic;
+  province?: string;
+  explanation: string;
+  reference_source: string;
+  is_active: boolean;
+  options: QuestionOption[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GetQuestionsParams {
+  topic_id?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
+  province?: string;
+  limit?: number;
+  page?: number;
+  exclude_answered?: boolean;
+  random?: boolean;
+}
+
+export interface QuestionsResponse {
+  questions: Question[];
+  pagination: PaginationMeta;
+}
+
+export interface SubmitAnswerRequest {
+  selected_option_id: string;
+  time_spent_seconds: number;
+}
+
+export interface AnswerResponse {
+  is_correct: boolean;
+  correct_option_id: string;
+  explanation: string;
+  reference_source: string;
+  your_answer_id: string;
+}
+
+export interface UserTopicMastery {
+  id: string;
+  user_id: string;
+  topic_id: string;
+  topic?: Topic;
+  questions_attempted: number;
+  questions_correct: number;
+  mastery_percentage: number;
+  last_practiced: string;
+}
+
+// Practice Test types
+export interface PracticeTest {
+  id: string;
+  user_id: string;
+  test_type: 'full_exam' | 'topic_specific' | 'custom';
+  status: 'in_progress' | 'completed' | 'abandoned';
+  total_questions: number;
+  correct_answers: number;
+  score: number;
+  time_spent_seconds: number;
+  time_limit_minutes: number;
+  started_at: string;
+  completed_at?: string;
+  questions?: PracticeTestQuestion[];
+}
+
+export interface PracticeTestQuestion {
+  id: string;
+  practice_test_id: string;
+  question_id: string;
+  question?: Question;
+  position: number;
+  answer_id?: string;
+  is_correct?: boolean;
+  time_spent_seconds: number;
+}
+
+export interface StartTestRequest {
+  test_type: 'full_exam' | 'topic_specific' | 'custom';
+  topic_ids?: string[];
+  difficulty?: 'easy' | 'medium' | 'hard';
+  question_count?: number;
+  time_limit_minutes?: number;
+}
+
+export interface StartTestResponse {
+  test_id: string;
+  questions: Question[];
+  total_questions: number;
+  time_limit_minutes: number;
+  started_at: string;
+}
+
+export interface TestResultResponse {
+  test_id: string;
+  score: number;
+  correct_answers: number;
+  total_questions: number;
+  time_spent_seconds: number;
+  pass_status: boolean;
+  performance_by_topic: TopicPerformance[];
+  weak_topics: string[];
+  pass_probability: number;
+  completed_at: string;
+}
+
+export interface TopicPerformance {
+  topic_name: string;
+  correct: number;
+  total: number;
+  percentage: number;
+}
+
+// Dashboard types
+export interface DashboardData {
+  overall_progress: number;
+  study_streak: number;
+  longest_streak: number;
+  questions_completed: number;
+  questions_correct: number;
+  accuracy_rate: number;
+  practice_tests_taken: number;
+  average_test_score: number;
+  time_studied_hours: number;
+  pass_probability: number;
+  days_until_exam: number;
+  recommended_study_time_daily: number;
+  topic_mastery: UserTopicMastery[];
+  weak_topics: WeakTopic[];
+  recent_activity: Activity[];
+}
+
+export interface WeakTopic {
+  name: string;
+  score: number;
+  questions_attempted?: number;
+  sub_topics?: SubTopicScore[];
+  recommended_practice?: number;
+}
+
+export interface SubTopicScore {
+  name: string;
+  score: number;
+  questions_attempted: number;
+}
+
+export interface Activity {
+  type: 'practice_test' | 'question' | 'module' | 'achievement';
+  description: string;
+  score?: number;
+  timestamp: string;
+}
+
+export interface AnalyticsData {
+  timeframe: '7d' | '30d' | '90d' | 'all';
+  questions_per_day: DailyMetric[];
+  accuracy_trend: DailyMetric[];
+  time_spent_per_day: DailyMetric[];
+  topic_breakdown: TopicBreakdown[];
+}
+
+export interface DailyMetric {
+  date: string;
+  count?: number;
+  percentage?: number;
+  minutes?: number;
+}
+
+export interface TopicBreakdown {
+  topic: string;
+  questions: number;
+  correct: number;
+}
+
+// Subscription types
+export interface Subscription {
+  id: string;
+  user_id: string;
+  plan: 'free' | 'monthly' | 'annual';
+  status: 'active' | 'cancelled' | 'expired' | 'past_due';
+  current_period_start: string;
+  current_period_end: string;
+  cancel_at_period_end: boolean;
+  created_at: string;
+}
+
+export interface CreateSubscriptionRequest {
+  plan: 'monthly' | 'annual';
+  payment_method_id: string;
+}
+
+// Study Path types
+export interface StudyPath {
+  id: string;
+  user_id: string;
+  status: 'not_started' | 'in_progress' | 'completed';
+  current_week: number;
+  start_date?: string;
+  target_date?: string;
+  modules: Module[];
+  progress_percentage: number;
+  next_module?: Module;
+}
+
+export interface Module {
+  id: string;
+  title: string;
+  description: string;
+  week: number;
+  order: number;
+  topic_id: string;
+  topic?: Topic;
+  duration_minutes: number;
+  content_url: string;
+  video_url: string;
+  status?: 'not_started' | 'in_progress' | 'completed';
+  progress?: number;
+  completed_at?: string;
+}
+
+export interface UpdateModuleProgressRequest {
+  progress: number;
+  time_spent_seconds: number;
+}
+
+// Notification types
+export interface Notification {
+  id: string;
+  user_id: string;
+  type: 'achievement' | 'reminder' | 'system' | 'test_result';
+  title: string;
+  message: string;
+  link?: string;
+  is_read: boolean;
+  created_at: string;
+}
+
+export interface NotificationSettings {
+  email_notifications: boolean;
+  push_notifications: boolean;
+  daily_reminder: boolean;
+  reminder_time: string;
+  weekly_report: boolean;
+}
+
+// Bookmark types
+export interface Bookmark {
+  id: string;
+  user_id: string;
+  question_id: string;
+  question?: Question;
+  created_at: string;
+}
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\App.tsx
+---- CONTENT ----
+
+import { BrowserRouter } from 'react-router-dom';
+import { Suspense } from 'react';
+import { AppRoutes } from './router';
+import EngineeringBackground from './components/effects/EngineeringBackground';
+import PageTransition from './components/effects/PageTransition';
+import LoadingSpinner from './components/effects/LoadingSpinner';
+import { AuthProvider } from './contexts/AuthContext';
+
+function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter basename={__BASE_PATH__}>
+        <div className="relative min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
+          {/* Engineering animated background */}
+          <EngineeringBackground />
+          
+          {/* Main content with page transitions */}
+          <Suspense
+            fallback={
+              <div className="min-h-screen flex items-center justify-center">
+                <LoadingSpinner
+                  size="xl"
+                  variant="engineering"
+                  text="Loading NPPE Pro..."
+                />
+              </div>
+            }
+          >
+            <PageTransition>
+              <AppRoutes />
+            </PageTransition>
+          </Suspense>
+        </div>
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
+
+export default App;
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\app\bootstrap.ts
+---- CONTENT ----
+import apiClient from '../api/client';
+
+export async function restoreSession() {
+  const token = localStorage.getItem('access_token');
+  if (!token) return { authed: false, me: null };
+  
+  try {
+    const { data } = await apiClient.get('/auth/me');
+    return { authed: true, me: data ?? null };
+  } catch {
+    // interceptor already clears storage/redirects on 401
+    return { authed: false, me: null };
+  }
+}
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\components\base\Button.tsx
+---- CONTENT ----
+
+import { ButtonHTMLAttributes, ReactNode, useRef, useEffect } from 'react';
+
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'icon';
+  size?: 'sm' | 'md' | 'lg';
+  children: ReactNode;
+  loading?: boolean;
+  magnetic?: boolean;
+  glow?: boolean;
+}
+
+export default function Button({ 
+  variant = 'primary', 
+  size = 'md', 
+  children, 
+  loading = false,
+  magnetic = false,
+  glow = false,
+  className = '',
+  disabled,
+  ...props 
+}: ButtonProps) {
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  
+  const baseClasses = 'font-medium transition-all duration-200 whitespace-nowrap cursor-pointer relative overflow-hidden';
+  
+  const variantClasses = {
+    primary: 'bg-primary text-white rounded-lg hover:bg-[#01579B] hover:shadow-lg hover:scale-102 active:scale-98 disabled:bg-gray-300 disabled:opacity-50',
+    secondary: 'bg-white text-primary border-2 border-primary rounded-lg hover:bg-[#E3F2FD] hover:border-[#01579B] hover:scale-102 active:scale-98',
+    icon: 'rounded-full shadow-md hover:shadow-lg hover:scale-102 active:scale-95'
+  };
+  
+  const sizeClasses = {
+    sm: 'px-4 py-2 text-sm',
+    md: 'px-6 py-3 text-base',
+    lg: 'px-8 py-4 text-lg'
+  };
+  
+  const iconSizeClasses = {
+    sm: 'w-8 h-8',
+    md: 'w-12 h-12', 
+    lg: 'w-16 h-16'
+  };
+
+  const magneticClass = magnetic ? 'btn-magnetic' : 'btn-transition';
+  const glowClass = glow ? 'glow-effect' : '';
+
+  // Magnetic effect
+  useEffect(() => {
+    if (!magnetic || !buttonRef.current) return;
+
+    const button = buttonRef.current;
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = button.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      
+      const distance = Math.sqrt(x * x + y * y);
+      const maxDistance = 100;
+      
+      if (distance < maxDistance) {
+        const strength = (maxDistance - distance) / maxDistance;
+        const moveX = x * strength * 0.3;
+        const moveY = y * strength * 0.3;
+        
+        button.style.transform = `translate(${moveX}px, ${moveY}px) scale(1.02)`;
+      }
+    };
+
+    const handleMouseLeave = () => {
+      button.style.transform = 'translate(0px, 0px) scale(1)';
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    button.addEventListener('mouseleave', handleMouseLeave);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      button.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, [magnetic]);
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // Enhanced ripple effect
+    const button = e.currentTarget;
+    const ripple = document.createElement('span');
+    const rect = button.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const x = e.clientX - rect.left - size / 2;
+    const y = e.clientY - rect.top - size / 2;
+    
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = x + 'px';
+    ripple.style.top = y + 'px';
+    ripple.classList.add('absolute', 'bg-white', 'bg-opacity-30', 'rounded-full', 'animate-ripple', 'pointer-events-none');
+    
+    button.appendChild(ripple);
+    
+    setTimeout(() => {
+      ripple.remove();
+    }, 400);
+
+    if (props.onClick) {
+      props.onClick(e);
+    }
+  };
+
+  return (
+    <button
+      ref={buttonRef}
+      className={`${baseClasses} ${variantClasses[variant]} ${variant === 'icon' ? iconSizeClasses[size] : sizeClasses[size]} ${magneticClass} ${glowClass} ${className}`}
+      disabled={disabled || loading}
+      onClick={handleClick}
+      {...props}
+    >
+      {loading ? (
+        <div className="flex items-center justify-center">
+          <i className="ri-loader-4-line animate-spin mr-2"></i>
+          Loading...
+        </div>
+      ) : children}
+    </button>
+  );
+}
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\components\base\Card.tsx
+---- CONTENT ----
+
+import { ReactNode, useEffect, useRef } from 'react';
+
+interface CardProps {
+  children: ReactNode;
+  className?: string;
+  padding?: 'sm' | 'md' | 'lg';
+  shadow?: 'sm' | 'md' | 'lg';
+  hover?: boolean;
+  animate?: boolean;
+  delay?: number;
+  glassmorphism?: boolean;
+  glow?: boolean;
+  interactive3d?: boolean;
+}
+
+export default function Card({ 
+  children, 
+  className = '', 
+  padding = 'md',
+  shadow = 'md',
+  hover = true,
+  animate = true,
+  delay = 0,
+  glassmorphism = false,
+  glow = false,
+  interactive3d = false
+}: CardProps) {
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const paddingClasses = {
+    sm: 'p-4',
+    md: 'p-6',
+    lg: 'p-8'
+  };
+  
+  const shadowClasses = {
+    sm: 'shadow-sm',
+    md: 'shadow-md',
+    lg: 'shadow-lg'
+  };
+
+  const baseClass = glassmorphism ? 'glass-card' : 'bg-white';
+  const hoverClass = interactive3d ? 'card-hover-3d' : hover ? 'card-hover' : '';
+  const animateClass = animate ? 'animate-fade-in-up' : '';
+  const glowClass = glow ? 'glow-effect animate-glow-pulse' : '';
+  const delayStyle = delay > 0 ? { animationDelay: `${delay}ms` } : {};
+
+  // 3D tilt effect
+  useEffect(() => {
+    if (!interactive3d || !cardRef.current) return;
+
+    const card = cardRef.current;
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      
+      const rotateX = (y - centerY) / 10;
+      const rotateY = (centerX - x) / 10;
+      
+      card.style.setProperty('--rotate-x', `${rotateX}deg`);
+      card.style.setProperty('--rotate-y', `${rotateY}deg`);
+    };
+
+    const handleMouseLeave = () => {
+      card.style.setProperty('--rotate-x', '0deg');
+      card.style.setProperty('--rotate-y', '0deg');
+    };
+
+    card.addEventListener('mousemove', handleMouseMove);
+    card.addEventListener('mouseleave', handleMouseLeave);
+
+    return () => {
+      card.removeEventListener('mousemove', handleMouseMove);
+      card.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, [interactive3d]);
+
+  return (
+    <div 
+      ref={cardRef}
+      className={`${baseClass} rounded-lg ${paddingClasses[padding]} ${shadowClasses[shadow]} ${hoverClass} ${animateClass} ${glowClass} ${className}`}
+      style={delayStyle}
+    >
+      {children}
+    </div>
+  );
+}
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\components\base\CircularProgress.tsx
+---- CONTENT ----
+
+import { useEffect, useState } from 'react';
+
+interface CircularProgressProps {
+  value: number;
+  max?: number;
+  size?: number;
+  strokeWidth?: number;
+  color?: 'primary' | 'success' | 'warning' | 'error';
+  animate?: boolean;
+  delay?: number;
+  showLabel?: boolean;
+  gradient?: boolean;
+  glow?: boolean;
+}
+
+export default function CircularProgress({
+  value,
+  max = 100,
+  size = 120,
+  strokeWidth = 8,
+  color = 'primary',
+  animate = false,
+  delay = 0,
+  showLabel = true,
+  gradient = true,
+  glow = false
+}: CircularProgressProps) {
+  const [currentValue, setCurrentValue] = useState(animate ? 0 : value);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const percentage = Math.min((currentValue / max) * 100, 100);
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+  const colorClasses = {
+    primary: '#0277BD',
+    success: '#388E3C',
+    warning: '#FBC02D',
+    error: '#D32F2F'
+  };
+
+  const gradientIds = {
+    primary: 'primaryGradient',
+    success: 'successGradient',
+    warning: 'warningGradient',
+    error: 'errorGradient'
+  };
+
+  useEffect(() => {
+    if (!animate) return;
+
+    const timer = setTimeout(() => {
+      setIsAnimating(true);
+      const duration = 1500;
+      const steps = 60;
+      const increment = value / steps;
+      let current = 0;
+
+      const interval = setInterval(() => {
+        current += increment;
+        if (current >= value) {
+          setCurrentValue(value);
+          setIsAnimating(false);
+          clearInterval(interval);
+        } else {
+          setCurrentValue(current);
+        }
+      }, duration / steps);
+
+      return () => clearInterval(interval);
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [animate, delay, value]);
+
+  return (
+    <div className="relative inline-flex items-center justify-center">
+      <svg
+        width={size}
+        height={size}
+        className={`transform -rotate-90 ${glow ? 'drop-shadow-lg' : ''}`}
+      >
+        <defs>
+          <linearGradient id={gradientIds.primary} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#0277BD" />
+            <stop offset="100%" stopColor="#01579B" />
+          </linearGradient>
+          <linearGradient id={gradientIds.success} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#388E3C" />
+            <stop offset="100%" stopColor="#2E7D32" />
+          </linearGradient>
+          <linearGradient id={gradientIds.warning} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#FBC02D" />
+            <stop offset="100%" stopColor="#F57C00" />
+          </linearGradient>
+          <linearGradient id={gradientIds.error} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#D32F2F" />
+            <stop offset="100%" stopColor="#B71C1C" />
+          </linearGradient>
+          
+          {glow && (
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+              <feMerge> 
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          )}
+        </defs>
+        
+        {/* Background circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke="#e5e7eb"
+          strokeWidth={strokeWidth}
+          fill="transparent"
+        />
+        
+        {/* Progress circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={gradient ? `url(#${gradientIds[color]})` : colorClasses[color]}
+          strokeWidth={strokeWidth}
+          fill="transparent"
+          strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
+          className={`transition-all duration-1000 ease-out ${
+            isAnimating ? 'animate-draw-progress' : ''
+          }`}
+          style={{
+            transition: animate ? 'stroke-dashoffset 1500ms cubic-bezier(0.23, 1, 0.32, 1)' : undefined,
+            filter: glow ? 'url(#glow)' : undefined
+          }}
+        />
+      </svg>
+      
+      {showLabel && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center">
+            <div className={`text-2xl font-bold text-gray-900 ${
+              isAnimating ? 'animate-number-count' : ''
+            }`}>
+              {Math.round(currentValue)}%
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\components\base\CountUpNumber.tsx
+---- CONTENT ----
+
+import { useEffect, useState } from 'react';
+
+interface CountUpNumberProps {
+  end: number;
+  start?: number;
+  duration?: number;
+  delay?: number;
+  className?: string;
+  suffix?: string;
+  prefix?: string;
+}
+
+export default function CountUpNumber({
+  end,
+  start = 0,
+  duration = 1500,
+  delay = 0,
+  className = '',
+  suffix = '',
+  prefix = ''
+}: CountUpNumberProps) {
+  const [count, setCount] = useState(start);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      let startTime: number;
+      const animate = (currentTime: number) => {
+        if (!startTime) startTime = currentTime;
+        const progress = Math.min((currentTime - startTime) / duration, 1);
+        
+        const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+        const currentCount = Math.floor(easeOutQuart * (end - start) + start);
+        
+        setCount(currentCount);
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          setCount(end);
+        }
+      };
+      
+      requestAnimationFrame(animate);
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [end, start, duration, delay]);
+
+  return (
+    <span className={`animate-count-up ${className}`}>
+      {prefix}{count}{suffix}
+    </span>
+  );
+}
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\components\base\Logo.tsx
+---- CONTENT ----
+
+interface LogoProps {
+  size?: 'small' | 'medium' | 'large';
+  variant?: 'full' | 'icon';
+  className?: string;
+}
+
+export default function Logo({ size = 'medium', variant = 'full', className = '' }: LogoProps) {
+  const sizeClasses = {
+    small: 'h-7',
+    medium: 'h-10',
+    large: 'h-12'
+  };
+
+  const iconSize = {
+    small: 'w-7 h-7',
+    medium: 'w-10 h-10',
+    large: 'w-12 h-12'
+  };
+
+  const textSize = {
+    small: 'text-lg',
+    medium: 'text-xl',
+    large: 'text-2xl'
+  };
+
+  if (variant === 'icon') {
+    return (
+      <div className={`${iconSize[size]} ${className} flex items-center justify-center`}>
+        <div className="relative">
+          {/* Gear icon */}
+          <div className="w-full h-full rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+            <i className="ri-settings-3-line text-white text-lg"></i>
+          </div>
+          {/* Graduation cap overlay */}
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-secondary rounded-full flex items-center justify-center">
+            <i className="ri-graduation-cap-line text-white text-xs"></i>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`flex items-center space-x-3 ${className}`}>
+      {/* Icon */}
+      <div className={`${iconSize[size]} flex items-center justify-center`}>
+        <div className="relative">
+          <div className="w-full h-full rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+            <i className="ri-settings-3-line text-white text-lg"></i>
+          </div>
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-secondary rounded-full flex items-center justify-center">
+            <i className="ri-graduation-cap-line text-white text-xs"></i>
+          </div>
+        </div>
+      </div>
+      
+      {/* Text */}
+      <div className={`font-bold text-gray-900 ${textSize[size]}`}>
+        NPPE Pro
+      </div>
+    </div>
+  );
+}
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\components\base\ProgressBar.tsx
+---- CONTENT ----
+
+import { useEffect, useState } from 'react';
+
+interface ProgressBarProps {
+  value: number;
+  max?: number;
+  color?: 'primary' | 'success' | 'warning' | 'error';
+  size?: 'sm' | 'md' | 'lg';
+  animate?: boolean;
+  delay?: number;
+  showLabel?: boolean;
+  glow?: boolean;
+  gradient?: boolean;
+}
+
+export default function ProgressBar({
+  value,
+  max = 100,
+  color = 'primary',
+  size = 'md',
+  animate = false,
+  delay = 0,
+  showLabel = false,
+  glow = false,
+  gradient = false
+}: ProgressBarProps) {
+  const [currentValue, setCurrentValue] = useState(animate ? 0 : value);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const percentage = Math.min((currentValue / max) * 100, 100);
+
+  const colorClasses = {
+    primary: gradient 
+      ? 'bg-gradient-to-r from-[#0277BD] to-[#01579B]' 
+      : 'bg-[#0277BD]',
+    success: gradient 
+      ? 'bg-gradient-to-r from-[#388E3C] to-[#2E7D32]' 
+      : 'bg-[#388E3C]',
+    warning: gradient 
+      ? 'bg-gradient-to-r from-[#FBC02D] to-[#F57C00]' 
+      : 'bg-[#FBC02D]',
+    error: gradient 
+      ? 'bg-gradient-to-r from-[#D32F2F] to-[#B71C1C]' 
+      : 'bg-[#D32F2F]'
+  };
+
+  const sizeClasses = {
+    sm: 'h-2',
+    md: 'h-3',
+    lg: 'h-4'
+  };
+
+  const glowClasses = {
+    primary: 'shadow-lg shadow-blue-500/30',
+    success: 'shadow-lg shadow-green-500/30',
+    warning: 'shadow-lg shadow-yellow-500/30',
+    error: 'shadow-lg shadow-red-500/30'
+  };
+
+  useEffect(() => {
+    if (!animate) return;
+
+    const timer = setTimeout(() => {
+      setIsAnimating(true);
+      const duration = 1200;
+      const steps = 60;
+      const increment = value / steps;
+      let current = 0;
+
+      const interval = setInterval(() => {
+        current += increment;
+        if (current >= value) {
+          setCurrentValue(value);
+          setIsAnimating(false);
+          clearInterval(interval);
+        } else {
+          setCurrentValue(current);
+        }
+      }, duration / steps);
+
+      return () => clearInterval(interval);
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [animate, delay, value]);
+
+  return (
+    <div className="w-full">
+      <div className={`w-full bg-gray-200 rounded-full overflow-hidden ${sizeClasses[size]}`}>
+        <div
+          className={`${sizeClasses[size]} ${colorClasses[color]} rounded-full transition-all duration-300 ease-out relative overflow-hidden ${
+            glow ? glowClasses[color] : ''
+          } ${isAnimating ? 'animate-progress-glow' : ''}`}
+          style={{ 
+            width: `${percentage}%`,
+            transition: animate ? 'width 1200ms cubic-bezier(0.23, 1, 0.32, 1)' : undefined
+          }}
+        >
+          {/* Shimmer effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full animate-shimmer" />
+          
+          {/* Glow effect */}
+          {glow && (
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
+          )}
+        </div>
+      </div>
+      
+      {showLabel && (
+        <div className="flex justify-between items-center mt-2 text-sm text-gray-600">
+          <span>{Math.round(currentValue)}</span>
+          <span>{max}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\components\effects\BlueprintReveal.tsx
+---- CONTENT ----
+
+import { useEffect, useState } from 'react';
+
+interface BlueprintRevealProps {
+  onComplete?: () => void;
+  duration?: number;
+}
+
+export default function BlueprintReveal({ onComplete, duration = 2500 }: BlueprintRevealProps) {
+  const [isVisible, setIsVisible] = useState(true);
+  const [phase, setPhase] = useState<'grid' | 'pulse' | 'fade'>('grid');
+
+  useEffect(() => {
+    const timer1 = setTimeout(() => setPhase('pulse'), 800);
+    const timer2 = setTimeout(() => setPhase('fade'), 1500);
+    const timer3 = setTimeout(() => {
+      setIsVisible(false);
+      onComplete?.();
+    }, duration);
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+    };
+  }, [duration, onComplete]);
+
+  if (!isVisible) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 pointer-events-none">
+      {/* Blueprint Grid */}
+      <div 
+        className={`absolute inset-0 blueprint-grid transition-opacity duration-1000 ${
+          phase === 'fade' ? 'opacity-0' : 'opacity-100'
+        }`}
+      />
+      
+      {/* Pulse Effect */}
+      {phase === 'pulse' && (
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-radial from-blue-500/20 via-transparent to-transparent animate-ping" />
+          <div className="absolute inset-0 bg-gradient-radial from-blue-400/10 via-transparent to-transparent animate-pulse" />
+        </div>
+      )}
+      
+      {/* Construction Lines */}
+      <svg className="absolute inset-0 w-full h-full">
+        <defs>
+          <pattern id="construction" patternUnits="userSpaceOnUse" width="100" height="100">
+            <path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(2, 119, 189, 0.3)" strokeWidth="1"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#construction)" className={`transition-opacity duration-1000 ${
+          phase === 'fade' ? 'opacity-0' : 'opacity-100'
+        }`} />
+      </svg>
+    </div>
+  );
+}
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\components\effects\EngineeringBackground.tsx
+---- CONTENT ----
+
+import { useEffect, useRef } from 'react';
+
+interface EngineeringElement {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  size: number;
+  opacity: number;
+  rotation: number;
+  rotationSpeed: number;
+  type: 'gear' | 'circuit' | 'blueprint' | 'grid';
+  glowIntensity: number;
+}
+
+export default function EngineeringBackground() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const elementsRef = useRef<EngineeringElement[]>([]);
+  const animationRef = useRef<number>();
+  const lightPositionRef = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    const createElements = () => {
+      const elementCount = window.innerWidth < 768 ? 15 : 25;
+      elementsRef.current = [];
+
+      for (let i = 0; i < elementCount; i++) {
+        elementsRef.current.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+          size: Math.random() * 40 + 20,
+          opacity: Math.random() * 0.3 + 0.1,
+          rotation: Math.random() * Math.PI * 2,
+          rotationSpeed: (Math.random() - 0.5) * 0.01,
+          type: ['gear', 'circuit', 'blueprint', 'grid'][Math.floor(Math.random() * 4)] as any,
+          glowIntensity: Math.random() * 0.5 + 0.3
+        });
+      }
+    };
+
+    const drawGear = (ctx: CanvasRenderingContext2D, size: number) => {
+      const teeth = 12;
+      const innerRadius = size * 0.3;
+      const outerRadius = size * 0.5;
+      
+      ctx.beginPath();
+      for (let i = 0; i < teeth * 2; i++) {
+        const angle = (i * Math.PI) / teeth;
+        const radius = i % 2 === 0 ? outerRadius : innerRadius;
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+        
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      
+      // Inner circle
+      ctx.moveTo(innerRadius * 0.5, 0);
+      ctx.arc(0, 0, innerRadius * 0.5, 0, Math.PI * 2);
+    };
+
+    const drawCircuit = (ctx: CanvasRenderingContext2D, size: number) => {
+      const gridSize = size / 6;
+      
+      // Circuit lines
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const x = (i - 2.5) * gridSize;
+        ctx.moveTo(x, -size/2);
+        ctx.lineTo(x, size/2);
+        
+        const y = (i - 2.5) * gridSize;
+        ctx.moveTo(-size/2, y);
+        ctx.lineTo(size/2, y);
+      }
+      
+      // Circuit nodes
+      for (let i = 0; i < 4; i++) {
+        const x = (Math.random() - 0.5) * size * 0.8;
+        const y = (Math.random() - 0.5) * size * 0.8;
+        ctx.moveTo(x + 3, y);
+        ctx.arc(x, y, 3, 0, Math.PI * 2);
+      }
+    };
+
+    const drawBlueprint = (ctx: CanvasRenderingContext2D, size: number) => {
+      // Blueprint grid
+      const gridSize = size / 8;
+      ctx.beginPath();
+      for (let i = -4; i <= 4; i++) {
+        ctx.moveTo(i * gridSize, -size/2);
+        ctx.lineTo(i * gridSize, size/2);
+        ctx.moveTo(-size/2, i * gridSize);
+        ctx.lineTo(size/2, i * gridSize);
+      }
+      
+      // Blueprint shapes
+      ctx.rect(-size/4, -size/4, size/2, size/2);
+      ctx.moveTo(size/4, 0);
+      ctx.arc(0, 0, size/4, 0, Math.PI * 2);
+    };
+
+    const drawGrid = (ctx: CanvasRenderingContext2D, size: number) => {
+      const spacing = size / 6;
+      ctx.beginPath();
+      
+      for (let i = -3; i <= 3; i++) {
+        // Vertical lines
+        ctx.moveTo(i * spacing, -size/2);
+        ctx.lineTo(i * spacing, size/2);
+        
+        // Horizontal lines
+        ctx.moveTo(-size/2, i * spacing);
+        ctx.lineTo(size/2, i * spacing);
+      }
+    };
+
+    const drawElement = (element: EngineeringElement) => {
+      ctx.save();
+      ctx.translate(element.x, element.y);
+      ctx.rotate(element.rotation);
+      
+      // Calculate distance from light for glow effect
+      const lightDistance = Math.sqrt(
+        Math.pow(element.x - lightPositionRef.current.x, 2) + 
+        Math.pow(element.y - lightPositionRef.current.y, 2)
+      );
+      const maxDistance = Math.sqrt(canvas.width * canvas.width + canvas.height * canvas.height);
+      const lightInfluence = Math.max(0, 1 - lightDistance / (maxDistance * 0.3));
+      
+      // Enhanced glow when near light
+      const glowOpacity = element.opacity + lightInfluence * element.glowIntensity;
+      
+      // Outer glow
+      if (lightInfluence > 0.1) {
+        ctx.shadowColor = '#0277BD';
+        ctx.shadowBlur = 20 * lightInfluence;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+      }
+      
+      ctx.globalAlpha = Math.min(glowOpacity, 0.6);
+      ctx.strokeStyle = `rgba(2, 119, 189, ${glowOpacity})`;
+      ctx.fillStyle = `rgba(2, 119, 189, ${glowOpacity * 0.1})`;
+      ctx.lineWidth = 1 + lightInfluence * 2;
+      
+      // Draw based on type
+      switch (element.type) {
+        case 'gear':
+          drawGear(ctx, element.size);
+          break;
+        case 'circuit':
+          drawCircuit(ctx, element.size);
+          break;
+        case 'blueprint':
+          drawBlueprint(ctx, element.size);
+          break;
+        case 'grid':
+          drawGrid(ctx, element.size);
+          break;
+      }
+      
+      ctx.stroke();
+      if (element.type === 'gear') {
+        ctx.fill();
+      }
+      
+      ctx.restore();
+    };
+
+    const drawMovingLight = () => {
+      const time = Date.now() * 0.001;
+      
+      // Moving light path (figure-8 pattern)
+      lightPositionRef.current.x = canvas.width * 0.5 + Math.sin(time * 0.3) * canvas.width * 0.3;
+      lightPositionRef.current.y = canvas.height * 0.5 + Math.sin(time * 0.6) * canvas.height * 0.2;
+      
+      // Draw light source
+      const gradient = ctx.createRadialGradient(
+        lightPositionRef.current.x, lightPositionRef.current.y, 0,
+        lightPositionRef.current.x, lightPositionRef.current.y, 150
+      );
+      gradient.addColorStop(0, 'rgba(2, 119, 189, 0.3)');
+      gradient.addColorStop(0.5, 'rgba(2, 119, 189, 0.1)');
+      gradient.addColorStop(1, 'rgba(2, 119, 189, 0)');
+      
+      ctx.fillStyle = gradient;
+      ctx.fillRect(
+        lightPositionRef.current.x - 150,
+        lightPositionRef.current.y - 150,
+        300,
+        300
+      );
+      
+      // Light beam effect
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.fillStyle = 'rgba(2, 119, 189, 0.05)';
+      ctx.beginPath();
+      ctx.arc(lightPositionRef.current.x, lightPositionRef.current.y, 80, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    };
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw moving light first
+      drawMovingLight();
+      
+      // Update and draw elements
+      elementsRef.current.forEach(element => {
+        // Update position
+        element.x += element.vx;
+        element.y += element.vy;
+        element.rotation += element.rotationSpeed;
+        
+        // Bounce off edges
+        if (element.x < -element.size || element.x > canvas.width + element.size) {
+          element.vx *= -1;
+        }
+        if (element.y < -element.size || element.y > canvas.height + element.size) {
+          element.vy *= -1;
+        }
+        
+        // Keep elements in bounds
+        element.x = Math.max(-element.size, Math.min(canvas.width + element.size, element.x));
+        element.y = Math.max(-element.size, Math.min(canvas.height + element.size, element.y));
+        
+        drawElement(element);
+      });
+      
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    resizeCanvas();
+    createElements();
+    animate();
+
+    const handleResize = () => {
+      resizeCanvas();
+      createElements();
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none z-0"
+      style={{ opacity: 0.4 }}
+    />
+  );
+}
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\components\effects\LoadingSpinner.tsx
+---- CONTENT ----
+
+interface LoadingSpinnerProps {
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  variant?: 'primary' | 'secondary' | 'engineering';
+  text?: string;
+  className?: string;
+}
+
+export default function LoadingSpinner({ 
+  size = 'md', 
+  variant = 'primary', 
+  text,
+  className = '' 
+}: LoadingSpinnerProps) {
+  const sizeClasses = {
+    sm: 'w-4 h-4',
+    md: 'w-8 h-8',
+    lg: 'w-12 h-12',
+    xl: 'w-16 h-16'
+  };
+
+  const textSizeClasses = {
+    sm: 'text-xs',
+    md: 'text-sm',
+    lg: 'text-base',
+    xl: 'text-lg'
+  };
+
+  if (variant === 'engineering') {
+    return (
+      <div className={`flex flex-col items-center justify-center ${className}`}>
+        <div className={`relative ${sizeClasses[size]}`}>
+          {/* Outer gear */}
+          <div className="absolute inset-0 border-4 border-blue-200 rounded-full animate-spin">
+            <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-blue-200 rounded-full"></div>
+            <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-blue-200 rounded-full"></div>
+            <div className="absolute -left-1 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-blue-200 rounded-full"></div>
+            <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-blue-200 rounded-full"></div>
+          </div>
+          
+          {/* Inner gear */}
+          <div className="absolute inset-2 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" 
+               style={{ animationDirection: 'reverse', animationDuration: '1.2s' }}>
+          </div>
+          
+          {/* Center icon */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <i className="ri-tools-line text-blue-600 animate-pulse" style={{ fontSize: size === 'sm' ? '8px' : size === 'md' ? '12px' : size === 'lg' ? '16px' : '20px' }}></i>
+          </div>
+        </div>
+        
+        {text && (
+          <div className={`mt-3 text-blue-600 font-medium animate-pulse ${textSizeClasses[size]}`}>
+            {text}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  const variantClasses = {
+    primary: 'border-blue-500 border-t-transparent',
+    secondary: 'border-gray-300 border-t-transparent'
+  };
+
+  return (
+    <div className={`flex flex-col items-center justify-center ${className}`}>
+      <div className={`${sizeClasses[size]} border-4 rounded-full animate-spin ${variantClasses[variant]}`}></div>
+      {text && (
+        <div className={`mt-2 text-gray-600 ${textSizeClasses[size]}`}>
+          {text}
+        </div>
+      )}
+    </div>
+  );
+}
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\components\effects\PageTransition.tsx
+---- CONTENT ----
+
+import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+
+interface PageTransitionProps {
+  children: React.ReactNode;
+}
+
+export default function PageTransition({ children }: PageTransitionProps) {
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [displayChildren, setDisplayChildren] = useState(children);
+  const location = useLocation();
+
+  useEffect(() => {
+    setIsTransitioning(true);
+    
+    const timer = setTimeout(() => {
+      setDisplayChildren(children);
+      setIsTransitioning(false);
+    }, 150);
+
+    return () => clearTimeout(timer);
+  }, [location.pathname, children]);
+
+  return (
+    <div className="relative min-h-screen">
+      {/* Page transition overlay */}
+      <div 
+        className={`fixed inset-0 z-50 pointer-events-none transition-all duration-300 ease-out ${
+          isTransitioning 
+            ? 'opacity-100 bg-gradient-to-br from-blue-50 via-white to-blue-50' 
+            : 'opacity-0'
+        }`}
+      >
+        {isTransitioning && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="relative">
+              {/* Animated engineering icon */}
+              <div className="w-16 h-16 relative">
+                <div className="absolute inset-0 border-4 border-blue-200 rounded-full animate-spin"></div>
+                <div className="absolute inset-2 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '0.8s' }}></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <i className="ri-settings-3-line text-2xl text-blue-600 animate-pulse"></i>
+                </div>
+              </div>
+              
+              {/* Loading text */}
+              <div className="mt-4 text-center">
+                <div className="text-blue-600 font-medium animate-pulse">Loading...</div>
+                <div className="w-24 h-1 bg-blue-200 rounded-full mt-2 overflow-hidden">
+                  <div className="h-full bg-blue-500 rounded-full animate-progress-fill"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Page content */}
+      <div 
+        className={`transition-all duration-500 ease-out ${
+          isTransitioning 
+            ? 'opacity-0 transform translate-y-4 scale-95' 
+            : 'opacity-100 transform translate-y-0 scale-100'
+        }`}
+      >
+        {displayChildren}
+      </div>
+    </div>
+  );
+}
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\components\effects\ParticleBackground.tsx
+---- CONTENT ----
+
+import { useEffect, useRef } from 'react';
+
+interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  size: number;
+  opacity: number;
+  rotation: number;
+  rotationSpeed: number;
+}
+
+export default function ParticleBackground() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const particlesRef = useRef<Particle[]>([]);
+  const animationRef = useRef<number>();
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    const createParticles = () => {
+      const particleCount = window.innerWidth < 768 ? 30 : 80;
+      particlesRef.current = [];
+
+      for (let i = 0; i < particleCount; i++) {
+        particlesRef.current.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          size: Math.random() * 3 + 1,
+          opacity: Math.random() * 0.5 + 0.2,
+          rotation: Math.random() * Math.PI * 2,
+          rotationSpeed: (Math.random() - 0.5) * 0.02
+        });
+      }
+    };
+
+    const drawParticle = (particle: Particle) => {
+      ctx.save();
+      ctx.translate(particle.x, particle.y);
+      ctx.rotate(particle.rotation);
+      ctx.globalAlpha = particle.opacity;
+      
+      // Draw geometric shape
+      ctx.fillStyle = '#0277BD';
+      ctx.fillRect(-particle.size / 2, -particle.size / 2, particle.size, particle.size);
+      
+      // Draw connecting lines
+      particlesRef.current.forEach(otherParticle => {
+        const dx = particle.x - otherParticle.x;
+        const dy = particle.y - otherParticle.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < 150) {
+          ctx.globalAlpha = (150 - distance) / 150 * 0.1;
+          ctx.strokeStyle = '#0277BD';
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(-dx, -dy);
+          ctx.stroke();
+        }
+      });
+      
+      ctx.restore();
+    };
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      particlesRef.current.forEach(particle => {
+        // Update position
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+        particle.rotation += particle.rotationSpeed;
+        
+        // Bounce off edges
+        if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
+        if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
+        
+        // Keep particles in bounds
+        particle.x = Math.max(0, Math.min(canvas.width, particle.x));
+        particle.y = Math.max(0, Math.min(canvas.height, particle.y));
+        
+        drawParticle(particle);
+      });
+      
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    resizeCanvas();
+    createParticles();
+    animate();
+
+    const handleResize = () => {
+      resizeCanvas();
+      createParticles();
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none z-0"
+      style={{ opacity: 0.6 }}
+    />
+  );
+}
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\components\feature\Header.tsx
+---- CONTENT ----
+
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Button from '../base/Button';
+import Logo from '../base/Logo';
+import { useAuthContext } from '../../contexts/AuthContext';
+
+export default function Header() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const { user, logout } = useAuthContext();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  return (
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      isScrolled ? 'glass-nav shadow-lg' : 'bg-white/90'
+    }`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 flex items-center justify-center">
+              <i className="ri-settings-3-line text-primary text-xl"></i>
+            </div>
+            <Logo />
+          </div>
+
+          {/* Search Bar */}
+          <div className="hidden md:flex flex-1 max-w-md mx-8">
+            <div className="relative w-full">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i className="ri-search-line text-gray-400"></i>
+              </div>
+              <input
+                type="text"
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white/80 backdrop-blur-sm placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-primary focus:border-primary text-sm transition-all duration-200"
+                placeholder="Search questions, topics..."
+              />
+            </div>
+          </div>
+
+          {/* Right Section */}
+          <div className="flex items-center space-x-4">
+            {/* Notifications */}
+            <div className="relative">
+              <Button variant="icon" size="sm" className="bg-gray-100 text-gray-600 hover:bg-gray-200">
+                <i className="ri-notification-3-line"></i>
+              </Button>
+              <span className="absolute -top-1 -right-1 h-4 w-4 bg-error text-white text-xs rounded-full flex items-center justify-center animate-bounce-in">
+                3
+              </span>
+            </div>
+
+            {/* User Avatar */}
+            <div className="relative group">
+              <button className="flex items-center space-x-2 p-1 rounded-lg hover:bg-gray-100 transition-colors">
+                <img
+                  src={user?.avatar_url || "https://readdy.ai/api/search-image?query=professional%20engineer%20avatar%20portrait%20confident%20smile%20modern%20office%20background%20business%20attire&width=40&height=40&seq=user-avatar&orientation=squarish"}
+                  alt="User Avatar"
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+                <span className="hidden md:block text-sm font-medium text-gray-700">
+                  {user ? `${user.first_name} ${user.last_name}` : 'User'}
+                </span>
+                <i className="ri-arrow-down-s-line text-gray-400 group-hover:text-gray-600 transition-colors"></i>
+              </button>
+              
+              {/* Dropdown Menu */}
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-1 group-hover:translate-y-0">
+                <div className="py-1">
+                  <a href="/profile" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                    <i className="ri-user-line mr-3"></i>
+                    Profile
+                  </a>
+                  <a href="/settings/account" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                    <i className="ri-settings-line mr-3"></i>
+                    Settings
+                  </a>
+                  <a href="/help" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                    <i className="ri-question-line mr-3"></i>
+                    Help
+                  </a>
+                  <hr className="my-1" />
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors w-full text-left"
+                  >
+                    <i className="ri-logout-box-line mr-3"></i>
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\components\feature\MobileNavigation.tsx
+---- CONTENT ----
+
+import { useState } from 'react';
+
+export default function MobileNavigation() {
+  const [activeTab, setActiveTab] = useState('home');
+
+  const navItems = [
+    { id: 'home', icon: 'ri-home-line', iconFilled: 'ri-home-fill', label: 'Home' },
+    { id: 'practice', icon: 'ri-question-line', iconFilled: 'ri-question-fill', label: 'Practice' },
+    { id: 'study', icon: 'ri-book-open-line', iconFilled: 'ri-book-open-fill', label: 'Study Path' },
+    { id: 'analytics', icon: 'ri-bar-chart-line', iconFilled: 'ri-bar-chart-fill', label: 'Analytics' },
+    { id: 'community', icon: 'ri-group-line', iconFilled: 'ri-group-fill', label: 'Community' }
+  ];
+
+  const handleTabClick = (tabId: string) => {
+    setActiveTab(tabId);
+    // Add bounce animation
+    const button = document.querySelector(`[data-tab="${tabId}"]`);
+    if (button) {
+      button.classList.add('animate-bounce');
+      setTimeout(() => {
+        button.classList.remove('animate-bounce');
+      }, 600);
+    }
+  };
+
+  return (
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+      <div className="flex items-center justify-around py-2">
+        {navItems.map((item) => (
+          <button
+            key={item.id}
+            data-tab={item.id}
+            onClick={() => handleTabClick(item.id)}
+            className={`flex flex-col items-center justify-center p-2 min-w-0 flex-1 transition-all duration-200 ${
+              activeTab === item.id
+                ? 'text-primary'
+                : 'text-gray-400 hover:text-gray-600'
+            }`}
+          >
+            <div className="w-6 h-6 flex items-center justify-center mb-1">
+              <i className={`text-xl ${activeTab === item.id ? item.iconFilled : item.icon}`}></i>
+            </div>
+            <span className={`text-xs font-medium transition-all duration-200 ${
+              activeTab === item.id 
+                ? 'opacity-100 transform translate-y-0' 
+                : 'opacity-0 transform translate-y-1'
+            }`}>
+              {item.label}
+            </span>
+          </button>
+        ))}
+      </div>
+    </nav>
+  );
+}
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\components\toast\ToastContext.tsx
+---- CONTENT ----
+import { createContext, useContext, useState } from 'react';
+import type { ReactNode } from 'react';
+
+type Toast = { id: number; message: string; type?: 'error' | 'success' | 'info' };
+
+interface ToastContextType {
+  push: (message: string, type?: 'error' | 'success' | 'info') => void;
+  list: Toast[];
+}
+
+const ToastContext = createContext<ToastContextType>({ push: () => {}, list: [] });
+
+export function ToastProvider({ children }: { children: ReactNode }) {
+  const [list, setList] = useState<Toast[]>([]);
+  
+  function push(message: string, type: 'error' | 'success' | 'info' = 'error') {
+    const id = Date.now();
+    setList(l => [...l, { id, message, type }]);
+    setTimeout(() => setList(l => l.filter(t => t.id !== id)), 3500);
+  }
+  
+  return (
+    <ToastContext.Provider value={{ push, list }}>
+      {children}
+      <div className="fixed bottom-4 right-4 space-y-2 z-50">
+        {list.map(t => (
+          <div
+            key={t.id}
+            className={`rounded-xl shadow-lg px-4 py-3 text-sm font-medium animate-slide-up ${
+              t.type === 'success' ? 'bg-green-600 text-white' :
+              t.type === 'info' ? 'bg-blue-600 text-white' :
+              'bg-red-600 text-white'
+            }`}
+          >
+            <div className="flex items-center space-x-2">
+              <i className={`${
+                t.type === 'success' ? 'ri-checkbox-circle-line' :
+                t.type === 'info' ? 'ri-information-line' :
+                'ri-error-warning-line'
+              }`}></i>
+              <span>{t.message}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </ToastContext.Provider>
+  );
+}
+
+export function useToast() {
+  return useContext(ToastContext);
+}
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\contexts\AuthContext.tsx
+---- CONTENT ----
+import { createContext, useContext, useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
+import { authService } from '../api';
+import type { User } from '../api';
+
+interface AuthContextType {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  setUser: (user: User | null) => void;
+  logout: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Validate session with backend on mount
+    const validateSession = async () => {
+      try {
+        // Validate session cookie with backend
+        const userData = await authService.validateSession();
+        setUser(userData);
+      } catch (error: any) {
+        // Session is invalid, expired, or user is not logged in
+        // This is expected for non-authenticated users, so don't log as error
+        if (error?.message?.includes('404')) {
+          // Backend endpoint might not exist or auth middleware rejected request
+          console.log('No active session found');
+        }
+        setUser(null);
+        // Clear any cached user data
+        localStorage.removeItem('user');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    validateSession();
+  }, []);
+
+  const logout = async () => {
+    try {
+      // Call logout service which clears cookies and redirects
+      await authService.logout();
+      setUser(null);
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Clear state anyway
+      setUser(null);
+      localStorage.removeItem('user');
+    }
+  };
+
+  const value = {
+    user,
+    isAuthenticated: !!user,
+    isLoading,
+    setUser,
+    logout,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+export const useAuthContext = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuthContext must be used within an AuthProvider');
+  }
+  return context;
+};
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\hooks\useAuth.ts
+---- CONTENT ----
+import { useState } from 'react';
+import { authService } from '../api';
+import type { LoginRequest, RegisterRequest, AuthResponse } from '../api';
+
+export const useAuth = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const login = async (credentials: LoginRequest): Promise<AuthResponse | null> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await authService.login(credentials);
+      return response;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed');
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const register = async (data: RegisterRequest): Promise<AuthResponse | null> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await authService.register(data);
+      return response;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Registration failed');
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    // authService.logout() handles redirect to login page
+    await authService.logout();
+  };
+
+  const forgotPassword = async (email: string): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+    try {
+      await authService.forgotPassword({ email });
+      return true;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Password reset failed');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetPassword = async (token: string, password: string): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+    try {
+      await authService.resetPassword({ token, password });
+      return true;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Password reset failed');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return {
+    login,
+    register,
+    logout,
+    forgotPassword,
+    resetPassword,
+    loading,
+    error,
+  };
+};
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\hooks\useDashboard.ts
+---- CONTENT ----
+import { useState, useEffect } from 'react';
+import { dashboardService } from '../api';
+import type { DashboardData } from '../api';
+
+export const useDashboard = () => {
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchDashboard = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const dashboardData = await dashboardService.getDashboard();
+      setData(dashboardData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch dashboard data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboard();
+  }, []);
+
+  return {
+    data,
+    loading,
+    error,
+    refresh: fetchDashboard,
+  };
+};
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\i18n\index.ts
+---- CONTENT ----
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
+import messages from './local/index';
+
+i18n
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .init({
+    lng: 'en',
+    fallbackLng: 'en',
+    debug: false,
+    resources: messages,
+    interpolation: {
+      escapeValue: false,
+    },
+  });
+
+export default i18n;
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\i18n\local\index.ts
+---- CONTENT ----
+const modules = import.meta.glob('./*/*.ts', { eager: true });
+
+const messages: Record<string, { translation: Record<string, string> }> = {};
+
+Object.keys(modules).forEach((path) => {
+  const match = path.match(/\.\/([^/]+)\/([^/]+)\.ts$/);
+  if (match) {
+    const [, lang] = match;
+    const module = modules[path] as { default?: Record<string, string> };
+    
+    if (!messages[lang]) {
+      messages[lang] = { translation: {} };
+    }
+    
+    // 合并翻译内容
+    if (module.default) {
+      messages[lang].translation = {
+        ...messages[lang].translation,
+        ...module.default
+      };
+    }
+  }
+});
+
+export default messages; 
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\index.css
+---- CONTENT ----
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Enhanced Glassmorphism styles */
+.glass {
+  backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 12px 40px rgba(31, 38, 135, 0.2);
+}
+
+/* Enhanced Glassmorphism styles */
+.glass-card {
+  backdrop-filter: blur(24px) saturate(180%);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 16px 48px rgba(31, 38, 135, 0.15);
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.glass-card:hover {
+  backdrop-filter: blur(28px) saturate(200%);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 24px 64px rgba(31, 38, 135, 0.25);
+}
+
+.glass-nav {
+  backdrop-filter: blur(16px) saturate(180%);
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Advanced animated gradient backgrounds */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  25% { background-position: 100% 50%; }
+  50% { background-position: 100% 100%; }
+  75% { background-position: 0% 100%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes meshGradient {
+  0% { transform: rotate(0deg) scale(1) translateX(0px); }
+  25% { transform: rotate(90deg) scale(1.1) translateX(20px); }
+  50% { transform: rotate(180deg) scale(0.9) translateX(-10px); }
+  75% { transform: rotate(270deg) scale(1.05) translateX(15px); }
+  100% { transform: rotate(360deg) scale(1) translateX(0px); }
+}
+
+@keyframes colorShift {
+  0% { filter: hue-rotate(0deg); }
+  50% { filter: hue-rotate(30deg); }
+  100% { filter: hue-rotate(0deg); }
+}
+
+.animated-gradient {
+  background: linear-gradient(-45deg, #0277BD, #6366f1, #F57C00, #01579B, #8B5CF6, #0277BD);
+  background-size: 600% 600%;
+  animation: gradientShift 25s ease infinite;
+}
+
+.mesh-gradient {
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(2, 119, 189, 0.4) 0%, transparent 60%),
+    radial-gradient(circle at 80% 20%, rgba(245, 124, 0, 0.35) 0%, transparent 60%),
+    radial-gradient(circle at 40% 40%, rgba(99, 102, 241, 0.3) 0%, transparent 60%),
+    radial-gradient(circle at 60% 80%, rgba(139, 92, 246, 0.25) 0%, transparent 60%);
+  animation: meshGradient 40s ease infinite, colorShift 60s ease infinite;
+}
+
+/* Blueprint grid pattern */
+@keyframes blueprintReveal {
+  0% { 
+    opacity: 1;
+    background-size: 40px 40px;
+  }
+  50% {
+    opacity: 0.8;
+    background-size: 45px 45px;
+  }
+  100% { 
+    opacity: 0.1;
+    background-size: 40px 40px;
+  }
+}
+
+.blueprint-grid {
+  background-image: 
+    linear-gradient(rgba(2, 119, 189, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(2, 119, 189, 0.1) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: blueprintReveal 2.5s ease-out;
+}
+
+/* Enhanced 3D Card Effects */
+.card-3d {
+  transform-style: preserve-3d;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: transform;
+}
+
+.card-3d:hover {
+  transform: perspective(1200px) rotateX(var(--rotate-x, -8deg)) rotateY(var(--rotate-y, 8deg)) translateZ(30px);
+}
+
+/* Premium button effects */
+.btn-premium {
+  background: linear-gradient(45deg, #0277BD, #01579B);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.btn-premium::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.btn-premium:hover::before {
+  left: 100%;
+}
+
+.btn-premium:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 20px 50px rgba(2, 119, 189, 0.5);
+  background: linear-gradient(45deg, #01579B, #0277BD);
+}
+
+/* Advanced glow effects */
+.glow-effect {
+  position: relative;
+  overflow: visible;
+}
+
+.glow-effect::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: linear-gradient(45deg, #0277BD, #F57C00, #6366f1, #8B5CF6, #0277BD);
+  border-radius: inherit;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.4s ease;
+  animation: gradientShift 4s ease infinite;
+  filter: blur(8px);
+}
+
+.glow-effect:hover::before {
+  opacity: 0.8;
+}
+
+/* Floating animations with physics */
+@keyframes floatComplex {
+  0%, 100% { 
+    transform: translateY(0px) translateX(0px) rotate(0deg); 
+  }
+  25% { 
+    transform: translateY(-15px) translateX(5px) rotate(2deg); 
+  }
+  50% { 
+    transform: translateY(-8px) translateX(-3px) rotate(-1deg); 
+  }
+  75% { 
+    transform: translateY(-12px) translateX(8px) rotate(1.5deg); 
+  }
+}
+
+.float-animation {
+  animation: floatComplex 8s ease-in-out infinite;
+}
+
+/* Enhanced particle system */
+.particles-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* Advanced animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes progressFill {
+  from {
+    width: 0%;
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes progressGlow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(2, 119, 188, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(2, 119, 188, 0.6);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.8;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+@keyframes drawProgress {
+  from {
+    stroke-dasharray: 0 100;
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(6);
+    opacity: 0;
+  }
+}
+
+@keyframes checkmark {
+  0% {
+    stroke-dashoffset: 16;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes expandCircle {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes morphShape {
+  0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  25% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+  50% { border-radius: 70% 30% 40% 60% / 40% 70% 60% 30%; }
+  75% { border-radius: 40% 70% 60% 30% / 70% 40% 30% 60%; }
+  100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(2, 119, 188, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 50px rgba(2, 119, 188, 0.7);
+  }
+}
+
+@keyframes textReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes numberCount {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loadingDots {
+  0%, 20% {
+    content: '';
+  }
+  40% {
+    content: '.';
+  }
+  60% {
+    content: '..';
+  }
+  80%, 100% {
+    content: '...';
+  }
+}
+
+/* Utility classes */
+.animate-fade-in-up {
+  animation: fadeInUp 400ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.animate-slide-in-left {
+  animation: slideInFromLeft 500ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.animate-slide-in-right {
+  animation: slideInFromRight 500ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.animate-scale-in {
+  animation: scaleIn 400ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.animate-progress-fill {
+  animation: progressFill 1200ms ease-in-out;
+}
+
+.animate-progress-glow {
+  animation: progressGlow 2s ease-in-out infinite;
+}
+
+.animate-pulse-gentle {
+  animation: pulse 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.8s infinite;
+}
+
+.animate-draw-progress {
+  animation: drawProgress 1000ms ease-out;
+}
+
+.animate-ripple {
+  animation: ripple 500ms ease-out;
+}
+
+.animate-checkmark {
+  stroke-dasharray: 16;
+  animation: checkmark 400ms ease-out forwards;
+}
+
+.animate-slide-down {
+  animation: slideDown 600ms ease-out;
+}
+
+.animate-expand-circle {
+  animation: expandCircle 700ms ease-out;
+}
+
+.animate-bounce-in {
+  animation: bounceIn 700ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-morph {
+  animation: morphShape 12s ease-in-out infinite;
+}
+
+.animate-glow-pulse {
+  animation: glowPulse 4s ease-in-out infinite;
+}
+
+.animate-text-reveal {
+  animation: textReveal 600ms ease-out;
+}
+
+.animate-number-count {
+  animation: numberCount 800ms ease-out;
+}
+
+/* Enhanced card hover effects */
+.card-hover {
+  transition: all 300ms cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: transform;
+}
+
+.card-hover:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+/* Premium card hover with 3D effect */
+.card-hover-3d {
+  transition: all 400ms cubic-bezier(0.23, 1, 0.32, 1);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.card-hover-3d:hover {
+  transform: perspective(1200px) rotateX(-8deg) rotateY(8deg) translateZ(40px);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+}
+
+/* Button transitions */
+.btn-transition {
+  transition: all 300ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Enhanced button with magnetic effect */
+.btn-magnetic {
+  transition: all 400ms cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative;
+  overflow: hidden;
+  will-change: transform;
+}
+
+.btn-magnetic:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 20px 50px rgba(2, 119, 188, 0.5);
+}
+
+.btn-magnetic::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s;
+}
+
+.btn-magnetic:hover::before {
+  left: 100%;
+}
+
+/* Progress bar animations */
+.progress-bar {
+  transition: width 1200ms cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: width;
+}
+
+.progress-bar-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar-glow::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  animation: shimmer 2.5s infinite;
+}
+
+/* Skeleton loading */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 2s infinite;
+  border-radius: 6px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(241, 241, 241, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(2, 119, 188, 0.6);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(2, 119, 188, 0.8);
+}
+
+/* Typography */
+body {
+  font-family: 'Inter', sans-serif;
+  scroll-behavior: smooth;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+}
+
+/* Page transition */
+.page-transition {
+  animation: fadeInUp 400ms ease-out;
+}
+
+/* Staggered animation delays */
+.stagger-1 { animation-delay: 100ms; }
+.stagger-2 { animation-delay: 200ms; }
+.stagger-3 { animation-delay: 300ms; }
+.stagger-4 { animation-delay: 400ms; }
+.stagger-5 { animation-delay: 500ms; }
+.stagger-6 { animation-delay: 600ms; }
+.stagger-7 { animation-delay: 700ms; }
+.stagger-8 { animation-delay: 800ms; }
+.stagger-9 { animation-delay: 900ms; }
+.stagger-10 { animation-delay: 1000ms; }
+
+/* Enhanced geometric shapes */
+.geometric-shape {
+  position: absolute;
+  opacity: 0.12;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.shape-1 {
+  width: 250px;
+  height: 250px;
+  background: linear-gradient(45deg, #0277BD, #6366f1, #8B5CF6);
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  animation: morphShape 15s ease-in-out infinite, floatComplex 10s ease-in-out infinite;
+  top: 8%;
+  right: 8%;
+}
+
+.shape-2 {
+  width: 180px;
+  height: 180px;
+  background: linear-gradient(135deg, #F57C00, #0277BD, #6366f1);
+  border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+  animation: morphShape 18s ease-in-out infinite reverse, floatComplex 12s ease-in-out infinite;
+  bottom: 15%;
+  left: 3%;
+  animation-delay: -6s;
+}
+
+.shape-3 {
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(225deg, #6366f1, #F57C00, #8B5CF6);
+  border-radius: 50% 20% 80% 30% / 30% 70% 20% 80%;
+  animation: morphShape 22s ease-in-out infinite, floatComplex 14s ease-in-out infinite;
+  top: 55%;
+  right: 25%;
+  animation-delay: -12s;
+}
+
+.shape-4 {
+  width: 200px;
+  height: 200px;
+  background: linear-gradient(315deg, #8B5CF6, #0277BD, #F57C00);
+  border-radius: 40% 60% 30% 70% / 70% 30% 60% 40%;
+  animation: morphShape 20s ease-in-out infinite, floatComplex 16s ease-in-out infinite;
+  top: 25%;
+  left: 15%;
+  animation-delay: -8s;
+}
+
+/* Scroll-triggered animations */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(60px) scale(0.95);
+  transition: all 1s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Interactive elements */
+.interactive-hover {
+  transition: all 400ms cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: transform;
+}
+
+.interactive-hover:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+}
+
+/* Floating particles with enhanced physics */
+@keyframes particleFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translateY(-40px) rotate(90deg) scale(1.1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg) scale(0.9);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translateY(-35px) rotate(270deg) scale(1.05);
+    opacity: 0.7;
+  }
+}
+
+.particle {
+  position: absolute;
+  opacity: 0.6;
+  animation: particleFloat 25s linear infinite;
+  will-change: transform;
+}
+
+.particle:nth-child(1) { animation-delay: 0s; }
+.particle:nth-child(2) { animation-delay: -3s; }
+.particle:nth-child(3) { animation-delay: -6s; }
+.particle:nth-child(4) { animation-delay: -9s; }
+.particle:nth-child(5) { animation-delay: -12s; }
+.particle:nth-child(6) { animation-delay: -15s; }
+.particle:nth-child(7) { animation-delay: -18s; }
+.particle:nth-child(8) { animation-delay: -21s; }
+
+/* Engineering-themed loading animations */
+@keyframes engineeringPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+}
+
+@keyframes gearRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes blueprintScan {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+@keyframes circuitFlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(2, 119, 188, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(2, 119, 188, 0.8);
+  }
+}
+
+@keyframes dataStream {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* Page transition effects */
+@keyframes pageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pageSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+  }
+}
+
+@keyframes overlayFade {
+  0% {
+    opacity: 0;
+    background: linear-gradient(45deg, transparent, rgba(2, 119, 188, 0.1), transparent);
+  }
+  50% {
+    opacity: 1;
+    background: linear-gradient(45deg, rgba(2, 119, 188, 0.05), rgba(2, 119, 188, 0.2), rgba(2, 119, 188, 0.05));
+  }
+  100% {
+    opacity: 0;
+    background: linear-gradient(45deg, transparent, rgba(2, 119, 188, 0.1), transparent);
+  }
+}
+
+/* Enhanced loading states */
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 2s infinite;
+}
+
+.loading-dots::after {
+  content: '';
+  animation: loadingDots 1.5s infinite;
+}
+
+/* Engineering-specific animations */
+.animate-engineering-pulse {
+  animation: engineeringPulse 2s ease-in-out infinite;
+}
+
+.animate-gear-rotate {
+  animation: gearRotate 3s linear infinite;
+}
+
+.animate-blueprint-scan {
+  background: linear-gradient(90deg, transparent, rgba(2, 119, 188, 0.3), transparent);
+  background-size: 200px 100%;
+  animation: blueprintScan 3s infinite;
+}
+
+.animate-circuit-flow {
+  animation: circuitFlow 2s ease-in-out infinite;
+}
+
+.animate-data-stream {
+  animation: dataStream 4s ease-in-out infinite;
+}
+
+.animate-page-slide-in {
+  animation: pageSlideIn 500ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.animate-page-slide-out {
+  animation: pageSlideOut 300ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.animate-overlay-fade {
+  animation: overlayFade 2s ease-in-out;
+}
+
+/* Enhanced button loading states */
+.btn-loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+}
+
+.btn-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Staggered animation utilities */
+.stagger-children > * {
+  animation-fill-mode: both;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 100ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 200ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 300ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 400ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 500ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 600ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 700ms; }
+
+/* Performance optimizations */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Responsive optimizations */
+@media (max-width: 768px) {
+  .geometric-shape {
+    opacity: 0.06;
+  }
+  
+  .particles-bg .particle:nth-child(n+4) {
+    display: none;
+  }
+  
+  .card-hover-3d:hover {
+    transform: translateY(-4px) scale(1.01);
+  }
+  
+  .btn-magnetic:hover {
+    transform: translateY(-2px) scale(1.01);
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .scroll-reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .glass-card {
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .skeleton {
+    background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+  }
+}
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\logging\clientLog.ts
+---- CONTENT ----
+export function logEvent(evt: string, data?: any) {
+  if (import.meta.env.DEV) {
+    console.info('[evt]', evt, data);
+  }
+  // In production, could send to analytics service
+}
+
+export function logError(err: any, ctx?: string) {
+  if (import.meta.env.DEV) {
+    console.error('[err]', ctx ?? '', err);
+  }
+  // In production, could send to error tracking service (e.g., Sentry)
+}
+
+export function logApiError(error: any, endpoint: string) {
+  logError(error, `api_error: ${endpoint}`);
+}
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\main.tsx
+---- CONTENT ----
+import { StrictMode } from 'react'
+import './i18n'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.tsx'
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\pages\about\page.tsx
+---- CONTENT ----
+
+import { useEffect } from 'react';
+import Button from '../../components/base/Button';
+import Card from '../../components/base/Card';
+import { updateSEO, seoData } from '../../utils/seo';
+
+export default function About() {
+  useEffect(() => {
+    updateSEO(seoData.about);
+  }, []);
+
+  const teamMembers = [
+    {
+      name: 'Dr. Sarah Chen',
+      role: 'Founder & CEO',
+      image: 'professional female engineer CEO portrait confident smile modern office background business attire leadership',
+      bio: 'P.Eng with 15+ years experience. Former NPPE examiner and engineering education specialist.'
+    },
+    {
+      name: 'Michael Rodriguez',
+      role: 'Head of Content',
+      image: 'professional male engineer content director portrait friendly expression modern office technical background',
+      bio: 'Licensed Professional Engineer specializing in NPPE curriculum development and exam preparation.'
+    },
+    {
+      name: 'Jennifer Liu',
+      role: 'Lead Developer',
+      image: 'professional female software engineer portrait confident smile tech office background modern lighting',
+      bio: 'Full-stack engineer passionate about creating intuitive learning experiences for technical professionals.'
+    },
+    {
+      name: 'David Thompson',
+      role: 'Student Success Manager',
+      image: 'professional male customer success manager portrait warm smile office environment modern design',
+      bio: 'Dedicated to helping engineers achieve their professional licensing goals through personalized support.'
+    }
+  ];
+
+  const milestones = [
+    {
+      year: '2020',
+      title: 'Company Founded',
+      description: 'Started with a mission to revolutionize NPPE exam preparation'
+    },
+    {
+      year: '2021',
+      title: '1,000 Students',
+      description: 'Reached our first thousand successful students'
+    },
+    {
+      year: '2022',
+      title: 'Platform Launch',
+      description: 'Launched comprehensive online learning platform'
+    },
+    {
+      year: '2023',
+      title: '95% Pass Rate',
+      description: 'Achieved industry-leading 95% first-attempt pass rate'
+    },
+    {
+      year: '2024',
+      title: '10,000+ Engineers',
+      description: 'Helped over 10,000 engineers earn their P.Eng designation'
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 flex items-center justify-center">
+                <i className="ri-settings-3-line text-[#0277BD] text-xl"></i>
+              </div>
+              <h1 className="text-xl font-bold text-[#0277BD]">NPPE Pro</h1>
+            </div>
+            <div className="flex items-center space-x-6">
+              <a href="/" className="text-gray-600 hover:text-[#0277BD] transition-colors">Home</a>
+              <a href="/features" className="text-gray-600 hover:text-[#0277BD] transition-colors">Features</a>
+              <a href="/pricing" className="text-gray-600 hover:text-[#0277BD] transition-colors">Pricing</a>
+              <a href="/about" className="text-[#0277BD] font-medium">About</a>
+              <a href="/blog" className="text-gray-600 hover:text-[#0277BD] transition-colors">Blog</a>
+              <a href="/contact" className="text-gray-600 hover:text-[#0277BD] transition-colors">Contact</a>
+              <a href="/login" className="text-gray-600 hover:text-[#0277BD] transition-colors">Login</a>
+              <Button onClick={() => window.location.href = '/signup'}>Sign Up</Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section 
+        className="relative bg-cover bg-center bg-no-repeat py-20"
+        style={{
+          backgroundImage: `linear-gradient(rgba(2, 119, 189, 0.9), rgba(1, 87, 155, 0.9)), url('https://readdy.ai/api/search-image?query=modern%20engineering%20team%20collaboration%20office%20environment%20professional%20engineers%20working%20together%20blueprints%20technical%20drawings%20bright%20lighting%20teamwork&width=1200&height=400&seq=about-hero&orientation=landscape')`
+        }}
+      >
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8 text-white">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">
+            Empowering Engineers to Achieve Professional Excellence
+          </h1>
+          <p className="text-xl md:text-2xl mb-8">
+            Founded by engineers, for engineers. We understand the challenges of the NPPE exam and have created the most effective preparation platform in Canada.
+          </p>
+        </div>
+      </section>
+
+      {/* Mission Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Our Mission</h2>
+              <p className="text-lg text-gray-600 mb-6">
+                We believe every qualified engineer deserves to achieve their Professional Engineer designation. Our mission is to provide the most comprehensive, effective, and accessible NPPE exam preparation platform in Canada.
+              </p>
+              <p className="text-lg text-gray-600 mb-8">
+                Through innovative technology, expert content, and personalized learning paths, we help engineers master the knowledge and confidence needed to pass the NPPE exam on their first attempt.
+              </p>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-[#0277BD] mb-2">95%</div>
+                  <div className="text-gray-600">First-Attempt Pass Rate</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-[#0277BD] mb-2">10,000+</div>
+                  <div className="text-gray-600">Engineers Helped</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <img
+                src="https://readdy.ai/api/search-image?query=professional%20engineering%20office%20workspace%20modern%20design%20engineers%20collaborating%20technical%20drawings%20computer%20screens%20professional%20environment%20clean%20bright%20lighting&width=600&height=400&seq=mission-img&orientation=landscape"
+                alt="Engineering workspace"
+                className="rounded-lg shadow-lg w-full h-auto object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Timeline Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Journey</h2>
+            <p className="text-xl text-gray-600">
+              From startup to Canada's leading NPPE preparation platform
+            </p>
+          </div>
+          
+          <div className="relative">
+            <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-[#0277BD] opacity-20"></div>
+            
+            {milestones.map((milestone, index) => (
+              <div key={index} className={`relative flex items-center mb-12 ${index % 2 === 0 ? 'justify-start' : 'justify-end'}`}>
+                <div className={`w-1/2 ${index % 2 === 0 ? 'pr-8 text-right' : 'pl-8 text-left'}`}>
+                  <Card className="p-6">
+                    <div className="text-2xl font-bold text-[#0277BD] mb-2">{milestone.year}</div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">{milestone.title}</h3>
+                    <p className="text-gray-600">{milestone.description}</p>
+                  </Card>
+                </div>
+                <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-[#0277BD] rounded-full border-4 border-white shadow-lg"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Team Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Meet Our Team</h2>
+            <p className="text-xl text-gray-600">
+              Experienced engineers and educators dedicated to your success
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {teamMembers.map((member, index) => (
+              <Card key={index} className="text-center hover:shadow-lg transition-shadow">
+                <img
+                  src={`https://readdy.ai/api/search-image?query=$%7Bmember.image%7D&width=200&height=200&seq=team-${index}&orientation=squarish`}
+                  alt={member.name}
+                  className="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
+                />
+                <h3 className="text-xl font-semibold text-gray-900 mb-1">{member.name}</h3>
+                <p className="text-[#0277BD] font-medium mb-3">{member.role}</p>
+                <p className="text-gray-600 text-sm">{member.bio}</p>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Values Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Values</h2>
+            <p className="text-xl text-gray-600">
+              The principles that guide everything we do
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="text-center p-8">
+              <div className="w-16 h-16 bg-[#0277BD] rounded-full flex items-center justify-center mx-auto mb-4">
+                <i className="ri-lightbulb-line text-white text-2xl"></i>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Excellence</h3>
+              <p className="text-gray-600">
+                We strive for the highest quality in everything we create, from content to user experience.
+              </p>
+            </Card>
+            
+            <Card className="text-center p-8">
+              <div className="w-16 h-16 bg-[#0277BD] rounded-full flex items-center justify-center mx-auto mb-4">
+                <i className="ri-heart-line text-white text-2xl"></i>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Empathy</h3>
+              <p className="text-gray-600">
+                We understand the stress and challenges of exam preparation and design with compassion.
+              </p>
+            </Card>
+            
+            <Card className="text-center p-8">
+              <div className="w-16 h-16 bg-[#0277BD] rounded-full flex items-center justify-center mx-auto mb-4">
+                <i className="ri-rocket-line text-white text-2xl"></i>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Innovation</h3>
+              <p className="text-gray-600">
+                We continuously innovate to create better, more effective learning experiences.
+              </p>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-[#0277BD]">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            Ready to Join Our Success Story?
+          </h2>
+          <p className="text-xl text-blue-100 mb-8">
+            Become part of the thousands of engineers who have achieved their P.Eng designation with NPPE Pro.
+          </p>
+          <Button size="lg" className="text-lg px-8 py-4 bg-white text-[#0277BD] hover:bg-gray-100" onClick={() => window.location.href = '/signup'}>
+            Start Your Journey Today
+          </Button>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-800 text-white py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <div className="w-8 h-8 flex items-center justify-center">
+                  <i className="ri-settings-3-line text-[#0277BD] text-xl"></i>
+                </div>
+                <h3 className="text-xl font-bold">NPPE Pro</h3>
+              </div>
+              <p className="text-gray-400">
+                The most comprehensive NPPE exam preparation platform for professional engineers.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Product</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="/features" className="hover:text-white transition-colors">Features</a></li>
+                <li><a href="/pricing" className="hover:text-white transition-colors">Pricing</a></li>
+                <li><a href="/practice" className="hover:text-white transition-colors">Practice Tests</a></li>
+                <li><a href="/study-path" className="hover:text-white transition-colors">Study Materials</a></li>
+                <li><a href="/topics" className="hover:text-white transition-colors">Topics</a></li>
+                <li><a href="/analytics" className="hover:text-white transition-colors">Analytics</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Community</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="/forum" className="hover:text-white transition-colors">Forum</a></li>
+                <li><a href="/study-groups" className="hover:text-white transition-colors">Study Groups</a></li>
+                <li><a href="/achievements" className="hover:text-white transition-colors">Achievements</a></li>
+                <li><a href="/dashboard" className="hover:text-white transition-colors">Dashboard</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Support</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="/about" className="hover:text-white transition-colors">About</a></li>
+                <li><a href="/blog" className="hover:text-white transition-colors">Blog</a></li>
+                <li><a href="/contact" className="hover:text-white transition-colors">Contact</a></li>
+                <li><a href="/help" className="hover:text-white transition-colors">Help</a></li>
+                <li><a href="/support" className="hover:text-white transition-colors">Support</a></li>
+                <li><a href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2024 NPPE Pro. All rights reserved. | <a href="https://readdy.ai/?origin=logo" className="hover:text-white transition-colors">Powered by Readdy</a></p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\pages\achievements\page.tsx
+---- CONTENT ----
+
+import { useEffect, useState } from 'react';
+import Header from '../../components/feature/Header';
+import MobileNavigation from '../../components/feature/MobileNavigation';
+import Card from '../../components/base/Card';
+import Button from '../../components/base/Button';
+import { updateSEO, seoData } from '../../utils/seo';
+
+export default function Achievements() {
+  const [selectedCategory, setSelectedCategory] = useState('all');
+
+  useEffect(() => {
+    updateSEO(seoData.achievements);
+  }, []);
+
+  const categories = [
+    { id: 'all', name: 'All Achievements', count: 24 },
+    { id: 'study', name: 'Study Milestones', count: 8 },
+    { id: 'practice', name: 'Practice Tests', count: 6 },
+    { id: 'community', name: 'Community', count: 4 },
+    { id: 'special', name: 'Special Events', count: 6 }
+  ];
+
+  const achievements = [
+    {
+      id: 1,
+      title: 'First Steps',
+      description: 'Complete your first practice question',
+      category: 'study',
+      icon: 'ri-footprint-line',
+      rarity: 'common',
+      points: 10,
+      unlocked: true,
+      unlockedDate: '2024-01-10',
+      progress: 100,
+      requirement: 'Answer 1 practice question'
+    },
+    {
+      id: 2,
+      title: 'Question Master',
+      description: 'Answer 100 practice questions correctly',
+      category: 'study',
+      icon: 'ri-question-mark',
+      rarity: 'uncommon',
+      points: 50,
+      unlocked: true,
+      unlockedDate: '2024-01-14',
+      progress: 100,
+      requirement: 'Answer 100 questions correctly'
+    },
+    {
+      id: 3,
+      title: 'Study Streak',
+      description: 'Study for 7 consecutive days',
+      category: 'study',
+      icon: 'ri-fire-line',
+      rarity: 'uncommon',
+      points: 75,
+      unlocked: true,
+      unlockedDate: '2024-01-12',
+      progress: 100,
+      requirement: 'Study 7 days in a row'
+    },
+    {
+      id: 4,
+      title: 'Perfect Score',
+      description: 'Score 100% on a practice test',
+      category: 'practice',
+      icon: 'ri-trophy-line',
+      rarity: 'rare',
+      points: 100,
+      unlocked: true,
+      unlockedDate: '2024-01-15',
+      progress: 100,
+      requirement: 'Score 100% on any practice test'
+    },
+    {
+      id: 5,
+      title: 'Speed Demon',
+      description: 'Complete a practice test in under 2 hours',
+      category: 'practice',
+      icon: 'ri-speed-line',
+      rarity: 'uncommon',
+      points: 60,
+      unlocked: true,
+      unlockedDate: '2024-01-13',
+      progress: 100,
+      requirement: 'Complete practice test in under 2 hours'
+    },
+    {
+      id: 6,
+      title: 'Community Helper',
+      description: 'Help 10 fellow engineers in the forum',
+      category: 'community',
+      icon: 'ri-hand-heart-line',
+      rarity: 'rare',
+      points: 120,
+      unlocked: true,
+      unlockedDate: '2024-01-11',
+      progress: 100,
+      requirement: 'Receive 10 helpful votes in forum'
+    },
+    {
+      id: 7,
+      title: 'Knowledge Seeker',
+      description: 'Complete all study path modules',
+      category: 'study',
+      icon: 'ri-book-open-line',
+      rarity: 'epic',
+      points: 200,
+      unlocked: false,
+      unlockedDate: null,
+      progress: 75,
+      requirement: 'Complete all 32 study modules'
+    },
+    {
+      id: 8,
+      title: 'Test Champion',
+      description: 'Pass 10 practice tests with 80%+ score',
+      category: 'practice',
+      icon: 'ri-medal-line',
+      rarity: 'rare',
+      points: 150,
+      unlocked: false,
+      unlockedDate: null,
+      progress: 60,
+      requirement: 'Pass 10 tests with 80%+ score'
+    },
+    {
+      id: 9,
+      title: 'Ethics Expert',
+      description: 'Master the Ethics topic with 90%+ accuracy',
+      category: 'study',
+      icon: 'ri-scales-line',
+      rarity: 'rare',
+      points: 100,
+      unlocked: false,
+      unlockedDate: null,
+      progress: 85,
+      requirement: 'Achieve 90%+ accuracy in Ethics'
+    },
+    {
+      id: 10,
+      title: 'Forum Veteran',
+      description: 'Be an active forum member for 30 days',
+      category: 'community',
+      icon: 'ri-user-star-line',
+      rarity: 'uncommon',
+      points: 80,
+      unlocked: false,
+      unlockedDate: null,
+      progress: 40,
+      requirement: 'Active forum participation for 30 days'
+    },
+    {
+      id: 11,
+      title: 'Early Bird',
+      description: 'Study before 7 AM for 5 consecutive days',
+      category: 'special',
+      icon: 'ri-sun-line',
+      rarity: 'uncommon',
+      points: 70,
+      unlocked: false,
+      unlockedDate: null,
+      progress: 20,
+      requirement: 'Study before 7 AM for 5 days'
+    },
+    {
+      id: 12,
+      title: 'NPPE Legend',
+      description: 'Complete the ultimate NPPE preparation challenge',
+      category: 'special',
+      icon: 'ri-crown-line',
+      rarity: 'legendary',
+      points: 500,
+      unlocked: false,
+      unlockedDate: null,
+      progress: 45,
+      requirement: 'Complete all requirements for NPPE mastery'
+    }
+  ];
+
+  const getRarityColor = (rarity: string) => {
+    switch (rarity) {
+      case 'common': return 'text-gray-600 bg-gray-100 border-gray-300';
+      case 'uncommon': return 'text-green-600 bg-green-100 border-green-300';
+      case 'rare': return 'text-blue-600 bg-blue-100 border-blue-300';
+      case 'epic': return 'text-purple-600 bg-purple-100 border-purple-300';
+      case 'legendary': return 'text-yellow-600 bg-yellow-100 border-yellow-300';
+      default: return 'text-gray-600 bg-gray-100 border-gray-300';
+    }
+  };
+
+  const getRarityGlow = (rarity: string) => {
+    switch (rarity) {
+      case 'rare': return 'shadow-blue-200';
+      case 'epic': return 'shadow-purple-200';
+      case 'legendary': return 'shadow-yellow-200';
+      default: return '';
+    }
+  };
+
+  const filteredAchievements = achievements.filter(achievement => 
+    selectedCategory === 'all' || achievement.category === selectedCategory
+  );
+
+  const unlockedAchievements = filteredAchievements.filter(a => a.unlocked);
+  const lockedAchievements = filteredAchievements.filter(a => !a.unlocked);
+
+  const totalPoints = achievements.filter(a => a.unlocked).reduce((sum, a) => sum + a.points, 0);
+  const totalUnlocked = achievements.filter(a => a.unlocked).length;
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Achievements
+          </h1>
+          <p className="text-gray-600">
+            Track your progress and unlock rewards as you advance in your NPPE preparation journey.
+          </p>
+        </div>
+
+        {/* Stats Overview */}
+        <div className="grid md:grid-cols-4 gap-6 mb-8">
+          <Card className="text-center">
+            <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <i className="ri-trophy-line text-yellow-600 text-xl"></i>
+            </div>
+            <div className="text-2xl font-bold text-gray-900 mb-1">{totalUnlocked}</div>
+            <div className="text-sm text-gray-600">Achievements Unlocked</div>
+          </Card>
+
+          <Card className="text-center">
+            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <i className="ri-star-line text-blue-600 text-xl"></i>
+            </div>
+            <div className="text-2xl font-bold text-gray-900 mb-1">{totalPoints}</div>
+            <div className="text-sm text-gray-600">Total Points</div>
+          </Card>
+
+          <Card className="text-center">
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <i className="ri-percent-line text-green-600 text-xl"></i>
+            </div>
+            <div className="text-2xl font-bold text-gray-900 mb-1">
+              {Math.round((totalUnlocked / achievements.length) * 100)}%
+            </div>
+            <div className="text-sm text-gray-600">Completion Rate</div>
+          </Card>
+
+          <Card className="text-center">
+            <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <i className="ri-medal-line text-purple-600 text-xl"></i>
+            </div>
+            <div className="text-2xl font-bold text-gray-900 mb-1">
+              {achievements.filter(a => a.unlocked && a.rarity === 'rare').length}
+            </div>
+            <div className="text-sm text-gray-600">Rare Achievements</div>
+          </Card>
+        </div>
+
+        <div className="grid lg:grid-cols-4 gap-8">
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <Card>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Categories</h3>
+              <div className="space-y-2">
+                {categories.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => setSelectedCategory(category.id)}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors cursor-pointer ${
+                      selectedCategory === category.id
+                        ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <span className="text-sm font-medium">{category.name}</span>
+                    <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
+                      {category.count}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </Card>
+
+            {/* Progress to Next Level */}
+            <Card className="mt-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Progress to Next Level</h3>
+              <div className="text-center mb-4">
+                <div className="text-3xl font-bold text-blue-600 mb-1">Level 8</div>
+                <div className="text-sm text-gray-600">Achievement Hunter</div>
+              </div>
+              <div className="mb-4">
+                <div className="flex justify-between text-sm mb-1">
+                  <span>Progress</span>
+                  <span>750/1000 XP</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-blue-600 h-2 rounded-full" style={{ width: '75%' }}></div>
+                </div>
+              </div>
+              <div className="text-xs text-gray-600">
+                250 XP needed to reach Level 9
+              </div>
+            </Card>
+          </div>
+
+          {/* Main Content */}
+          <div className="lg:col-span-3">
+            {/* Unlocked Achievements */}
+            {unlockedAchievements.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                  <i className="ri-check-circle-line text-green-600 mr-2"></i>
+                  Unlocked Achievements ({unlockedAchievements.length})
+                </h2>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {unlockedAchievements.map((achievement) => (
+                    <Card 
+                      key={achievement.id} 
+                      className={`relative overflow-hidden border-2 ${getRarityColor(achievement.rarity)} ${getRarityGlow(achievement.rarity)}`}
+                    >
+                      {/* Rarity Indicator */}
+                      <div className={`absolute top-0 right-0 px-2 py-1 text-xs font-medium rounded-bl-lg ${getRarityColor(achievement.rarity)}`}>
+                        {achievement.rarity.charAt(0).toUpperCase() + achievement.rarity.slice(1)}
+                      </div>
+
+                      <div className="text-center">
+                        <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${getRarityColor(achievement.rarity)}`}>
+                          <i className={`${achievement.icon} text-2xl`}></i>
+                        </div>
+                        
+                        <h3 className="font-semibold text-gray-900 mb-2">
+                          {achievement.title}
+                        </h3>
+                        
+                        <p className="text-sm text-gray-600 mb-4">
+                          {achievement.description}
+                        </p>
+
+                        <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
+                          <span>+{achievement.points} XP</span>
+                          <span>Unlocked {achievement.unlockedDate}</span>
+                        </div>
+
+                        <div className="flex items-center justify-center text-green-600">
+                          <i className="ri-check-circle-fill mr-1"></i>
+                          <span className="text-sm font-medium">Completed</span>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Locked Achievements */}
+            {lockedAchievements.length > 0 && (
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                  <i className="ri-lock-line text-gray-400 mr-2"></i>
+                  Locked Achievements ({lockedAchievements.length})
+                </h2>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {lockedAchievements.map((achievement) => (
+                    <Card 
+                      key={achievement.id} 
+                      className="relative overflow-hidden border-2 border-gray-300 opacity-75"
+                    >
+                      {/* Rarity Indicator */}
+                      <div className="absolute top-0 right-0 px-2 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-bl-lg">
+                        {achievement.rarity.charAt(0).toUpperCase() + achievement.rarity.slice(1)}
+                      </div>
+
+                      <div className="text-center">
+                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <i className={`${achievement.icon} text-2xl text-gray-400`}></i>
+                        </div>
+                        
+                        <h3 className="font-semibold text-gray-900 mb-2">
+                          {achievement.title}
+                        </h3>
+                        
+                        <p className="text-sm text-gray-600 mb-4">
+                          {achievement.description}
+                        </p>
+
+                        {/* Progress Bar */}
+                        <div className="mb-4">
+                          <div className="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>Progress</span>
+                            <span>{achievement.progress}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                              style={{ width: `${achievement.progress}%` }}
+                            ></div>
+                          </div>
+                        </div>
+
+                        <div className="text-xs text-gray-500 mb-3">
+                          {achievement.requirement}
+                        </div>
+
+                        <div className="flex items-center justify-center text-gray-500">
+                          <i className="ri-lock-line mr-1"></i>
+                          <span className="text-sm">+{achievement.points} XP when unlocked</span>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Empty State */}
+            {filteredAchievements.length === 0 && (
+              <Card className="text-center py-12">
+                <i className="ri-trophy-line text-4xl text-gray-400 mb-4 block"></i>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No achievements found</h3>
+                <p className="text-gray-600">
+                  Try selecting a different category to view achievements.
+                </p>
+              </Card>
+            )}
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <Card className="mt-8 bg-gradient-to-r from-blue-50 to-blue-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            <i className="ri-history-line mr-2"></i>
+            Recent Achievement Activity
+          </h3>
+          <div className="space-y-3">
+            {achievements
+              .filter(a => a.unlocked)
+              .sort((a, b) => new Date(b.unlockedDate!).getTime() - new Date(a.unlockedDate!).getTime())
+              .slice(0, 3)
+              .map((achievement) => (
+                <div key={achievement.id} className="flex items-center space-x-4 p-3 bg-white rounded-lg">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getRarityColor(achievement.rarity)}`}>
+                    <i className={`${achievement.icon} text-lg`}></i>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">{achievement.title}</h4>
+                    <p className="text-sm text-gray-600">Unlocked on {achievement.unlockedDate}</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-medium text-gray-900">+{achievement.points} XP</div>
+                    <div className={`text-xs px-2 py-1 rounded-full ${getRarityColor(achievement.rarity)}`}>
+                      {achievement.rarity.charAt(0).toUpperCase() + achievement.rarity.slice(1)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </Card>
+      </main>
+
+      <MobileNavigation />
+    </div>
+  );
+}
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\pages\admin\analytics\page.tsx
+---- CONTENT ----
+
+import { useState } from 'react';
+import Header from '../../../components/feature/Header';
+
+interface AnalyticsData {
+  userGrowth: { month: string; users: number; }[];
+  questionPerformance: { topic: string; accuracy: number; attempts: number; }[];
+  subscriptionMetrics: { plan: string; count: number; revenue: number; }[];
+  engagementMetrics: { metric: string; value: number; change: number; }[];
+}
+
+const mockAnalytics: AnalyticsData = {
+  userGrowth: [
+    { month: 'Jan', users: 1200 },
+    { month: 'Feb', users: 1450 },
+    { month: 'Mar', users: 1680 },
+    { month: 'Apr', users: 1920 },
+    { month: 'May', users: 2150 },
+    { month: 'Jun', users: 2380 }
+  ],
+  questionPerformance: [
+    { topic: 'Structural Analysis', accuracy: 68, attempts: 15420 },
+    { topic: 'Concrete Design', accuracy: 72, attempts: 12890 },
+    { topic: 'Steel Design', accuracy: 75, attempts: 11230 },
+    { topic: 'Geotechnical Engineering', accuracy: 62, attempts: 9870 },
+    { topic: 'Transportation Engineering', accuracy: 78, attempts: 8450 },
+    { topic: 'Water Resources', accuracy: 71, attempts: 7230 },
+    { topic: 'Environmental Engineering', accuracy: 74, attempts: 6890 },
+    { topic: 'Construction Management', accuracy: 81, attempts: 5670 }
+  ],
+  subscriptionMetrics: [
+    { plan: 'Free', count: 1247, revenue: 0 },
+    { plan: 'Basic', count: 892, revenue: 25876 },
+    { plan: 'Pro', count: 567, revenue: 27783 },
+    { plan: 'Premium', count: 141, revenue: 11139 }
+  ],
+  engagementMetrics: [
+    { metric: 'Daily Active Users', value: 1923, change: 8.2 },
+    { metric: 'Avg Session Duration', value: 24, change: 12.5 },
+    { metric: 'Questions per Session', value: 15, change: -2.1 },
+    { metric: 'Completion Rate', value: 87, change: 5.3 }
+  ]
+};
+
+export default function AdminAnalytics() {
+  const [timeRange, setTimeRange] = useState('30d');
+  const [selectedMetric, setSelectedMetric] = useState('users');
+
+  const totalRevenue = mockAnalytics.subscriptionMetrics.reduce((sum, plan) => sum + plan.revenue, 0);
+  const totalUsers = mockAnalytics.subscriptionMetrics.reduce((sum, plan) => sum + plan.count, 0);
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Analytics Dashboard</h1>
+              <p className="text-gray-600">Detailed insights and performance metrics</p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <select
+                value={timeRange}
+                onChange={(e) => setTimeRange(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-8"
+              >
+                <option value="7d">Last 7 days</option>
+                <option value="30d">Last 30 days</option>
+                <option value="90d">Last 90 days</option>
+                <option value="1y">Last year</option>
+              </select>
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap">
+                Export Report
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Key Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {mockAnalytics.engagementMetrics.map((metric) => (
+            <div key={metric.metric} className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">{metric.metric}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {metric.metric.includes('Duration') ? `${metric.value}m` : 
+                     metric.metric.includes('Rate') ? `${metric.value}%` : 
+                     metric.value.toLocaleString()}
+                  </p>
+                  <p className={`text-sm ${metric.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {metric.change >= 0 ? '+' : ''}{metric.change}% from last period
+                  </p>
+                </div>
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <i className="ri-line-chart-line text-blue-600 text-xl"></i>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Charts Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* User Growth Chart */}
+          <div className="bg-white rounded-lg shadow">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">User Growth</h2>
+            </div>
+            <div className="p-6">
+              <div className="h-64 flex items-end justify-between space-x-2">
+                {mockAnalytics.userGrowth.map((data, index) => (
+                  <div key={data.month} className="flex flex-col items-center flex-1">
+                    <div 
+                      className="w-full bg-blue-600 rounded-t"
+                      style={{ 
+                        height: `${(data.users / Math.max(...mockAnalytics.userGrowth.map(d => d.users))) * 200}px`,
+                        minHeight: '20px'
+                      }}
+                    ></div>
+                    <span className="text-xs text-gray-600 mt-2">{data.month}</span>
+                    <span className="text-xs text-gray-900 font-medium">{data.users}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Subscription Distribution */}
+          <div className="bg-white rounded-lg shadow">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">Subscription Distribution</h2>
+            </div>
+            <div className="p-6">
+              <div className="space-y-4">
+                {mockAnalytics.subscriptionMetrics.map((plan) => {
+                  const percentage = (plan.count / totalUsers) * 100;
+                  return (
+                    <div key={plan.plan}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium text-gray-700">{plan.plan}</span>
+                        <span className="text-sm text-gray-600">{plan.count} users ({percentage.toFixed(1)}%)</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div 
+                          className={`h-2 rounded-full ${
+                            plan.plan === 'Free' ? 'bg-gray-400' :
+                            plan.plan === 'Basic' ? 'bg-blue-400' :
+                            plan.plan === 'Pro' ? 'bg-purple-400' : 'bg-yellow-400'
+                          }`}
+                          style={{ width: `${percentage}%` }}
+                        ></div>
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        Revenue: ${plan.revenue.toLocaleString()}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="mt-6 pt-4 border-t border-gray-200">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium text-gray-900">Total Revenue</span>
+                  <span className="text-lg font-bold text-green-600">${totalRevenue.toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Question Performance Table */}
+        <div className="bg-white rounded-lg shadow">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">Question Performance by Topic</h2>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Topic
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Total Attempts
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Average Accuracy
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Performance
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {mockAnalytics.questionPerformance.map((topic) => (
+                  <tr key={topic.topic}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="font-medium text-gray-900">{topic.topic}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {topic.attempts.toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {topic.accuracy}%
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                          <div 
+                            className={`h-2 rounded-full ${
+                              topic.accuracy >= 75 ? 'bg-green-500' :
+                              topic.accuracy >= 65 ? 'bg-yellow-500' : 'bg-red-500'
+                            }`}
+                            style={{ width: `${topic.accuracy}%` }}
+                          ></div>
+                        </div>
+                        <span className="text-sm text-gray-600">{topic.accuracy}%</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        topic.accuracy >= 75 ? 'bg-green-100 text-green-800' :
+                        topic.accuracy >= 65 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {topic.accuracy >= 75 ? 'Good' : topic.accuracy >= 65 ? 'Average' : 'Needs Review'}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Export Options */}
+        <div className="mt-8 bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Export Options</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-center">
+              <i className="ri-file-excel-line text-2xl text-green-600 mb-2"></i>
+              <h4 className="font-medium text-gray-900">Excel Report</h4>
+              <p className="text-sm text-gray-600">Detailed analytics in spreadsheet format</p>
+            </button>
+            
+            <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-center">
+              <i className="ri-file-pdf-line text-2xl text-red-600 mb-2"></i>
+              <h4 className="font-medium text-gray-900">PDF Summary</h4>
+              <p className="text-sm text-gray-600">Executive summary with key insights</p>
+            </button>
+            
+            <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-center">
+              <i className="ri-database-line text-2xl text-blue-600 mb-2"></i>
+              <h4 className="font-medium text-gray-900">Raw Data</h4>
+              <p className="text-sm text-gray-600">CSV export of all analytics data</p>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+===== END FILE =====
+
+===== BEGIN FILE =====
+PATH: C:\Users\meysa\Desktop\Document\PEng\Pen-Code\NPPE Mock exam\source\front\src\pages\admin\page.tsx
+---- CONTENT ----
+
+import { useState, useEffect } from 'react';
+import Header from '../../components/feature/Header';
+import LoadingSpinner from '../../components/effects/LoadingSpinner';
+import { adminService } from '../../api';
+
+interface DashboardStats {
+  totalUsers: number;
+  activeUsers: number;
+  totalQuestions: number;
+  totalTests: number;
+  revenue: number;
+  conversionRate: number;
+}
+
+interface RecentActivity {
+  id: string;
+  type: 'user_signup' | 'question_added' | 'test_completed' | 'subscription';
+  description: string;
+  timestamp: string;
+  user?: string;
+}
+
+const mockStats: DashboardStats = {
+  totalUsers: 2847,
+  activeUsers: 1923,
+  totalQuestions: 2156,
+  totalTests: 8934,
+  revenue: 142850,
+  conversionRate: 23.4
+};
+
+const mockActivity: RecentActivity[] = [
+  {
+    id: '1',
+    type: 'user_signup',
+    description: 'New user registration',
+    timestamp: '2024-01-15T14:30:00Z',
+    user: 'sarah.chen@email.com'
+  },
+  {
+    id: '2',
+    type: 'question_added',
+    description: 'New question added to Structural Analysis',
+    timestamp: '2024-01-15T13:45:00Z',
+    user: 'admin@nppepro.com'
+  },
+  {
+    id: '3',
+    type: 'subscription',
+    description: 'User upgraded to Pro plan',
+    timestamp: '2024-01-15T12:20:00Z',
+    user: 'mike.rodriguez@email.com'
+  },
+  {
+    id: '4',
+    type: 'test_completed',
+    description: 'Practice test completed',
+    timestamp: '2024-01-15T11:15:00Z',
+    user: 'emily.johnson@email.com'
+  }
+];
+
+export default function AdminDashboard() {
+  const [timeRange, setTimeRange] = useState('7d');
+  const [stats, setStats] = useState(mockStats);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const data = await adminService.getStatistics();
+        setStats({
+          totalUsers: data.total_users,
+          activeUsers: data.active_users,
+          totalQuestions: data.total_questions,
+          totalTests: data.total_tests,
+          revenue: data.revenue,
+          conversionRate: data.conversion_rate
+        });
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load statistics');
+        // Keep using mock data on error
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, [timeRange]);
+
+  const getActivityIcon = (type: string) => {
+    switch (type) {
+      case 'user_signup': return 'ri-user-add-line text-green-600';
+      case 'question_added': return 'ri-question-line text-blue-600';
+      case 'test_completed': return 'ri-check-line text-purple-600';
+      case 'subscription': return 'ri-vip-crown-line text-yellow-600';
+      default: return 'ri-information-line text-gray-600';
+    }
+  };
+
+  const formatTimestamp = (timestamp: string) => {
+    return new Date(timestamp).toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-center h-96">
+            <LoadingSpinner size="lg" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {error && (
+          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div className="flex items-center">
+              <i className="ri-information-line text-yellow-600 text-xl mr-3"></i>
+              <p className="text-yellow-800">Using cached data. {error}</p>
+            </div>
+          </div>
+        )}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
+              <p className="text-gray-600">Platform overview and management</p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <select
+                value={timeRange}
+                onChange={(e) => setTimeRange(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-8"
+              >
+                <option value="24h">Last 24 hours</option>
+                <option value="7d">Last 7 days</option>
+                <option value="30d">Last 30 days</option>
+                <option value="90d">Last 90 days</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <i className="ri-group-line text-blue-600 text-xl"></i>
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Total Users</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.totalUsers.toLocaleString()}</p>
+                <p className="text-sm text-green-600">+12% from last month</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <i className="ri-user-line text-green-600 text-xl"></i>
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Active Users</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.activeUsers.toLocaleString()}</p>
+                <p className="text-sm text-green-600">+8% from last month</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <i className="ri-question-line text-purple-600 text-xl"></i>
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Total Questions</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.totalQuestions.toLocaleString()}</p>
+                <p className="text-sm text-green-600">+15 this week</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                <i className="ri-file-list-line text-orange-600 text-xl"></i>
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Tests Completed</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.totalTests.toLocaleString()}</p>
+                <p className="text-sm text-green-600">+156 today</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <i className="ri-money-dollar-circle-line text-yellow-600 text-xl"></i>
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Revenue</p>
+                <p className="text-2xl font-bold text-gray-900">${stats.revenue.toLocaleString()}</p>
+                <p className="text-sm text-green-600">+18% from last month</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                <i className="ri-line-chart-line text-red-600 text-xl"></i>
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Conversion Rate</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.conversionRate}%</p>
+                <p className="text-sm text-green-600">+2.1% from last month</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="bg-white rounded-lg shadow">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
+            </div>
+            <div className="p-6">
+              <div className="space-y-4">
+                {mockActivity.map((activity) => (
+                  <div key={activity.id} className="flex items-start space-x-3">
+                    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                      <i className={getActivityIcon(activity.type)}></i>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-900">{activity.description}</p>
+                      {activity.user && (
+                        <p className="text-xs text-gray-600">{activity.user}</p>
+                      )}
+                      <p className="text-xs text-gray-500">{formatTimestamp(activity.timestamp)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-2 gap-4">
+                <a 
+                  href="/admin/users"
+                  className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-center"
+                >
+                  <i className="ri-group-line text-2xl text-blue-600 mb-2"></i>
+                  <h3 className="font-medium text-gray-900">Manage Users</h3>
+                  <p className="text-sm text-gray-600">View and edit user accounts</p>
+                </a>
+
+                <a 
+                  href="/admin/questions"
+                  className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-center"
+                >
+                  <i className="ri-question-line text-2xl text-green-600 mb-2"></i>
+                  <h3 className="font-medium text-gray-900">Question Bank</h3>
+                  <p className="text-sm text-gray-600">Add and edit questions</p>
+                </a>
+
+                <a 
+                  href="/admin/analytics"
+                  className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-center"
+                >
+                  <i className="ri-bar-chart-line text-2xl text-purple-600 mb-2"></i>
+                  <h3 className="font-medium text-gray-900">Analytics</h3>
+                  <p className="text-sm text-gray-600">View detailed reports</p>
+                </a>
+
+                <a 
+                  href="/admin/subscriptions"
+                  className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-center"
+                >
+                  <i className="ri-vip-crown-line text-2xl text-yellow-600 mb-2"></i>
+                  <h3 className="font-medium text-gray-900">Subscriptions</h3>
+                  <p className="text-sm text-gray-600">Manage billing and plans</p>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 bg-white rounded-lg shadow">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">System Status</h2>
+          </div>
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <i className="ri-check-line text-green-600 text-2xl"></i>
+                </div>
+                <h3 className="font-medium text-gray-900">API Status</h3>
+                <p className="text-sm text-green-600">All systems operational</p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <i className="ri-database-line text-green-600 text-2xl"></i>
+                </div>
+                <h3 className="font-medium text-gray-900">Database</h3>
+                <p className="text-sm text-green-600">Running smoothly</p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <i className="ri-cloud-line text-yellow-600 text-2xl"></i>
+                </div>
+                <h3 className="font-medium text-gray-900">CDN</h3>
+                <p className="text-sm text-yellow-600">Minor delays detected</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+===== END FILE =====
+

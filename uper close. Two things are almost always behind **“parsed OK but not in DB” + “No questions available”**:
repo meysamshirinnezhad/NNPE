@@ -1,0 +1,36 @@
+                                Table "public.questions"
+      Column      |           Type           | Collation | Nullable |      Default      
+------------------+--------------------------+-----------+----------+-------------------
+ id               | uuid                     |           | not null | gen_random_uuid()
+ content          | text                     |           | not null | 
+ question_type    | character varying(50)    |           | not null | 
+ difficulty       | character varying(20)    |           | not null | 
+ topic_id         | uuid                     |           | not null | 
+ sub_topic_id     | uuid                     |           |          | 
+ province         | text                     |           |          | 
+ explanation      | text                     |           |          | 
+ reference_source | text                     |           |          | 
+ is_active        | boolean                  |           |          | true
+ created_at       | timestamp with time zone |           |          | 
+ updated_at       | timestamp with time zone |           |          | 
+ deleted_at       | timestamp with time zone |           |          | 
+Indexes:
+    "questions_pkey" PRIMARY KEY, btree (id)
+    "idx_questions_active" btree (is_active) WHERE is_active = true
+    "idx_questions_content_trgm" gin (content gin_trgm_ops)
+    "idx_questions_deleted_at" btree (deleted_at)
+    "idx_questions_explanation_trgm" gin (explanation gin_trgm_ops)
+    "idx_questions_is_active" btree (is_active)
+    "idx_questions_topic_difficulty" btree (topic_id, difficulty)
+    "idx_questions_topic_subtopic" btree (topic_id, sub_topic_id)
+    "idx_questions_type_difficulty" btree (question_type, difficulty)
+    "idx_questions_updated_at" btree (updated_at DESC)
+Foreign-key constraints:
+    "fk_questions_sub_topic" FOREIGN KEY (sub_topic_id) REFERENCES sub_topics(id)
+    "fk_questions_topic" FOREIGN KEY (topic_id) REFERENCES topics(id)
+Referenced by:
+    TABLE "practice_test_questions" CONSTRAINT "fk_practice_test_questions_question" FOREIGN KEY (question_id) REFERENCES questions(id)
+    TABLE "question_options" CONSTRAINT "fk_questions_options" FOREIGN KEY (question_id) REFERENCES questions(id) ON UPDATE CASCADE ON DELETE CASCADE
+    TABLE "user_answers" CONSTRAINT "fk_user_answers_question" FOREIGN KEY (question_id) REFERENCES questions(id)
+    TABLE "user_bookmarks" CONSTRAINT "fk_user_bookmarks_question" FOREIGN KEY (question_id) REFERENCES questions(id)
+
