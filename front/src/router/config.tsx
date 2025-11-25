@@ -2,7 +2,7 @@
 import type { RouteObject } from "react-router-dom";
 import NotFound from "../pages/NotFound";
 import Home from "../pages/home/page";
-import Landing from "../pages/landing/page";
+import Landing from "../pages/landing/ConversionFocusedLanding";
 import Dashboard from "../pages/dashboard/page";
 import RootRedirect from "./RootRedirect";
 import About from "../pages/about/page";
