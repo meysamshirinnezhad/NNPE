@@ -13,3 +13,5 @@ export { default as dashboardService } from './services/dashboard.service';
 export { default as studyService } from './services/study.service';
 export { default as adminService } from './services/admin.service';
 export { default as adminQuestionsService } from './services/admin.questions.service';
+export { default as couponService } from './services/coupon.service';
+export { default as coachService } from './services/coach.service';

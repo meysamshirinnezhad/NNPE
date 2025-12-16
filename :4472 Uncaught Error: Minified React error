@@ -1,0 +1,19 @@
+[0;1;32m●[0m nppe-frontend.service - NPPE Frontend Development Server
+     Loaded: loaded (/etc/systemd/system/nppe-frontend.service; enabled; vendor preset: enabled)
+     Active: [0;1;32mactive (running)[0m since Fri 2025-11-28 04:35:56 UTC; 12s ago
+   Main PID: 2055451 (npm run dev)
+      Tasks: 28 (limit: 2083)
+     Memory: 103.3M
+        CPU: 1.556s
+     CGroup: /system.slice/nppe-frontend.service
+             ├─2055451 "npm run dev" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─2055465 sh -c vite
+             ├─2055466 node /root/Learning-platform/source/front/node_modules/.bin/vite
+             └─2055477 /root/Learning-platform/source/front/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.25.12 --ping
+
+Nov 28 04:35:56 ubuntu systemd[1]: Started NPPE Frontend Development Server.
+Nov 28 04:35:56 ubuntu npm[2055451]: > nppe-pro@0.0.0 dev
+Nov 28 04:35:56 ubuntu npm[2055451]: > vite
+Nov 28 04:35:57 ubuntu npm[2055466]:   VITE v6.4.1  ready in 666 ms
+Nov 28 04:35:57 ubuntu npm[2055466]:   ➜  Local:   http://localhost:3000/
+Nov 28 04:35:57 ubuntu npm[2055466]:   ➜  Network: http://82.165.176.81:3000/

@@ -170,6 +170,18 @@ class AuthService {
   }
 
   /**
+   * Send verification email
+   */
+  async sendVerificationEmail(): Promise<{ message: string }> {
+    try {
+      const response = await apiClient.post<{ message: string }>('/auth/send-verification');
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
    * Get cached user from localStorage
    * Note: This may be stale; use validateSession() for fresh data
    */

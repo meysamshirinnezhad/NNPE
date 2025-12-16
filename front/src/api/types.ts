@@ -63,6 +63,8 @@ export interface User {
   subscription_id?: string;
   created_at: string;
   updated_at: string;
+  exam_attempts_left?: number;
+  access_expires_at?: string;
 }
 
 export interface UserProfile extends User {
@@ -617,4 +619,14 @@ export interface Bookmark {
   question_id: string;
   question?: Question;
   created_at: string;
+}
+
+// Coach types (mock implementation for now)
+export interface CoachResponse {
+  id: string;
+  name: string;
+  specialization: string;
+  avatar_url?: string;
+  rating: number;
+  availability: 'available' | 'busy' | 'offline';
 }
