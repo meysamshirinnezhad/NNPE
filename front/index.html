@@ -1,10 +1,12 @@
-
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- BUILD MARKER: This will help identify which deployment is live -->
+    <meta name="build-id" content="2025-12-16-stale-build-fix-branch-claude-2" />
     
     <!-- SEO Meta Tags -->
     <title>NPPE Pro - Professional Engineering Exam Preparation Platform</title>
@@ -50,7 +52,14 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     
-    <!-- Readdy Agent Widget -->
+    <!-- Readdy Agent Widget - DISABLED TO FIX EMAIL VERIFICATION 404 ISSUE -->
+    <!-- 
+    The readdy.ai script was causing email verification 404 issues by hijacking 
+    the page and showing its own 404 message instead of letting React Router 
+    handle the /verify-email route properly.
+    
+    To re-enable the chat widget, uncomment the script below:
+    
     <script 
       src="https://readdy.ai/api/public/assistant/widget?projectId=69c4dfdf-a8e5-432c-8d98-28d64036048a"
       mode="hybrid"
@@ -62,5 +71,6 @@
       button-accent-color="#FFFFFF"
       defer
     ></script>
+    -->
   </body>
 </html>
