@@ -10,10 +10,19 @@ The backend code has been updated with working implementations for:
 
 1. **Close the existing backend terminal window** (the one running `go run cmd/api/main.go`)
 
-2. **Restart the backend:**
-   ```cmd
-   cd back
-   go run cmd/api/main.go
+2. **Full System Restart (Backend, Nginx, Frontend):**
+   ```bash
+   # Backend
+   cd back && go run cmd/api/main.go
+   sudo systemctl restart nppe-api
+   
+   # Nginx
+   sudo systemctl restart nginx
+   sudo systemctl status nginx
+
+   # Frontend
+   cd front && npm run build
+   sudo systemctl restart nppe-frontend
    ```
 
 3. **Once restarted, run the test script:**

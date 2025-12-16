@@ -80,6 +80,8 @@ type EmailConfig struct {
 	SendGridAPIKey string
 	FromEmail      string
 	FromName       string
+	GmailSMTPUser  string
+	GmailSMTPPass  string
 }
 
 type AWSConfig struct {
@@ -153,6 +155,8 @@ func Load() (*Config, error) {
 			SendGridAPIKey: getEnv("SENDGRID_API_KEY", ""),
 			FromEmail:      getEnv("FROM_EMAIL", "noreply@nppepro.com"),
 			FromName:       getEnv("FROM_NAME", "NPPE Pro"),
+			GmailSMTPUser:  getEnv("GMAIL_SMTP_USER", ""),
+			GmailSMTPPass:  getEnv("GMAIL_SMTP_PASS", ""),
 		},
 		AWS: AWSConfig{
 			AccessKeyID:     getEnv("AWS_ACCESS_KEY_ID", ""),

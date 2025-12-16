@@ -1,14 +1,15 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../../components/base/Card';
 import Button from '../../components/base/Button';
 import ProgressBar from '../../components/base/ProgressBar';
+import QuestionsPopup from '../../components/feature/QuestionsPopup';
 import { updateSEO, seoData } from '../../utils/seo';
 import { userService } from '../../api';
 
 export default function Onboarding() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [showQuestionsPopup, setShowQuestionsPopup] = useState(false);
   const [formData, setFormData] = useState({
     examDate: '',
     studyGoal: '',
@@ -76,8 +77,8 @@ export default function Onboarding() {
           weekly_report: formData.notifications.weeklyProgress
         });
 
-        // Navigate to dashboard
-        navigate('/dashboard');
+        // Show the questions popup before navigating to dashboard
+        setShowQuestionsPopup(true);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to save onboarding data');
         setIsLoading(false);
@@ -92,6 +93,16 @@ export default function Onboarding() {
   };
 
   const handleSkip = () => {
+    navigate('/dashboard');
+  };
+
+  const handleQuestionsSkip = () => {
+    setShowQuestionsPopup(false);
+    navigate('/dashboard');
+  };
+
+  const handleQuestionsComplete = () => {
+    setShowQuestionsPopup(false);
     navigate('/dashboard');
   };
 
@@ -421,6 +432,13 @@ export default function Onboarding() {
           </div>
         </Card>
       </div>
+
+      {/* Questions Popup */}
+      <QuestionsPopup
+        isOpen={showQuestionsPopup}
+        onSkip={handleQuestionsSkip}
+        onComplete={handleQuestionsComplete}
+      />
     </div>
   );
 }

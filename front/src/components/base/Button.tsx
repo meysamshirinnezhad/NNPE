@@ -1,35 +1,39 @@
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'icon';
+  variant?: 'primary' | 'secondary' | 'icon' | 'future';
   size?: 'sm' | 'md' | 'lg';
   children: ReactNode;
   loading?: boolean;
   magnetic?: boolean;
   glow?: boolean;
+  tooltip?: string;
 }
 
-export default function Button({ 
-  variant = 'primary', 
-  size = 'md', 
-  children, 
+export default function Button({
+  variant = 'primary',
+  size = 'md',
+  children,
   loading = false,
   magnetic = false,
   glow = false,
+  tooltip,
   className = '',
   disabled,
-  ...props 
+  ...props
 }: ButtonProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const [showTooltip, setShowTooltip] = useState(false);
   
   const baseClasses = 'font-medium transition-all duration-200 whitespace-nowrap cursor-pointer relative overflow-hidden';
   
   const variantClasses = {
     primary: 'bg-primary text-white rounded-lg hover:bg-[#01579B] hover:shadow-lg hover:scale-102 active:scale-98 disabled:bg-gray-300 disabled:opacity-50',
     secondary: 'bg-white text-primary border-2 border-primary rounded-lg hover:bg-[#E3F2FD] hover:border-[#01579B] hover:scale-102 active:scale-98',
-    icon: 'rounded-full shadow-md hover:shadow-lg hover:scale-102 active:scale-95'
+    icon: 'rounded-full shadow-md hover:shadow-lg hover:scale-102 active:scale-95',
+    future: 'bg-gray-200 text-gray-500 rounded-lg opacity-50 cursor-not-allowed'
   };
   
   const sizeClasses = {
@@ -108,20 +112,47 @@ export default function Button({
     }
   };
 
+  const buttonProps = {
+    ...props,
+    ...(variant === 'future' && { title: tooltip || 'Active in future' })
+  };
+
+  const handleMouseEnter = () => {
+    if (tooltip || variant === 'future') {
+      setShowTooltip(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setShowTooltip(false);
+  };
+
   return (
-    <button
-      ref={buttonRef}
-      className={`${baseClasses} ${variantClasses[variant]} ${variant === 'icon' ? iconSizeClasses[size] : sizeClasses[size]} ${magneticClass} ${glowClass} ${className}`}
-      disabled={disabled || loading}
-      onClick={handleClick}
-      {...props}
-    >
-      {loading ? (
-        <div className="flex items-center justify-center">
-          <i className="ri-loader-4-line animate-spin mr-2"></i>
-          Loading...
+    <div className="relative inline-block">
+      <button
+        ref={buttonRef}
+        className={`${baseClasses} ${variantClasses[variant]} ${variant === 'icon' ? iconSizeClasses[size] : sizeClasses[size]} ${magneticClass} ${glowClass} ${className}`}
+        disabled={disabled || loading || variant === 'future'}
+        onClick={variant === 'future' ? undefined : handleClick}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        {...buttonProps}
+      >
+        {loading ? (
+          <div className="flex items-center justify-center">
+            <i className="ri-loader-4-line animate-spin mr-2"></i>
+            Loading...
+          </div>
+        ) : children}
+      </button>
+
+      {/* Tooltip */}
+      {showTooltip && (tooltip || variant === 'future') && (
+        <div className="absolute z-50 px-2 py-1 text-sm text-white bg-gray-900 rounded-md shadow-lg bottom-full left-1/2 transform -translate-x-1/2 mb-2 whitespace-nowrap">
+          {tooltip || 'Active in future'}
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
         </div>
-      ) : children}
-    </button>
+      )}
+    </div>
   );
 }

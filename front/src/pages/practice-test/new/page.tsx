@@ -7,11 +7,14 @@ import Card from '../../../components/base/Card';
 import Button from '../../../components/base/Button';
 import LoadingSpinner from '../../../components/effects/LoadingSpinner';
 import { updateSEO } from '../../../utils/seo';
-import { testService, questionService } from '../../../api';
-import type { Topic } from '../../../api/types';
+import { testService, questionService, userService, couponService } from '../../../api';
+import { useAuthContext } from '../../../contexts/AuthContext';
+import type { Topic, UserProfile } from '../../../api/types';
 
 export default function PracticeTestNew() {
   const navigate = useNavigate();
+  const { isAuthenticated, isLoading: authLoading } = useAuthContext();
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [testConfig, setTestConfig] = useState({
     testType: 'full_exam' as 'full_exam' | 'topic_specific' | 'custom',
     topics: [] as string[],
@@ -24,6 +27,9 @@ export default function PracticeTestNew() {
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
+  const [couponCode, setCouponCode] = useState('');
+  const [redeeming, setRedeeming] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     updateSEO({
@@ -35,19 +41,33 @@ export default function PracticeTestNew() {
   }, []);
 
   useEffect(() => {
-    const fetchTopics = async () => {
+    // Wait for authentication to complete
+    if (authLoading) return;
+
+    // Redirect if not authenticated
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    const fetchInitialData = async () => {
       try {
-        const data = await questionService.getTopics();
-        setTopics(data);
+        // Fetch user profile to check access
+        const profile = await userService.getProfile();
+        setUserProfile(profile);
+
+        // Fetch topics
+        const topicData = await questionService.getTopics();
+        setTopics(topicData);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load topics');
+        setError(err instanceof Error ? err.message : 'Failed to load data');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTopics();
-  }, []);
+    fetchInitialData();
+  }, [authLoading, isAuthenticated, navigate]);
 
   const testTypes = [
     {
@@ -109,10 +129,39 @@ export default function PracticeTestNew() {
     return true;
   };
 
+  const handleRedeemCoupon = async () => {
+    if (!couponCode.trim()) {
+      setError('Please enter a coupon code');
+      return;
+    }
+
+    setRedeeming(true);
+    setError('');
+    setSuccessMessage('');
+
+    try {
+      const result = await couponService.redeemCoupon({ code: couponCode.trim() });
+
+      // Update user profile to reflect new access
+      const updatedProfile = await userService.getProfile();
+      setUserProfile(updatedProfile);
+
+      setSuccessMessage(result.message);
+      setCouponCode('');
+
+      // Auto-hide success message after 3 seconds
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to redeem coupon');
+    } finally {
+      setRedeeming(false);
+    }
+  };
+
   const handleStartTest = async () => {
     setCreating(true);
     setError('');
-    
+
     try {
       const result = await testService.startTest({
         test_type: testConfig.testType,
@@ -123,7 +172,7 @@ export default function PracticeTestNew() {
                             testConfig.testType === 'full_exam' ? 180 :
                             Math.round(testConfig.questionCount * 1.8)
       });
-      
+
       navigate(`/practice-test/take/${result.test_id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create test');
@@ -131,7 +180,7 @@ export default function PracticeTestNew() {
     }
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
@@ -158,6 +207,16 @@ export default function PracticeTestNew() {
             </div>
           </div>
         )}
+
+        {successMessage && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center">
+              <i className="ri-check-circle-line text-green-600 text-xl mr-3"></i>
+              <p className="text-green-800">{successMessage}</p>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -168,7 +227,61 @@ export default function PracticeTestNew() {
           </p>
         </div>
 
-        <div className="space-y-8">
+        {/* Coupon Gate - Show when user doesn't have attempts */}
+        {userProfile && (userProfile.exam_attempts_left <= 0 || (userProfile.access_expires_at && new Date(userProfile.access_expires_at) < new Date())) ? (
+          <Card className="text-center py-12">
+            <div className="max-w-md mx-auto">
+              <div className="mb-6">
+                <i className="ri-lock-line text-6xl text-gray-400"></i>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                Invitation Required
+              </h2>
+              <p className="text-gray-600 mb-8">
+                To access practice tests, please enter a valid invitation coupon code.
+                Contact your administrator or instructor for a code.
+              </p>
+
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="coupon-code" className="block text-sm font-medium text-gray-700 mb-2">
+                    Coupon Code
+                  </label>
+                  <input
+                    id="coupon-code"
+                    type="text"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    placeholder="Enter your coupon code"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center text-lg font-mono tracking-wider"
+                    disabled={redeeming}
+                  />
+                </div>
+
+                <Button
+                  onClick={handleRedeemCoupon}
+                  disabled={redeeming || !couponCode.trim()}
+                  size="lg"
+                  className="w-full"
+                >
+                  {redeeming ? (
+                    <>
+                      <LoadingSpinner size="sm" />
+                      <span className="ml-2">Redeeming...</span>
+                    </>
+                  ) : (
+                    <>
+                      <i className="ri-coupon-line mr-2"></i>
+                      Redeem Coupon
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </Card>
+        ) : (
+          /* Test Configuration Form - Show when user has access */
+          <div className="space-y-8">
           {/* Test Type Selection */}
           <Card>
             <h2 className="text-xl font-semibold text-gray-900 mb-6">Choose Test Type</h2>
@@ -462,7 +575,8 @@ export default function PracticeTestNew() {
               </Button>
             </div>
           </Card>
-        </div>
+          </div>
+        )}
       </main>
 
       <MobileNavigation />

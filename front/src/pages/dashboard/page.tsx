@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/feature/Header';
 import MobileNavigation from '../../components/feature/MobileNavigation';
+import VerificationBanner from '../../components/feature/VerificationBanner';
 import Card from '../../components/base/Card';
 import Button from '../../components/base/Button';
 import ProgressBar from '../../components/base/ProgressBar';
@@ -9,277 +10,115 @@ import CircularProgress from '../../components/base/CircularProgress';
 import CountUpNumber from '../../components/base/CountUpNumber';
 import ParticleBackground from '../../components/effects/ParticleBackground';
 import BlueprintReveal from '../../components/effects/BlueprintReveal';
+import ExamAttemptsCounter from '../../components/feature/ExamAttemptsCounter';
+import CouponRedemptionModal from '../../components/feature/CouponRedemptionModal';
 import { updateSEO, seoData } from '../../utils/seo';
 import { useDashboard } from '../../hooks/useDashboard';
-import { useAuthContext } from '../../contexts/AuthContext';
-import { testService } from '../../api';
+import { useCoach } from '../../hooks/useCoach';
 
 export default function Dashboard() {
   const dashboardRef = useRef<HTMLDivElement>(null);
   const [showBlueprint, setShowBlueprint] = useState(true);
   const [contentVisible, setContentVisible] = useState(false);
-  const [creating, setCreating] = useState(false);
-  const [inProgressTest, setInProgressTest] = useState<any>(null);
+  const [showCouponModal, setShowCouponModal] = useState(false);
   const navigate = useNavigate();
-  
-  // Fetch real data from backend
-  const { data: dashboardData, loading, error } = useDashboard();
-  const { user } = useAuthContext();
+  const { data: dashboard, loading, error } = useDashboard();
+  const { data: coach, loading: coachLoading, error: coachError, refresh: refreshCoach } = useCoach();
+  console.log("AI Coach:", { coach, coachLoading, coachError });
 
   useEffect(() => {
     updateSEO(seoData.dashboard);
   }, []);
-  
-  // Check for in-progress tests
-  useEffect(() => {
-    const checkInProgressTests = async () => {
-      try {
-        const response = await testService.getTestHistory();
-        // Handle if response is array directly or wrapped in object
-        const tests = Array.isArray(response) ? response : (response as any)?.tests || [];
-        const inProgress = tests.find((t: any) => t.status === 'in_progress');
-        setInProgressTest(inProgress || null);
-      } catch (err) {
-        console.error('Failed to check in-progress tests:', err);
-      }
-    };
-    
-    if (!loading && dashboardData) {
-      checkInProgressTests();
-    }
-  }, [loading, dashboardData]);
-
-  // Blueprint reveal completion handler
-  const handleBlueprintComplete = () => {
-    setShowBlueprint(false);
-    setContentVisible(true);
-  };
-
-  // Skip blueprint animation on click
-  const handleSkipBlueprint = () => {
-    setShowBlueprint(false);
-    setContentVisible(true);
-  };
-
-  // Scroll-triggered animations
-  useEffect(() => {
-    if (!contentVisible) return;
-
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('revealed');
-        }
-      });
-    }, observerOptions);
-
-    const scrollElements = document.querySelectorAll('.scroll-reveal');
-    scrollElements.forEach((el) => observer.observe(el));
-
-    return () => observer.disconnect();
-  }, [contentVisible]);
-
-  // Transform topic mastery data for display
-  const topicPerformance = dashboardData?.topic_mastery?.map(topic => ({
-    topic: topic.topic?.name || 'Unknown Topic',
-    score: Math.round(topic.mastery_percentage),
-    color: topic.mastery_percentage >= 80 ? 'success' : 
-           topic.mastery_percentage >= 60 ? 'warning' : 'error'
-  })) || [];
-
-  // Get weak topics (score < 60%)
-  const weakTopics = dashboardData?.weak_topics?.slice(0, 3) || [];
-
-  // Format recent activities
-  const recentActivities = dashboardData?.recent_activity?.map(activity => ({
-    icon: activity.type === 'practice_test' ? 'ri-file-text-line' :
-          activity.type === 'question' ? 'ri-play-circle-line' :
-          activity.type === 'achievement' ? 'ri-award-line' : 'ri-book-open-line',
-    text: activity.description,
-    time: formatRelativeTime(activity.timestamp),
-    color: activity.type === 'achievement' ? 'text-secondary' : 'text-primary'
-  })) || [];
-
-  // Calculate questions progress percentage
-  const questionsProgress = dashboardData ?
-    Math.round((dashboardData.questions_completed / 500) * 100) : 0;
-
-  // Handler for Practice Weakest Topic button
-  const handlePracticeWeakestTopic = async () => {
-    if (creating || !weakTopics.length) return;
-    
-    setCreating(true);
-    try {
-      // Get the weakest topic (first one in the list)
-      const weakestTopic = dashboardData?.weak_topics?.[0];
-      if (!weakestTopic) return;
-
-      // Find the topic ID from topic_mastery
-      const topicMastery = dashboardData?.topic_mastery?.find(
-        (tm) => tm.topic?.name === weakestTopic.name
-      );
-      
-      const topicId = topicMastery?.topic_id;
-      if (!topicId) {
-        throw new Error('Could not find topic ID');
-      }
-
-      // Start a topic-specific test
-      const response = await testService.startTest({
-        test_type: 'topic_specific',
-        topic_ids: [topicId],
-        question_count: 20,
-        time_limit_minutes: 30
-      });
-
-      // Extract test_id from response (check multiple possible locations)
-      const testId = response?.test_id || (response as any)?.id || (response as any)?.data?.test_id;
-      if (!testId) {
-        console.error('API Response:', response);
-        throw new Error('No test ID returned from server');
-      }
-      navigate(`/practice-test/take/${testId}`);
-    } catch (err) {
-      console.error('Failed to start practice test:', err);
-      alert('Failed to start practice test. Please try again.');
-    } finally {
-      setCreating(false);
-    }
-  };
-
-  // Handler for Start Full Mock button
-  const handleStartFullMock = async () => {
-    if (creating) return;
-    
-    setCreating(true);
-    try {
-      // Let the server decide question_count/time_limit if it has defaults
-      const response = await testService.startTest({
-        test_type: 'full_exam',
-      });
-
-      // Extract test_id from response (check multiple possible locations)
-      const testId = response?.test_id || (response as any)?.id || (response as any)?.data?.test_id;
-      if (!testId) {
-        console.error('API Response:', response);
-        throw new Error('No test ID returned from server');
-      }
-      navigate(`/practice-test/take/${testId}`);
-    } catch (err: any) {
-      console.error('Failed to start full mock:', err);
-      
-      // Fallback: try a smaller custom test if the server complains about size
-      if (err?.response?.status === 400) {
-        try {
-          const retry = await testService.startTest({
-            test_type: 'custom',
-            question_count: 10,
-            time_limit_minutes: 15,
-          });
-          const testId = retry?.test_id || (retry as any)?.id || (retry as any)?.data?.test_id;
-          if (!testId) {
-            throw new Error('No test ID returned from server');
-          }
-          navigate(`/practice-test/take/${testId}`);
-          return;
-        } catch (retryErr) {
-          console.error('Fallback test creation also failed:', retryErr);
-        }
-      }
-      
-      alert('Failed to start full mock exam. Please try again.');
-    } finally {
-      setCreating(false);
-    }
-  };
-
-  // Handler for Continue Studying button
-  const handleContinueStudying = async () => {
-    if (creating) return;
-    
-    setCreating(true);
-    try {
-      // Start a small mixed test that works with limited question bank
-      const response = await testService.startTest({
-        test_type: 'custom',
-        question_count: 10,
-        time_limit_minutes: 15,
-      });
-
-      // Extract test_id from response (check multiple possible locations)
-      const testId = response?.test_id || (response as any)?.id || (response as any)?.data?.test_id;
-      if (!testId) {
-        console.error('API Response:', response);
-        throw new Error('No test ID returned from server');
-      }
-      navigate(`/practice-test/take/${testId}`);
-    } catch (err) {
-      console.error('Failed to start practice session:', err);
-      alert('Failed to start practice session. Please try again.');
-    } finally {
-      setCreating(false);
-    }
-  };
 
   // Show loading state
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your dashboard...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-lg text-gray-600">Loading your dashboard...</p>
         </div>
       </div>
     );
   }
 
   // Show error state
-  if (error) {
+  if (error || !dashboard) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <i className="ri-error-warning-line text-red-600 text-5xl mb-4"></i>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Unable to load dashboard</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            Retry
-          </button>
+          <i className="ri-error-warning-line text-6xl text-red-500 mb-4"></i>
+          <p className="text-lg text-gray-600">Failed to load dashboard</p>
+          <p className="text-sm text-gray-500 mt-2">{error}</p>
         </div>
       </div>
     );
   }
 
+  const d = dashboard; // Use the real API data
+
+  const handleBlueprintComplete = () => {
+    setShowBlueprint(false);
+    setContentVisible(true);
+  };
+
+  const handleSkipBlueprint = () => {
+    setShowBlueprint(false);
+    setContentVisible(true);
+  };
+
+  const handleStartNewTest = () => {
+    navigate('/practice-test/new');
+  };
+
+  const handleRecommendedTestClick = async (_test: any) => {
+    // All test creation must go through the coupon gate
+    // Note: The /practice-test/new page will validate coupon access
+    navigate('/practice-test/new');
+  };
+
+  const handleFullPracticeExam = async () => {
+    // All test creation must go through the coupon gate
+    // Note: The /practice-test/new page will validate coupon access
+    navigate('/practice-test/new');
+  };
+
+  // Helper functions for dynamic messaging
+  const getPassReadyMessage = (passReady: number) => {
+    if (passReady < 30) return "Early in your journey – keep practicing and building a solid foundation.";
+    if (passReady < 60) return "You're making progress – focus on your weak areas to build momentum.";
+    if (passReady < 80) return "You're getting close – now is the time for full exams and timing practice.";
+    return "You're in excellent shape – keep your skills fresh with regular practice exams.";
+  };
+
+  const getProgressTitle = (passReady: number) => {
+    if (passReady < 30) return "Let's Build Your Foundation 💪";
+    if (passReady < 60) return "You're On Your Way 🚀";
+    return "You're Almost There! 🚀";
+  };
+
+  // Remove problematic useEffect - let CSS handle animations
+
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Blueprint Reveal Animation */}
       {showBlueprint && (
         <div onClick={handleSkipBlueprint} className="cursor-pointer">
           <BlueprintReveal onComplete={handleBlueprintComplete} />
         </div>
       )}
 
-      {/* Enhanced Background Effects */}
       <div className="fixed inset-0 animated-gradient opacity-25"></div>
       <div className="fixed inset-0 mesh-gradient"></div>
       
-      {/* Particle Background */}
       <ParticleBackground />
       
-      {/* Enhanced Geometric Shapes */}
       <div className="geometric-shape shape-1"></div>
       <div className="geometric-shape shape-2"></div>
       <div className="geometric-shape shape-3"></div>
       <div className="geometric-shape shape-4"></div>
 
       <Header />
+      <VerificationBanner />
       
       <main 
         ref={dashboardRef} 
@@ -287,19 +126,33 @@ export default function Dashboard() {
           contentVisible ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        {/* Welcome Section */}
+        {/* Welcome Section with CTA */}
         <div className="mb-8 animate-fade-in-up stagger-1">
-          <h1 className="text-h1 text-gray-900 mb-2 animate-text-reveal">
-            Welcome back, {user?.first_name || 'Student'}! 👋
-          </h1>
-          <p className="text-body text-neutral animate-text-reveal stagger-2">
-            You're making great progress. Keep up the momentum!
-          </p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-h1 text-gray-900 mb-2 animate-text-reveal">
+                Ready for Your Next Test, {d.user_name}? 🎯
+              </h1>
+              <p className="text-body text-neutral animate-text-reveal stagger-2">
+                You're on track! Your last score was {d.last_score.toFixed(1)}% - keep the momentum going.
+              </p>
+            </div>
+            <Button
+              className="btn-premium whitespace-nowrap"
+              size="lg"
+              magnetic={true}
+              glow={true}
+              onClick={handleStartNewTest}
+            >
+              <i className="ri-play-circle-line mr-2"></i>
+              Start New Mock Test
+            </Button>
+          </div>
         </div>
 
-        {/* Hero Statistics Cards */}
+        {/* Key Statistics */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-          {/* Overall Progress */}
+          {/* Tests Completed */}
           <Card 
             className="text-center" 
             delay={300} 
@@ -307,22 +160,17 @@ export default function Dashboard() {
             interactive3d={true}
             glow={true}
           >
-            <div className="mb-4 flex justify-center">
-              <CircularProgress 
-                value={dashboardData?.overall_progress || 0} 
-                size={90} 
-                strokeWidth={10}
-                animate={contentVisible}
-                delay={500}
-                gradient={true}
-                glow={true}
-              />
+            <div className="w-12 h-12 mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 rounded-full">
+              <i className="ri-file-list-3-line text-2xl text-primary"></i>
             </div>
-            <h3 className="font-semibold text-gray-900 mb-1 animate-text-reveal stagger-3">Overall Progress</h3>
-            <p className="text-small text-success font-medium animate-text-reveal stagger-4">Keep going!</p>
+            <div className="text-3xl font-bold text-gray-900 mb-1 animate-number-count">
+              <CountUpNumber end={d.tests_taken.total} duration={1200} delay={400} />
+            </div>
+            <h3 className="font-semibold text-gray-900 mb-1">Tests Taken</h3>
+            <p className="text-small text-success font-medium">+{d.tests_taken.this_month} this month</p>
           </Card>
 
-          {/* Study Streak */}
+          {/* Average Score */}
           <Card 
             className="text-center" 
             delay={400} 
@@ -330,20 +178,22 @@ export default function Dashboard() {
             interactive3d={true}
             glow={true}
           >
-            <div className="w-12 h-12 mx-auto mb-4 flex items-center justify-center">
-              <i className="ri-fire-line text-3xl text-secondary animate-pulse-gentle"></i>
+            <div className="mb-4 flex justify-center">
+              <CircularProgress
+                value={d.average_score.current}
+                size={90}
+                strokeWidth={10}
+                animate={contentVisible}
+                delay={500}
+                gradient={true}
+                glow={true}
+              />
             </div>
-            <div className="text-2xl font-bold text-gray-900 mb-1 animate-number-count stagger-5">
-              <CountUpNumber end={dashboardData?.study_streak || 0} duration={1200} delay={600} />
-              <span> Days</span>
-            </div>
-            <h3 className="font-semibold text-gray-900 mb-1 animate-text-reveal stagger-6">Study Streak</h3>
-            <p className="text-small text-neutral animate-text-reveal stagger-7">
-              Your longest: {dashboardData?.longest_streak || 0} days
-            </p>
+            <h3 className="font-semibold text-gray-900 mb-1">Average Score</h3>
+            <p className="text-small text-success font-medium">+{d.average_score.improvement.toFixed(1)}% improvement</p>
           </Card>
 
-          {/* Questions Completed */}
+          {/* Study Streak */}
           <Card 
             className="text-center" 
             delay={500} 
@@ -351,27 +201,18 @@ export default function Dashboard() {
             interactive3d={true}
             glow={true}
           >
-            <div className="mb-4">
-              <div className="text-2xl font-bold text-gray-900 mb-2 animate-number-count stagger-8">
-                <CountUpNumber end={dashboardData?.questions_completed || 0} duration={1400} delay={700} />
-                <span>/500</span>
-              </div>
-              <ProgressBar 
-                value={questionsProgress} 
-                animate={contentVisible} 
-                delay={800}
-                color="primary"
-                glow={true}
-                gradient={true}
-              />
+            <div className="w-12 h-12 mx-auto mb-4 flex items-center justify-center">
+              <i className="ri-fire-line text-3xl text-orange-600 animate-pulse-gentle"></i>
             </div>
-            <h3 className="font-semibold text-gray-900 mb-1 animate-text-reveal stagger-9">Questions Done</h3>
-            <p className="text-small text-neutral animate-text-reveal stagger-10">
-              {dashboardData?.accuracy_rate ? `${dashboardData.accuracy_rate.toFixed(1)}% accuracy` : 'Start practicing'}
-            </p>
+            <div className="text-3xl font-bold text-gray-900 mb-1 animate-number-count">
+              <CountUpNumber end={d.study_streak.current} duration={1200} delay={600} />
+              <span className="text-xl"> Days</span>
+            </div>
+            <h3 className="font-semibold text-gray-900 mb-1">Active Streak</h3>
+            <p className="text-small text-neutral">Best: {d.study_streak.longest} days</p>
           </Card>
 
-          {/* Pass Probability */}
+          {/* Pass Readiness */}
           <Card 
             className="text-center" 
             delay={600} 
@@ -380,282 +221,376 @@ export default function Dashboard() {
             glow={true}
           >
             <div className="w-12 h-12 mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-green-100 to-green-200 rounded-full">
-              <i className="ri-arrow-up-line text-xl text-success animate-bounce-in"></i>
+              <i className="ri-shield-check-line text-2xl text-success"></i>
             </div>
-            <div className="text-2xl font-bold text-success mb-1 animate-number-count">
-              <CountUpNumber end={dashboardData?.pass_probability || 0} duration={1500} delay={900} suffix="%" />
+            <div className="text-3xl font-bold text-success mb-1 animate-number-count">
+              <CountUpNumber end={d.pass_ready_percentage} duration={1500} delay={700} suffix="%" />
             </div>
-            <h3 className="font-semibold text-gray-900 mb-1 animate-text-reveal">Pass Ready</h3>
-            <p className="text-small text-success animate-text-reveal">
-              {dashboardData && dashboardData.pass_probability >= 70 ? 'Trending up' : 'Keep studying'}
-            </p>
+            <h3 className="font-semibold text-gray-900 mb-1">Pass Ready</h3>
+            <p className="text-small text-success">Excellent progress!</p>
           </Card>
         </div>
 
-        {/* Middle Section */}
-        <div className="grid lg:grid-cols-4 gap-6 mb-8">
-          {/* Exam Activity */}
-          <div>
-            <Card delay={700} glassmorphism={true} glow={true} className="scroll-reveal">
-              <div className="text-center">
-                <div className="w-12 h-12 mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-purple-100 to-purple-200 rounded-full">
-                  <i className="ri-file-text-line text-2xl text-purple-600 animate-bounce-in"></i>
-                </div>
-                <div className="text-3xl font-bold text-gray-900 mb-2 animate-number-count">
-                  <CountUpNumber end={dashboardData?.practice_tests_taken || 0} duration={1200} delay={800} />
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-1 animate-text-reveal">Mock Exams</h3>
-                <p className="text-small text-neutral animate-text-reveal mb-4">Completed</p>
-
-                {/* Progress towards target (assuming 10 exams as target) */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs text-gray-600">
-                    <span>Progress to Target</span>
-                    <span>{Math.min(dashboardData?.practice_tests_taken || 0, 10)}/10</span>
-                  </div>
-                  <ProgressBar
-                    value={Math.min(((dashboardData?.practice_tests_taken || 0) / 10) * 100, 100)}
-                    animate={contentVisible}
-                    delay={1000}
-                    color="primary"
-                    glow={true}
-                    gradient={true}
-                    size="sm"
-                  />
-                  <p className="text-xs text-gray-500">
-                    {(dashboardData?.practice_tests_taken || 0) >= 10 ? 'Target achieved!' : `${10 - (dashboardData?.practice_tests_taken || 0)} more to go`}
-                  </p>
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          {/* Performance by Topic Chart */}
+        {/* Main Content Grid */}
+        <div className="grid lg:grid-cols-3 gap-6 mb-8">
+          {/* Test History - Takes 2 columns */}
           <div className="lg:col-span-2">
             <Card delay={700} glassmorphism={true} glow={true} className="scroll-reveal">
-              <h2 className="text-h2 text-gray-900 mb-6 animate-text-reveal">Performance by Topic</h2>
-              {topicPerformance.length > 0 ? (
-                <>
-                  <div className="space-y-4">
-                    {topicPerformance.map((topic, index) => (
-                      <div key={index} className="flex items-center animate-slide-in-left interactive-hover" style={{ animationDelay: `${1000 + index * 150}ms` }}>
-                        <div className="w-40 text-small text-gray-700 truncate font-medium">
-                          {topic.topic}
-                        </div>
-                        <div className="flex-1 mx-4">
-                          <ProgressBar 
-                            value={topic.score} 
-                            animate={contentVisible} 
-                            delay={1200 + index * 150}
-                            color={topic.color as 'success' | 'warning' | 'error'}
-                            glow={true}
-                            gradient={true}
-                          />
-                        </div>
-                        <div className="w-12 text-small font-bold text-gray-900">
-                          <CountUpNumber end={topic.score} duration={1000} delay={1400 + index * 150} suffix="%" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-6 flex items-center space-x-6 text-small animate-fade-in-up" style={{ animationDelay: '2200ms' }}>
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 bg-gradient-to-r from-green-500 to-green-600 rounded-full mr-2"></div>
-                      <span className="text-neutral">Mastered (80-100%)</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full mr-2"></div>
-                      <span className="text-neutral">In Progress (60-79%)</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 bg-gradient-to-r from-red-500 to-red-600 rounded-full mr-2"></div>
-                      <span className="text-neutral">Needs Focus (&lt;60%)</span>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <i className="ri-bar-chart-line text-4xl mb-2"></i>
-                  <p>Start practicing to see your performance by topic</p>
-                </div>
-              )}
-            </Card>
-          </div>
-
-          {/* Weakness Spotlight */}
-          <div>
-            <Card 
-              className="border-2 border-red-200/50 scroll-reveal" 
-              delay={800} 
-              glassmorphism={true}
-              glow={true}
-            >
-              <div className="flex items-center mb-4">
-                <i className="ri-error-warning-line text-error text-xl mr-2 animate-bounce-in"></i>
-                <h2 className="text-h2 text-gray-900 animate-text-reveal">Weakness Spotlight</h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-h2 text-gray-900 animate-text-reveal">Recent Mock Tests</h2>
+                <Button variant="secondary" size="sm" className="text-xs">
+                  View All History
+                </Button>
               </div>
-              <p className="text-small text-neutral mb-4 animate-text-reveal">
-                Focus on these areas to improve your overall score
-              </p>
-              {weakTopics.length > 0 ? (
-                <div className="space-y-3">
-                  {weakTopics.map((topic, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gradient-to-r from-red-50/90 to-red-100/90 backdrop-blur-sm rounded-lg card-hover-3d animate-slide-in-right" style={{ animationDelay: `${1200 + index * 200}ms` }}>
-                      <div>
-                        <div className="font-medium text-gray-900 text-small">{topic.name}</div>
-                        <div className="text-small text-error font-semibold">
-                          <CountUpNumber end={Math.round(topic.score)} duration={800} delay={1400 + index * 200} suffix="% mastery" />
+              
+              <div className="space-y-3">
+                {d.recent_tests.map((test, index) => (
+                  <div
+                    key={test.id}
+                    className="p-4 bg-gradient-to-r from-white/80 to-white/60 backdrop-blur-sm rounded-lg border border-gray-200/50 hover:border-primary/30 transition-all duration-300 card-hover-3d animate-slide-in-left cursor-pointer"
+                    style={{ animationDelay: `${800 + index * 100}ms` }}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900 mb-1">{test.name}</h3>
+                        <div className="flex items-center gap-3 text-xs text-neutral">
+                          <span className="flex items-center">
+                            <i className="ri-calendar-line mr-1"></i>
+                            {test.date}
+                          </span>
+                          <span className="flex items-center">
+                            <i className="ri-time-line mr-1"></i>
+                            {test.duration}
+                          </span>
+                          <span className="flex items-center">
+                            <i className="ri-question-line mr-1"></i>
+                            {test.questions} questions
+                          </span>
                         </div>
                       </div>
-                      <Button size="sm" className="text-xs px-3 py-1 btn-premium" magnetic={true} glow={true}>
-                        Focus Here
+                      <div className="text-right">
+                        <div className={`text-2xl font-bold ${test.score >= 75 ? 'text-success' : test.score >= 65 ? 'text-warning' : 'text-error'}`}>
+                          {test.score.toFixed(1)}%
+                        </div>
+                        <div className={`text-xs font-medium ${test.delta >= 0 ? 'text-success' : 'text-error'}`}>
+                          {test.delta >= 0 ? '+' : ''}{test.delta.toFixed(1)}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1">
+                        <ProgressBar
+                          value={test.score}
+                          animate={contentVisible}
+                          delay={1000 + index * 100}
+                          color={test.score >= 75 ? 'success' : test.score >= 65 ? 'warning' : 'error'}
+                          size="sm"
+                          gradient={true}
+                        />
+                      </div>
+                      <Button size="sm" variant="secondary" className="text-xs px-3 py-1">
+                        <i className="ri-eye-line mr-1"></i>
+                        Review
                       </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Performance Trend Chart */}
+              <div className="mt-6 pt-6 border-t border-gray-200/50">
+                <h3 className="font-semibold text-gray-900 mb-4">Score Progression</h3>
+                <div className="flex items-end justify-between h-32 gap-2">
+                  {d.score_progression.map((item, index) => (
+                    <div key={index} className="flex-1 flex flex-col items-center gap-2">
+                      <div className="w-full bg-gray-200 rounded-t-lg relative overflow-hidden" style={{ height: `${item.score}%` }}>
+                        <div
+                          className={`absolute inset-0 bg-gradient-to-t ${
+                            item.score >= 75 ? 'from-green-400 to-green-500' :
+                            item.score >= 65 ? 'from-yellow-400 to-yellow-500' :
+                            'from-red-400 to-red-500'
+                          } animate-slide-up`}
+                          style={{ animationDelay: `${1500 + index * 150}ms` }}
+                        ></div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-xs font-bold text-white">{item.score.toFixed(1)}%</span>
+                        </div>
+                      </div>
+                      <span className="text-xs text-neutral font-medium">{item.label}</span>
                     </div>
                   ))}
                 </div>
-              ) : (
-                <div className="text-center py-4 text-gray-500">
-                  <i className="ri-checkbox-circle-line text-3xl mb-2 text-green-600"></i>
-                  <p className="text-sm">Great job! No weak areas detected yet.</p>
+              </div>
+            </Card>
+          </div>
+
+          {/* Right Sidebar */}
+          <div className="space-y-6">
+            {/* Exam Attempts Counter */}
+            <ExamAttemptsCounter
+              onRedeemClick={() => setShowCouponModal(true)}
+            />
+
+            {/* Achievements */}
+            <Card delay={800} glassmorphism={true} glow={true} className="scroll-reveal">
+              <h2 className="text-h2 text-gray-900 mb-4 animate-text-reveal">Recent Achievements</h2>
+              <div className="space-y-3">
+                {d.recent_achievements.length > 0 ? d.recent_achievements.map((achievement, index) => (
+                  <div
+                    key={achievement.earned_at}
+                    className="p-3 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg animate-scale-in"
+                    style={{ animationDelay: `${1200 + index * 150}ms` }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white/80 text-yellow-600">
+                        <i className={`ri-trophy-line text-xl`}></i>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900 text-sm">{achievement.title}</h3>
+                        <p className="text-xs text-neutral">{achievement.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                )) : (
+                  <p className="text-sm text-neutral">No achievements yet. Keep practicing to unlock them!</p>
+                )}
+              </div>
+            </Card>
+
+            {/* Exam Countdown */}
+            <Card delay={900} glassmorphism={true} glow={true} className="scroll-reveal">
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-red-100 to-red-200 rounded-full">
+                  <i className="ri-calendar-check-line text-3xl text-red-600"></i>
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">Exam Countdown</h3>
+                <div className="text-4xl font-bold text-red-600 mb-1 animate-number-count">
+                  <CountUpNumber end={d.exam_countdown.days_left} duration={1200} delay={1000} />
+                  <span className="text-2xl"> Days</span>
+                </div>
+                <p className="text-small text-neutral mb-4">
+                  {d.exam_countdown.days_left === 0
+                    ? "Until your scheduled NPPE exam"
+                    : "Until your scheduled NPPE exam"
+                  }
+                </p>
+                {d.exam_countdown.days_left === 0 ? (
+                  <p className="text-xs text-neutral">
+                    No exam date set yet – add your exam date in your profile to get a proper countdown.
+                  </p>
+                ) : (
+                  <>
+                    <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div className="bg-gradient-to-r from-red-500 to-red-600 h-3 rounded-full animate-progress-fill" style={{ width: `${d.exam_countdown.prep_time_used}%`, animationDelay: '1200ms' }}></div>
+                    </div>
+                    <p className="text-xs text-neutral mt-2">
+                      {d.exam_countdown.prep_time_used.toFixed(1)}% of your prep window has passed. Stay consistent!
+                    </p>
+                  </>
+                )}
+              </div>
+            </Card>
+
+            {/* AI Coach */}
+            <Card delay={950} glassmorphism={true} glow={true} className="scroll-reveal">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <i className="ri-robot-line text-2xl text-primary"></i>
+                  <h2 className="text-h3 text-gray-900 animate-text-reveal">NPPE AI Coach 🧠</h2>
+                </div>
+                {coach && (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={refreshCoach}
+                    className="text-xs"
+                    disabled={coachLoading}
+                  >
+                    <i className="ri-refresh-line mr-1"></i>
+                    {coachLoading ? 'Refreshing...' : 'Refresh'}
+                  </Button>
+                )}
+              </div>
+
+              <div className="text-xs text-gray-500 mb-4 italic">
+                Powered by AI – personalized plan created from your real test data
+              </div>
+
+              {coachLoading && (
+                <div className="text-center py-4">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
+                  <p className="text-sm text-gray-500">Generating your personalized study plan…</p>
+                </div>
+              )}
+
+              {coachError && (
+                <div className="text-center py-4">
+                  <i className="ri-error-warning-line text-2xl text-red-500 mb-2"></i>
+                  <p className="text-sm text-red-500">Couldn't load AI coach right now.</p>
+                  <p className="text-xs text-gray-500 mt-1">Please try again later.</p>
+                </div>
+              )}
+
+              {coach && (
+                <div className="space-y-4">
+                  <p className="text-sm text-gray-700">{coach.summary}</p>
+
+                  <div className="grid grid-cols-1 gap-3">
+                    <div>
+                      <h3 className="font-medium text-sm mb-2 text-green-700">Strengths</h3>
+                      <ul className="space-y-1">
+                        {coach.strengths.map((strength, i) => (
+                          <li key={i} className="text-xs text-gray-600 flex items-start">
+                            <i className="ri-check-line text-green-600 mr-1 mt-0.5 flex-shrink-0"></i>
+                            {strength}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div>
+                      <h3 className="font-medium text-sm mb-2 text-red-700">Areas to Focus</h3>
+                      <ul className="space-y-1">
+                        {coach.weaknesses.map((weakness, i) => (
+                          <li key={i} className="text-xs text-gray-600 flex items-start">
+                            <i className="ri-arrow-right-line text-red-600 mr-1 mt-0.5 flex-shrink-0"></i>
+                            {weakness}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="pt-3 border-t border-gray-200/50">
+                    <h3 className="font-medium text-sm mb-2">Recommended Tests</h3>
+                    <div className="space-y-2">
+                      {coach.recommended_tests.map((test, i) => (
+                        <div key={i} className="text-xs bg-blue-50 text-blue-700 px-3 py-2 rounded">
+                          {test}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-gray-200/50">
+                    <p className="text-xs text-gray-600 italic">
+                      {coach.motivational_message}
+                    </p>
+                  </div>
                 </div>
               )}
             </Card>
           </div>
         </div>
 
-        {/* Bottom Section */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Recent Activity Feed */}
-          <div className="lg:col-span-2">
-            <Card delay={900} glassmorphism={true} glow={true} className="scroll-reveal">
-              <h2 className="text-h2 text-gray-900 mb-6 animate-text-reveal">Recent Activity</h2>
-              {recentActivities.length > 0 ? (
-                <div className="space-y-4">
-                  {recentActivities.map((activity, index) => (
-                    <div key={index} className="flex items-start space-x-3 animate-slide-in-left interactive-hover" style={{ animationDelay: `${1600 + index * 150}ms` }}>
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${activity.color} bg-gradient-to-br from-white/80 to-white/60 backdrop-blur-sm shadow-lg`}>
-                        <i className={`${activity.icon} ${activity.color} text-lg`}></i>
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-small text-gray-900 font-medium">{activity.text}</p>
-                        <p className="text-xs text-neutral mt-1">{activity.time}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <i className="ri-time-line text-4xl mb-2"></i>
-                  <p>Your recent activities will appear here</p>
-                </div>
-              )}
-            </Card>
+        {/* Recommended Tests Section */}
+        <Card delay={1000} glassmorphism={true} glow={true} className="scroll-reveal">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-h2 text-gray-900 animate-text-reveal">Recommended Next Tests</h2>
           </div>
-
-          {/* Quick Actions */}
-          <div>
-            <Card delay={1000} glassmorphism={true} glow={true} className="scroll-reveal">
-              <h2 className="text-h2 text-gray-900 mb-6 animate-text-reveal">Quick Actions</h2>
-              <div className="space-y-3">
-                {inProgressTest && (
-                  <Button
-                    className="w-full justify-center bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700"
-                    size="lg"
-                    magnetic={true}
-                    glow={true}
-                    onClick={() => navigate(`/practice-test/take/${inProgressTest.id}`)}
-                  >
-                    <i className="ri-play-line mr-2"></i>
-                    Resume Test in Progress
-                  </Button>
-                )}
-                <Button
-                  className="w-full justify-center btn-premium"
-                  size="lg"
-                  magnetic={true}
-                  glow={true}
-                  onClick={handlePracticeWeakestTopic}
-                  disabled={creating || !weakTopics.length}
-                >
-                  {creating ? (
-                    <>
-                      <i className="ri-loader-4-line mr-2 animate-spin"></i>
-                      Starting...
-                    </>
-                  ) : (
-                    <>
-                      <i className="ri-focus-line mr-2"></i>
-                      Practice Weakest Topic
-                    </>
-                  )}
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="w-full justify-center"
-                  magnetic={true}
-                  glow={true}
-                  onClick={handleStartFullMock}
-                  disabled={creating}
-                >
-                  <i className="ri-file-text-line mr-2"></i>
-                  Start Full Mock
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="w-full justify-center"
-                  magnetic={true}
-                  glow={true}
-                  onClick={handleContinueStudying}
-                  disabled={creating}
-                >
-                  <i className="ri-play-circle-line mr-2"></i>
-                  Continue Studying
-                </Button>
-              </div>
-              
-              <div className="mt-6 p-4 bg-gradient-to-br from-blue-50/90 to-blue-100/90 backdrop-blur-sm rounded-lg animate-scale-in float-animation" style={{ animationDelay: '2000ms' }}>
-                <h3 className="font-semibold text-gray-900 mb-2 animate-text-reveal">Exam Countdown</h3>
-                <div className="text-3xl font-bold text-primary mb-1 animate-number-count">
-                  <CountUpNumber end={dashboardData?.days_until_exam || 0} duration={1200} delay={2200} />
-                  <span> Days</span>
-                </div>
-                <p className="text-small text-neutral animate-text-reveal">Until your scheduled exam date</p>
-                {dashboardData?.days_until_exam && (
-                  <div className="mt-3 w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full animate-progress-fill" 
-                      style={{ 
-                        width: `${Math.min(100, ((180 - dashboardData.days_until_exam) / 180) * 100)}%`, 
-                        animationDelay: '2400ms' 
-                      }}
-                    ></div>
+          
+          <div className="grid md:grid-cols-3 gap-4">
+            {d.recommended_tests.map((test, index) => (
+              <div
+                key={index}
+                className={`p-5 rounded-lg border-2 transition-all duration-300 card-hover-3d animate-slide-in-up cursor-pointer ${
+                  test.recommended
+                    ? 'bg-gradient-to-br from-blue-50/90 to-blue-100/90 border-primary/30 hover:border-primary'
+                    : 'bg-gradient-to-br from-white/80 to-white/60 border-gray-200/50 hover:border-gray-300'
+                }`}
+                style={{ animationDelay: `${1400 + index * 150}ms` }}
+              >
+                {test.recommended && (
+                  <div className="inline-flex items-center px-2 py-1 bg-primary text-white text-xs font-semibold rounded-full mb-3">
+                    <i className="ri-star-line mr-1"></i>
+                    Recommended
                   </div>
                 )}
+                <h3 className="font-bold text-gray-900 mb-3">{test.title}</h3>
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center text-sm text-neutral">
+                    <i className="ri-question-line mr-2 text-primary"></i>
+                    {test.questions} questions
+                  </div>
+                  <div className="flex items-center text-sm text-neutral">
+                    <i className="ri-time-line mr-2 text-primary"></i>
+                    {test.duration}
+                  </div>
+                  <div className="flex items-center text-sm text-neutral">
+                    <i className="ri-bar-chart-line mr-2 text-primary"></i>
+                    {test.difficulty}
+                  </div>
+                  <div className="flex items-center text-sm text-neutral">
+                    <i className="ri-focus-3-line mr-2 text-primary"></i>
+                    {test.focus}
+                  </div>
+                </div>
+                <Button
+                  className={`w-full justify-center ${test.recommended ? 'btn-premium' : ''}`}
+                  variant={test.recommended ? 'primary' : 'secondary'}
+                  magnetic={test.recommended}
+                  glow={test.recommended}
+                  onClick={() => handleRecommendedTestClick(test)}
+                >
+                  <i className="ri-play-circle-line mr-2"></i>
+                  Start Test
+                </Button>
               </div>
-            </Card>
+            ))}
+          </div>
+        </Card>
+
+        {/* Motivational Banner */}
+        <div className="mt-8 animate-fade-in-up" style={{ animationDelay: '1800ms' }}>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary via-blue-600 to-blue-700 p-8 text-white">
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px' }}></div>
+            </div>
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold mb-2">{getProgressTitle(d.pass_ready_percentage)}</h2>
+                <p className="text-blue-100 mb-4">
+                  {getPassReadyMessage(d.pass_ready_percentage)}
+                </p>
+                <div className="flex items-center gap-4 text-sm">
+                  <div className="flex items-center">
+                    <i className="ri-checkbox-circle-line mr-2"></i>
+                    <span>{d.almost_there_summary.tests_completed} tests completed</span>
+                  </div>
+                  <div className="flex items-center">
+                    <i className="ri-arrow-up-line mr-2"></i>
+                    <span>+{d.almost_there_summary.improvement_percent.toFixed(1)}% improvement</span>
+                  </div>
+                  <div className="flex items-center">
+                    <i className="ri-trophy-line mr-2"></i>
+                    <span>{d.almost_there_summary.achievements_count} achievements unlocked</span>
+                  </div>
+                </div>
+              </div>
+              <Button
+                variant="secondary"
+                className="text-gray-900 hover:bg-gray-100 whitespace-nowrap font-bold px-8"
+                size="lg"
+                magnetic={true}
+                onClick={handleFullPracticeExam}
+              >
+                <i className="ri-rocket-line mr-2"></i>
+                Take Full Practice Exam
+              </Button>
+            </div>
           </div>
         </div>
       </main>
 
       <MobileNavigation />
+
+      {/* Coupon Redemption Modal */}
+      <CouponRedemptionModal
+        isOpen={showCouponModal}
+        onClose={() => setShowCouponModal(false)}
+        onSuccess={() => setShowCouponModal(false)}
+      />
     </div>
   );
-}
-
-// Helper function to format relative time
-function formatRelativeTime(timestamp: string): string {
-  const date = new Date(timestamp);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-
-  if (diffMins < 1) return 'Just now';
-  if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-  if (diffDays === 1) return 'Yesterday';
-  if (diffDays < 7) return `${diffDays} days ago`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) > 1 ? 's' : ''} ago`;
-  return date.toLocaleDateString();
 }

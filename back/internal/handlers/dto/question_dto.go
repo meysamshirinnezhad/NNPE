@@ -2,6 +2,7 @@ package dto
 
 import (
 	"github.com/google/uuid"
+	"github.com/nppe-pro/api/pkg/text"
 )
 
 // CreateOptionRequest represents a request to create a question option
@@ -24,8 +25,18 @@ type CreateQuestionRequest struct {
 	Options         []CreateOptionRequest `json:"options" binding:"required,min=2,dive"`
 }
 
+// Clean applies text cleaning to option texts
+func (r *CreateQuestionRequest) Clean() {
+	for i := range r.Options {
+		r.Options[i].OptionText = text.CleanOptionPrefix(r.Options[i].OptionText)
+	}
+}
+
 // Validate performs additional validation on CreateQuestionRequest
 func (r *CreateQuestionRequest) Validate() error {
+	// Clean option texts first
+	r.Clean()
+
 	// Check at least one correct answer
 	correctCount := 0
 	for _, opt := range r.Options {
@@ -73,8 +84,20 @@ type UpdateQuestionRequest struct {
 	Options         []UpdateOptionRequest `json:"options,omitempty" binding:"omitempty,min=2,dive"`
 }
 
+// Clean applies text cleaning to option texts
+func (r *UpdateQuestionRequest) Clean() {
+	if len(r.Options) > 0 {
+		for i := range r.Options {
+			r.Options[i].OptionText = text.CleanOptionPrefix(r.Options[i].OptionText)
+		}
+	}
+}
+
 // Validate performs additional validation on UpdateQuestionRequest
 func (r *UpdateQuestionRequest) Validate() error {
+	// Clean option texts first
+	r.Clean()
+
 	// If options provided, validate them
 	if len(r.Options) > 0 {
 		correctCount := 0

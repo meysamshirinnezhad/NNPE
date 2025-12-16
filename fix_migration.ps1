@@ -34,8 +34,8 @@ if ($checkResult -match "content") {
         Write-Host "=====================================" -ForegroundColor Green
         Write-Host ""
         Write-Host "Next steps:" -ForegroundColor Cyan
-        Write-Host "1. cd back" -ForegroundColor White
-        Write-Host "2. go run cmd/api/main.go" -ForegroundColor White
+        Write-Host "1. cd back && go run cmd/api/main.go" -ForegroundColor White
+        Write-Host "2. sudo systemctl restart nppe-api" -ForegroundColor White
         Write-Host ""
     } else {
         Write-Host ""
@@ -48,8 +48,8 @@ if ($checkResult -match "content") {
     Write-Host "The database schema is up to date." -ForegroundColor White
     Write-Host ""
     Write-Host "You can now start the backend:" -ForegroundColor Cyan
-    Write-Host "  cd back" -ForegroundColor White
-    Write-Host "  go run cmd/api/main.go" -ForegroundColor White
+    Write-Host "  cd back && go run cmd/api/main.go" -ForegroundColor White
+    Write-Host "  sudo systemctl restart nppe-api" -ForegroundColor White
     Write-Host ""
 }
 

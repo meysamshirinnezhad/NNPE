@@ -3,13 +3,32 @@ import { useEffect, useState } from 'react';
 import Button from '../../components/base/Button';
 import Card from '../../components/base/Card';
 import { updateSEO, seoData } from '../../utils/seo';
+import { useAuthContext } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function Pricing() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
+  const { user } = useAuthContext();
+  const navigate = useNavigate();
 
   useEffect(() => {
     updateSEO(seoData.pricing);
   }, []);
+
+  const handlePlanSelect = (_plan: any) => {
+    if (!user) {
+      window.location.href = '/signup';
+      return;
+    }
+    
+    if (!user.is_verified) {
+      navigate('/dashboard'); // Will show verification banner
+      return;
+    }
+    
+    // Proceed to checkout (existing flow)
+    // window.location.href = '/checkout...';
+  };
 
   const plans = [
     {
@@ -209,9 +228,10 @@ export default function Pricing() {
                   <Button 
                     className={`w-full ${plan.popular ? 'bg-[#0277BD] hover:bg-[#01579B]' : ''}`}
                     variant={plan.popular ? 'primary' : 'secondary'}
-                    onClick={() => window.location.href = '/signup'}
+                    onClick={() => handlePlanSelect(plan)}
+                    disabled={!!(user && !user.is_verified)}
                   >
-                    {plan.cta}
+                    {user && !user.is_verified ? 'Verify Email to Subscribe' : plan.cta}
                   </Button>
                   
                   <p className="text-sm text-gray-500 mt-2">14-day free trial included</p>

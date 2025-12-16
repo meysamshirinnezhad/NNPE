@@ -1,320 +1,327 @@
-
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Button from '../../components/base/Button';
-import Card from '../../components/base/Card';
-import { updateSEO, seoData } from '../../utils/seo';
-import LoadingSpinner from '../../components/effects/LoadingSpinner';
+import Logo from '../../components/base/Logo';
 
 export default function LandingPage() {
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    updateSEO(seoData.landing);
-  }, []);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentFeature, setCurrentFeature] = useState(0);
 
   const features = [
-    {
-      icon: 'ri-book-open-line',
-      title: 'Comprehensive Study Materials',
-      description: 'Access 500+ practice questions, video tutorials, and detailed explanations covering all NPPE exam topics.'
-    },
-    {
-      icon: 'ri-bar-chart-line',
-      title: 'Progress Analytics',
-      description: 'Track your performance with detailed analytics, identify weak areas, and monitor your improvement over time.'
-    },
-    {
-      icon: 'ri-timer-line',
-      title: 'Realistic Practice Tests',
-      description: 'Take full-length practice exams with authentic timing and question formats to simulate the real NPPE experience.'
-    },
-    {
-      icon: 'ri-team-line',
-      title: 'Study Community',
-      description: 'Connect with fellow engineers, join study groups, and get support from peers preparing for the same exam.'
-    }
+    'Real NPPE Exam Questions',
+    'Instant Performance Analytics',
+    'Adaptive Learning System'
   ];
 
-  const testimonials = [
-    {
-      name: 'Michael Rodriguez',
-      role: 'Mechanical Engineer',
-      image: 'professional engineer testimonial portrait confident smile office background modern lighting business attire',
-      quote: 'NPPE Pro helped me pass on my first attempt. The practice questions were spot-on and the analytics showed exactly where I needed to focus.'
-    },
-    {
-      name: 'Jennifer Liu',
-      role: 'Civil Engineer',
-      image: 'female professional engineer testimonial portrait confident expression office environment modern lighting business professional',
-      quote: 'The study path feature kept me organized and motivated. I loved tracking my progress and seeing my weak areas improve over time.'
-    },
-    {
-      name: 'David Thompson',
-      role: 'Electrical Engineer',
-      image: 'male professional engineer testimonial portrait friendly smile office background modern lighting professional attire',
-      quote: 'The community forum was invaluable. Getting tips from engineers who had already passed made all the difference in my preparation.'
-    }
-  ];
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentFeature((prev) => (prev + 1) % features.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
-  const handleGetStarted = () => {
+  const handleStartTest = () => {
     setIsLoading(true);
-    // Simulate loading before navigation
     setTimeout(() => {
       navigate('/signup');
-      setIsLoading(false);
-    }, 1000);
+    }, 1500);
   };
 
+  // Generate grid cells for animated background
+  const gridCells = Array.from({ length: 120 }, (_, i) => i);
+
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 flex items-center justify-center">
-                <i className="ri-settings-3-line text-[#0277BD] text-xl"></i>
-              </div>
-              <h1 className="text-xl font-bold text-[#0277BD]">NPPE Pro</h1>
-            </div>
-            <div className="flex items-center space-x-6">
-              <a href="/" className="text-[#0277BD] font-medium">Home</a>
-              <a href="/features" className="text-gray-600 hover:text-[#0277BD] transition-colors">Features</a>
-              <a href="/pricing" className="text-gray-600 hover:text-[#0277BD] transition-colors">Pricing</a>
-              <a href="/about" className="text-gray-600 hover:text-[#0277BD] transition-colors">About</a>
-              <a href="/blog" className="text-gray-600 hover:text-[#0277BD] transition-colors">Blog</a>
-              <a href="/contact" className="text-gray-600 hover:text-[#0277BD] transition-colors">Contact</a>
-              <a href="/login" className="text-gray-600 hover:text-[#0277BD] transition-colors">Login</a>
-              <Button onClick={() => window.location.href = '/signup'}>Sign Up</Button>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white overflow-hidden relative">
+      {/* Animated Grid Background with Lights */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 grid grid-cols-12 grid-rows-10 gap-1 p-4 opacity-30">
+          {gridCells.map((cell) => (
+            <div
+              key={cell}
+              className="light-cell rounded-sm"
+              style={{
+                animationDelay: `${Math.random() * 5}s`,
+                animationDuration: `${2 + Math.random() * 3}s`
+              }}
+            />
+          ))}
         </div>
+      </div>
+
+      {/* Animated Gradient Orbs */}
+      <div className="absolute top-20 left-10 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s' }} />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '5s', animationDelay: '2s' }} />
+
+      {/* Floating Tech Icons */}
+      <div className="absolute top-1/4 left-1/4 animate-float opacity-20">
+        <i className="ri-code-s-slash-line text-6xl text-cyan-400" />
+      </div>
+      <div className="absolute top-2/3 right-1/4 animate-float opacity-20" style={{ animationDelay: '1s' }}>
+        <i className="ri-brain-line text-6xl text-blue-400" />
+      </div>
+      <div className="absolute bottom-1/4 left-1/3 animate-float opacity-20" style={{ animationDelay: '2s' }}>
+        <i className="ri-lightbulb-flash-line text-6xl text-purple-400" />
+      </div>
+
+      {/* Header */}
+      <header className="relative z-10 flex justify-between items-center px-8 py-6">
+        <Logo />
+        <button
+          onClick={() => navigate('/login')}
+          className="px-6 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 rounded-lg transition-all duration-300 hover:scale-105 whitespace-nowrap cursor-pointer"
+        >
+          Login
+        </button>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-transparent to-blue-800/20"></div>
-        
-        <div className="relative z-10 max-w-7xl mx-auto">
-          <div className="text-center animate-fade-in-up">
-            <div className="mb-8 animate-engineering-pulse">
-              <i className="ri-tools-line text-6xl text-blue-600 mb-4 block"></i>
-            </div>
-            
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-              Master Your{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-800 animate-shimmer">
-                P.Eng Exam
+      {/* Main Content */}
+      <main className="relative z-10 max-w-6xl mx-auto px-8 py-20">
+        {/* Hero Section */}
+        <div className="text-center mb-20 animate-fade-in">
+          <div className="inline-block mb-6 px-6 py-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 backdrop-blur-sm border border-blue-400/30 rounded-full">
+            <span className="text-cyan-400 font-semibold">🚀 Canada's #1 NPPE Prep Platform</span>
+          </div>
+          
+          <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent animate-gradient leading-tight">
+            Pass Your NPPE Exam<br />With Confidence
+          </h1>
+          
+          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+            Practice with real exam questions, get instant feedback, and track your progress with our AI-powered learning platform
+          </p>
+
+          {/* Rotating Feature Highlight */}
+          <div className="h-8 mb-10 flex items-center justify-center">
+            <div className="flex items-center gap-2 text-cyan-400">
+              <i className="ri-checkbox-circle-fill text-2xl" />
+              <span className="text-lg font-semibold animate-fade-in" key={currentFeature}>
+                {features[currentFeature]}
               </span>
-            </h1>
-            
-            <p className="text-xl sm:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed animate-slide-in-left stagger-1">
-              The most comprehensive NPPE preparation platform designed by engineers, for engineers.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-in-right stagger-2">
-              <button
-                onClick={handleGetStarted}
-                disabled={isLoading}
-                className="btn-premium px-8 py-4 bg-blue-600 text-white rounded-lg font-semibold text-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl whitespace-nowrap cursor-pointer disabled:opacity-50"
+            </div>
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="flex gap-4 justify-center items-center">
+            <button
+              onClick={handleStartTest}
+              disabled={isLoading}
+              className="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 rounded-lg font-semibold text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/50 whitespace-nowrap cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <i className="ri-loader-4-line animate-spin" />
+                  Loading...
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  Start Free Mock Test
+                  <i className="ri-arrow-right-line group-hover:translate-x-1 transition-transform" />
+                </span>
+              )}
+            </button>
+          </div>
+
+          <p className="text-sm text-gray-400 mt-4">No credit card required • 7-day free trial</p>
+        </div>
+
+        {/* Stats Section */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+          {[
+            { icon: 'ri-trophy-line', value: '95%', label: 'Pass Rate', color: 'from-yellow-400 to-orange-400' },
+            { icon: 'ri-team-line', value: '10,000+', label: 'Engineers Trained', color: 'from-blue-400 to-cyan-400' },
+            { icon: 'ri-question-answer-line', value: '500+', label: 'Practice Questions', color: 'from-purple-400 to-pink-400' }
+          ].map((stat, index) => (
+            <div
+              key={index}
+              className="group p-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:border-cyan-400/50 animate-slide-up cursor-pointer"
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
+              <div className={`w-16 h-16 mx-auto mb-4 bg-gradient-to-br ${stat.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                <i className={`${stat.icon} text-3xl text-white`} />
+              </div>
+              <div className={`text-4xl font-bold mb-2 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
+                {stat.value}
+              </div>
+              <div className="text-gray-400">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Social Proof */}
+        <div className="mb-20">
+          <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+            Trusted by Engineers Across Canada
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                name: 'Sarah Chen',
+                role: 'Mechanical Engineer',
+                text: 'Passed on my first attempt! The mock tests were incredibly similar to the actual exam.',
+                rating: 5
+              },
+              {
+                name: 'Michael Rodriguez',
+                role: 'Civil Engineer',
+                text: 'The analytics helped me focus on my weak areas. Best investment for my career.',
+                rating: 5
+              },
+              {
+                name: 'Priya Patel',
+                role: 'Electrical Engineer',
+                text: 'Comprehensive question bank and excellent explanations. Highly recommend!',
+                rating: 5
+              }
+            ].map((testimonial, index) => (
+              <div
+                key={index}
+                className="p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl hover:bg-white/10 transition-all duration-300 hover:scale-105 animate-slide-up cursor-pointer"
+                style={{ animationDelay: `${index * 0.1}s` }}
               >
-                {isLoading ? (
-                  <LoadingSpinner size="sm" variant="engineering" />
-                ) : (
-                  <>
-                    Start Your Journey
-                    <i className="ri-arrow-right-line ml-2"></i>
-                  </>
-                )}
-              </button>
-              
-              <button className="px-8 py-4 border-2 border-blue-600 text-blue-600 rounded-lg font-semibold text-lg hover:bg-blue-50 transition-all duration-300 whitespace-nowrap cursor-pointer">
-                Watch Demo
-                <i className="ri-play-circle-line ml-2"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Floating engineering elements */}
-        <div className="absolute top-20 left-10 animate-float-animation">
-          <div className="w-16 h-16 border-2 border-blue-300 rounded-lg flex items-center justify-center animate-gear-rotate">
-            <i className="ri-settings-3-line text-2xl text-blue-500"></i>
-          </div>
-        </div>
-        
-        <div className="absolute bottom-32 right-16 animate-float-animation" style={{ animationDelay: '2s' }}>
-          <div className="w-20 h-20 border-2 border-blue-400 rounded-full flex items-center justify-center animate-circuit-flow">
-            <i className="ri-cpu-line text-2xl text-blue-600"></i>
-          </div>
-        </div>
-        
-        <div className="absolute top-1/2 left-20 animate-float-animation" style={{ animationDelay: '4s' }}>
-          <div className="w-12 h-12 border-2 border-blue-200 rounded-lg flex items-center justify-center animate-engineering-pulse">
-            <i className="ri-compass-3-line text-xl text-blue-400"></i>
-          </div>
-        </div>
-      </section>
-
-      {/* Rest of the existing sections with enhanced animations */}
-      {/* Features Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Everything You Need to Succeed
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Our comprehensive platform provides all the tools and resources you need to prepare effectively for the NPPE exam.
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <Card key={index} className="text-center hover:shadow-lg transition-shadow">
-                <div className="w-16 h-16 bg-[#0277BD] rounded-full flex items-center justify-center mx-auto mb-4">
-                  <i className={`${feature.icon} text-white text-2xl`}></i>
+                <div className="flex gap-1 mb-4">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <i key={i} className="ri-star-fill text-yellow-400" />
+                  ))}
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600">
-                  {feature.description}
-                </p>
-              </Card>
+                <p className="text-gray-300 mb-4 italic">&ldquo;{testimonial.text}&rdquo;</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-xl font-bold">
+                    {testimonial.name.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="font-semibold text-white">{testimonial.name}</div>
+                    <div className="text-sm text-gray-400">{testimonial.role}</div>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </div>
-      </section>
 
-      {/* Statistics Section */}
-      <section className="py-20 bg-[#0277BD]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8 text-center text-white">
-            <div>
-              <div className="text-4xl font-bold mb-2">95%</div>
-              <div className="text-lg opacity-90">Pass Rate</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">10,000+</div>
-              <div className="text-lg opacity-90">Engineers Trained</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">500+</div>
-              <div className="text-lg opacity-90">Practice Questions</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">24/7</div>
-              <div className="text-lg opacity-90">Support Available</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Success Stories
-            </h2>
-            <p className="text-xl text-gray-600">
-              Hear from engineers who achieved their professional designation with NPPE Pro
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="text-center">
-                <img
-                  src={`https://readdy.ai/api/search-image?query=$%7Btestimonial.image%7D&width=80&height=80&seq=testimonial-${index}&orientation=squarish`}
-                  alt={testimonial.name}
-                  className="w-20 h-20 rounded-full mx-auto mb-4 object-cover"
-                />
-                <p className="text-gray-600 mb-4 italic">
-                  "{testimonial.quote}"
-                </p>
-                <h4 className="font-semibold text-gray-900">{testimonial.name}</h4>
-                <p className="text-sm text-gray-500">{testimonial.role}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-gray-900">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+        {/* Final CTA */}
+        <div className="text-center p-12 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 backdrop-blur-sm border border-blue-400/30 rounded-2xl animate-slide-up">
+          <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
             Ready to Start Your Journey?
           </h2>
           <p className="text-xl text-gray-300 mb-8">
-            Join thousands of engineers who have successfully passed their NPPE exam with our proven study system.
+            Join thousands of engineers who have successfully passed their NPPE exam
           </p>
-          <Button size="lg" className="text-lg px-8 py-4" onClick={() => window.location.href = '/signup'}>
-            Start Your Free Trial Today
-          </Button>
-          <p className="mt-4 text-sm text-gray-400">
-            No commitment required • Full access for 14 days
-          </p>
+          <button
+            onClick={handleStartTest}
+            disabled={isLoading}
+            className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 rounded-lg font-semibold text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/50 whitespace-nowrap cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <i className="ri-loader-4-line animate-spin" />
+                Loading...
+              </span>
+            ) : (
+              <span className="flex items-center gap-2">
+                Start Free Mock Test
+                <i className="ri-arrow-right-line group-hover:translate-x-1 transition-transform" />
+              </span>
+            )}
+          </button>
         </div>
-      </section>
+      </main>
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 flex items-center justify-center">
-                  <i className="ri-settings-3-line text-[#0277BD] text-xl"></i>
-                </div>
-                <h3 className="text-xl font-bold">NPPE Pro</h3>
-              </div>
-              <p className="text-gray-400">
-                The most comprehensive NPPE exam preparation platform for professional engineers.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="/features" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="/pricing" className="hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="/practice" className="hover:text-white transition-colors">Practice Tests</a></li>
-                <li><a href="/study-path" className="hover:text-white transition-colors">Study Materials</a></li>
-                <li><a href="/topics" className="hover:text-white transition-colors">Topics</a></li>
-                <li><a href="/analytics" className="hover:text-white transition-colors">Analytics</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Community</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="/forum" className="hover:text-white transition-colors">Forum</a></li>
-                <li><a href="/study-groups" className="hover:text-white transition-colors">Study Groups</a></li>
-                <li><a href="/achievements" className="hover:text-white transition-colors">Achievements</a></li>
-                <li><a href="/dashboard" className="hover:text-white transition-colors">Dashboard</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="/about" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="/blog" className="hover:text-white transition-colors">Blog</a></li>
-                <li><a href="/contact" className="hover:text-white transition-colors">Contact</a></li>
-                <li><a href="/help" className="hover:text-white transition-colors">Help</a></li>
-                <li><a href="/support" className="hover:text-white transition-colors">Support</a></li>
-                <li><a href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 NPPE Pro. All rights reserved. | <a href="https://readdy.ai/?origin=logo" className="hover:text-white transition-colors">Powered by Readdy</a></p>
-          </div>
-        </div>
+      <footer className="relative z-10 text-center py-8 text-gray-400 text-sm border-t border-white/10">
+        <p>&copy; 2024 NPPE Pro. All rights reserved.</p>
       </footer>
+
+      <style>{`
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes slide-up {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-20px) rotate(5deg);
+          }
+        }
+
+        @keyframes gradient {
+          0%, 100% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+        }
+
+        @keyframes light-pulse {
+          0%, 100% {
+            background-color: rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+          }
+          50% {
+            background-color: rgba(6, 182, 212, 0.3);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.6);
+          }
+        }
+
+        .animate-fade-in {
+          animation: fade-in 1s ease-out;
+        }
+
+        .animate-slide-up {
+          animation: slide-up 0.8s ease-out;
+        }
+
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+
+        .animate-gradient {
+          background-size: 200% 200%;
+          animation: gradient 3s ease infinite;
+        }
+
+        .light-cell {
+          background-color: rgba(59, 130, 246, 0.05);
+          animation: light-pulse infinite ease-in-out;
+        }
+
+        .light-cell:nth-child(3n) {
+          animation-delay: 0.5s;
+        }
+
+        .light-cell:nth-child(5n) {
+          animation-delay: 1s;
+        }
+
+        .light-cell:nth-child(7n) {
+          animation-delay: 1.5s;
+        }
+
+        .light-cell:nth-child(11n) {
+          animation-delay: 2s;
+        }
+      `}</style>
     </div>
   );
 }

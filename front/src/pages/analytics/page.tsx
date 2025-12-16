@@ -6,15 +6,14 @@ import Card from '../../components/base/Card';
 import Button from '../../components/base/Button';
 import LoadingSpinner from '../../components/effects/LoadingSpinner';
 import { updateSEO } from '../../utils/seo';
-import { dashboardService } from '../../api';
-import type { AnalyticsData } from '../../api/types';
+import { useAnalytics, useWeaknesses } from '../../hooks/useAnalytics';
 
 export default function Analytics() {
   const [selectedTimeRange, setSelectedTimeRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
   const [selectedMetric, setSelectedMetric] = useState('accuracy');
-  const [, setAnalyticsData] = useState<AnalyticsData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+
+  const { data: analyticsData, loading, error } = useAnalytics(selectedTimeRange);
+  const { data: weaknessesData } = useWeaknesses();
 
   useEffect(() => {
     updateSEO({
@@ -25,23 +24,6 @@ export default function Analytics() {
     });
   }, []);
 
-  useEffect(() => {
-    const fetchAnalytics = async () => {
-      setLoading(true);
-      setError('');
-      try {
-        const data = await dashboardService.getAnalytics(selectedTimeRange);
-        setAnalyticsData(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load analytics');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAnalytics();
-  }, [selectedTimeRange]);
-
   const timeRanges: { id: '7d' | '30d' | '90d' | 'all', name: string }[] = [
     { id: '7d', name: 'Last 7 Days' },
     { id: '30d', name: 'Last 30 Days' },
@@ -49,51 +31,52 @@ export default function Analytics() {
     { id: 'all', name: 'All Time' }
   ];
 
-  const overallStats = [
+  // Calculate overall stats from analytics data
+  const overallStats = analyticsData ? [
     {
       title: 'Questions Answered',
-      value: '1,247',
-      change: '+23%',
-      changeType: 'positive',
+      value: analyticsData.questions_per_day.reduce((sum, day) => sum + (day.count || 0), 0).toLocaleString(),
+      change: '+23%', // TODO: Calculate real change
+      changeType: 'positive' as const,
       icon: 'ri-question-line',
       color: 'blue'
     },
     {
       title: 'Average Accuracy',
-      value: '78%',
-      change: '+5%',
-      changeType: 'positive',
+      value: `${analyticsData.accuracy_trend.length > 0
+        ? Math.round(analyticsData.accuracy_trend.reduce((sum, day) => sum + (day.percentage || 0), 0) / analyticsData.accuracy_trend.length)
+        : 0}%`,
+      change: '+5%', // TODO: Calculate real change
+      changeType: 'positive' as const,
       icon: 'ri-target-line',
       color: 'green'
     },
     {
       title: 'Study Time',
-      value: '42.5h',
-      change: '+12%',
-      changeType: 'positive',
+      value: `${Math.round(analyticsData.time_spent_per_day.reduce((sum, day) => sum + (day.minutes || 0), 0) / 60 * 10) / 10}h`,
+      change: '+12%', // TODO: Calculate real change
+      changeType: 'positive' as const,
       icon: 'ri-time-line',
       color: 'purple'
     },
     {
       title: 'Practice Tests',
-      value: '18',
+      value: '18', // TODO: Get from API
       change: '+3',
-      changeType: 'positive',
+      changeType: 'positive' as const,
       icon: 'ri-file-text-line',
       color: 'orange'
     }
-  ];
+  ] : [];
 
-  const topicPerformance = [
-    { topic: 'Professional Practice', accuracy: 85, questions: 156, timeSpent: '8.2h', trend: 'up' },
-    { topic: 'Ethics', accuracy: 82, questions: 142, timeSpent: '7.5h', trend: 'up' },
-    { topic: 'Engineering Law', accuracy: 76, questions: 128, timeSpent: '6.8h', trend: 'stable' },
-    { topic: 'Liability', accuracy: 74, questions: 118, timeSpent: '6.2h', trend: 'up' },
-    { topic: 'Contracts', accuracy: 68, questions: 98, timeSpent: '5.1h', trend: 'down' },
-    { topic: 'Sustainability', accuracy: 71, questions: 89, timeSpent: '4.8h', trend: 'up' },
-    { topic: 'Project Management', accuracy: 65, questions: 76, timeSpent: '4.2h', trend: 'down' },
-    { topic: 'Leadership', accuracy: 69, questions: 82, timeSpent: '3.9h', trend: 'stable' }
-  ];
+  // Use real topic breakdown data from analytics
+  const topicPerformance = analyticsData ? analyticsData.topic_breakdown.map(topic => ({
+    topic: topic.topic,
+    accuracy: topic.questions > 0 ? Math.round((topic.correct / topic.questions) * 100) : 0,
+    questions: topic.questions,
+    timeSpent: '0h', // TODO: Add time tracking to API
+    trend: 'stable' as const // TODO: Calculate real trend
+  })) : [];
 
   const weeklyProgress = [
     { week: 'Week 1', questions: 45, accuracy: 72, timeSpent: 3.2 },
@@ -397,35 +380,41 @@ export default function Analytics() {
             <div>
               <h3 className="font-medium text-gray-900 mb-3">Strengths</h3>
               <ul className="space-y-2 text-sm text-gray-700">
-                <li className="flex items-center">
-                  <i className="ri-check-circle-line text-green-600 mr-2"></i>
-                  Strong performance in Professional Practice (85% accuracy)
-                </li>
-                <li className="flex items-center">
-                  <i className="ri-check-circle-line text-green-600 mr-2"></i>
-                  Consistent improvement in Ethics over time
-                </li>
-                <li className="flex items-center">
-                  <i className="ri-check-circle-line text-green-600 mr-2"></i>
-                  Good study consistency with regular practice
-                </li>
+                {topicPerformance.filter(t => t.accuracy >= 75).slice(0, 3).map((topic, index) => (
+                  <li key={index} className="flex items-center">
+                    <i className="ri-check-circle-line text-green-600 mr-2"></i>
+                    Strong performance in {topic.topic} ({topic.accuracy}% accuracy)
+                  </li>
+                ))}
+                {topicPerformance.filter(t => t.accuracy >= 75).length === 0 && (
+                  <li className="flex items-center">
+                    <i className="ri-check-circle-line text-green-600 mr-2"></i>
+                    Keep up the good work and continue practicing!
+                  </li>
+                )}
               </ul>
             </div>
             <div>
               <h3 className="font-medium text-gray-900 mb-3">Areas for Improvement</h3>
               <ul className="space-y-2 text-sm text-gray-700">
-                <li className="flex items-center">
-                  <i className="ri-alert-circle-line text-orange-600 mr-2"></i>
-                  Focus more on Project Management (65% accuracy)
-                </li>
-                <li className="flex items-center">
-                  <i className="ri-alert-circle-line text-orange-600 mr-2"></i>
-                  Contracts topic needs additional practice
-                </li>
-                <li className="flex items-center">
-                  <i className="ri-alert-circle-line text-orange-600 mr-2"></i>
-                  Consider taking more full-length practice tests
-                </li>
+                {weaknessesData?.weak_topics.slice(0, 3).map((weakTopic, index) => (
+                  <li key={index} className="flex items-center">
+                    <i className="ri-alert-circle-line text-orange-600 mr-2"></i>
+                    Focus more on {weakTopic.name} ({Math.round(weakTopic.score)}% accuracy)
+                  </li>
+                ))}
+                {(weaknessesData?.weak_topics.length === 0 || !weaknessesData) && topicPerformance.filter(t => t.accuracy < 70).slice(0, 3).map((topic, index) => (
+                  <li key={index} className="flex items-center">
+                    <i className="ri-alert-circle-line text-orange-600 mr-2"></i>
+                    {topic.topic} needs additional practice ({topic.accuracy}% accuracy)
+                  </li>
+                ))}
+                {topicPerformance.filter(t => t.accuracy < 70).length === 0 && weaknessesData?.weak_topics.length === 0 && (
+                  <li className="flex items-center">
+                    <i className="ri-trophy-line text-green-600 mr-2"></i>
+                    Excellent! No major weak areas identified.
+                  </li>
+                )}
               </ul>
             </div>
           </div>

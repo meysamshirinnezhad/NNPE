@@ -8,20 +8,33 @@ export const useDashboard = () => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchDashboard = async () => {
-    setLoading(true);
-    setError(null);
     try {
+      setLoading(true);
+      setError(null);
       const dashboardData = await dashboardService.getDashboard();
       setData(dashboardData);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch dashboard data');
+    } catch (err: any) {
+      console.error('Dashboard fetch error:', err);
+      setError(err?.response?.data?.error || err?.message || 'Failed to fetch dashboard data');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchDashboard();
+    let mounted = true;
+
+    const loadData = async () => {
+      if (mounted) {
+        await fetchDashboard();
+      }
+    };
+
+    loadData();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   return {

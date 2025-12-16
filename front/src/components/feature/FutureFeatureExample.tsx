@@ -20,12 +20,14 @@ export default function FutureFeatureExample() {
           <Button>Normal Button</Button>
           <Button variant="secondary">Secondary Button</Button>
 
-          {/* Future buttons with disabled state */}
-          <Button disabled>Future Button</Button>
-          <Button disabled size="sm">Small Future</Button>
-          <Button disabled size="lg">Large Future</Button>
-          <Button disabled>Custom Tooltip</Button>
-          <Button disabled>Premium Feature</Button>
+          {/* Future buttons with default tooltip */}
+          <Button variant="future">Future Button</Button>
+          <Button variant="future" size="sm">Small Future</Button>
+          <Button variant="future" size="lg">Large Future</Button>
+
+          {/* Future buttons with custom tooltips */}
+          <Button variant="future" tooltip="Coming in v2.1">Custom Tooltip</Button>
+          <Button variant="future" tooltip="Premium feature - upgrade required">Premium Feature</Button>
         </div>
       </div>
 
@@ -88,10 +90,10 @@ export default function FutureFeatureExample() {
         <h2 className="text-xl font-semibold text-gray-800">Usage Examples</h2>
 
         <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="font-semibold text-gray-900 mb-2">Button with Disabled State:</h3>
+          <h3 className="font-semibold text-gray-900 mb-2">Button with Future Variant:</h3>
           <pre className="text-sm text-gray-700">
-{`<Button disabled>Coming Soon</Button>
-<Button disabled>Custom Button</Button>`}
+{`<Button variant="future">Coming Soon</Button>
+<Button variant="future" tooltip="Available in v2.0">Custom Tooltip</Button>`}
           </pre>
         </div>
 

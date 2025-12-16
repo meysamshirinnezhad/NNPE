@@ -1,11 +1,14 @@
 package handlers
 
 import (
+	"fmt"
+	"math"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/nppe-pro/api/internal/handlers/dto"
 	"github.com/nppe-pro/api/internal/models"
 	"github.com/nppe-pro/api/pkg/database"
 	"gorm.io/gorm"
@@ -25,75 +28,88 @@ func NewDashboardHandler(db *gorm.DB, redis *database.RedisClient) *DashboardHan
 
 // GetDashboard returns dashboard statistics for the authenticated user
 func (h *DashboardHandler) GetDashboard(c *gin.Context) {
-	userID, exists := c.Get("user_id")
+	rawUserID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
 		return
 	}
+	userID, ok := rawUserID.(uuid.UUID)
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id type"})
+		return
+	}
 
+	// 1) Load user
 	var user models.User
-	if err := h.db.First(&user, userID).Error; err != nil {
+	if err := h.db.First(&user, "id = ?", userID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
 
-	var stats models.UserStats
-	if err := h.db.Where("user_id = ?", userID).First(&stats).Error; err != nil {
-		stats = models.UserStats{
-			UserID: userID.(uuid.UUID),
-		}
+	// 2) Load stats once
+	stats := h.getUserStats(userID)
+
+	// 3) Last test score
+	lastScore := 0.0
+	var lastTest models.PracticeTest
+	if err := h.db.
+		Where("user_id = ? AND status = ?", userID, "completed").
+		Order("completed_at DESC").
+		First(&lastTest).Error; err == nil {
+		lastScore = h.roundToDecimalPlaces(lastTest.Score, 1)
 	}
 
-	var accuracyRate float64
-	if stats.QuestionsCompleted > 0 {
-		accuracyRate = (float64(stats.QuestionsCorrect) / float64(stats.QuestionsCompleted)) * 100
+	// 4) Tests taken this month
+	now := time.Now()
+	startOfMonth := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+
+	var testsThisMonth int64
+	h.db.Model(&models.PracticeTest{}).
+		Where("user_id = ? AND status = ? AND completed_at >= ?",
+			userID, "completed", startOfMonth).
+		Count(&testsThisMonth)
+
+	// 5) Score improvement
+	improvement := h.calculateScoreImprovement(userID)
+
+	// 6) Recent tests + progression + achievements etc.
+	recentTests := h.getRecentTestsWithDeltas(userID)
+	scoreProgression := h.getScoreProgression(userID)
+	recentAchievements := h.getRecentAchievements(userID)
+	passReady := h.calculatePassReadiness(userID)
+	examCountdown := h.calculateExamCountdown(user.ExamDate)
+	recommendedTests := h.generateTestRecommendations(userID)
+	almostThere := h.calculateAlmostThereSummary(userID, stats)
+
+	// 7) Build response DTO
+	resp := dto.DashboardResponse{
+		UserName:  user.FirstName,
+		LastScore: lastScore,
+		TestsTaken: dto.TestsTakenBlock{
+			Total:     stats.PracticeTestsTaken,
+			ThisMonth: testsThisMonth,
+		},
+		AverageScore: dto.AverageScoreBlock{
+			Current:     h.roundToDecimalPlaces(stats.AverageTestScore, 1),
+			Improvement: h.roundToDecimalPlaces(improvement, 1),
+		},
+		StudyStreak: dto.StudyStreakBlock{
+			Current: user.StudyStreak,
+			Longest: user.LongestStreak,
+		},
+		PassReadyPercentage: h.roundToDecimalPlaces(passReady, 1),
+		RecentTests:         recentTests,
+		ScoreProgression:    scoreProgression,
+		RecentAchievements:  recentAchievements,
+		ExamCountdown: dto.ExamCountdownBlock{
+			DaysLeft:     examCountdown["days_left"].(int),
+			PrepTimeUsed: h.roundToDecimalPlaces(examCountdown["prep_time_used"].(float64), 1),
+		},
+		RecommendedTests:   recommendedTests,
+		AlmostThereSummary: almostThere,
 	}
 
-	overallProgress := 0
-	if stats.QuestionsCompleted > 0 {
-		overallProgress = int((float64(stats.QuestionsCompleted) / 500.0) * 100)
-		if overallProgress > 100 {
-			overallProgress = 100
-		}
-	}
-
-	daysUntilExam := 0
-	if user.ExamDate != nil {
-		daysUntil := int(time.Until(*user.ExamDate).Hours() / 24)
-		if daysUntil > 0 {
-			daysUntilExam = daysUntil
-		}
-	}
-
-	passProbability := 0
-	if accuracyRate > 0 {
-		passProbability = int((accuracyRate * 0.7) + (float64(overallProgress) * 0.3))
-		if passProbability > 100 {
-			passProbability = 100
-		}
-	}
-
-	topicMastery := h.calculateTopicMastery(userID.(uuid.UUID))
-	weakTopics := h.calculateWeakTopics(userID.(uuid.UUID))
-	recentActivity := h.getRecentActivity(userID.(uuid.UUID))
-
-	c.JSON(http.StatusOK, gin.H{
-		"overall_progress":             overallProgress,
-		"study_streak":                 user.StudyStreak,
-		"longest_streak":               user.LongestStreak,
-		"questions_completed":          stats.QuestionsCompleted,
-		"questions_correct":            stats.QuestionsCorrect,
-		"accuracy_rate":                accuracyRate,
-		"practice_tests_taken":         stats.PracticeTestsTaken,
-		"average_test_score":           stats.AverageTestScore,
-		"time_studied_hours":           stats.TimeStudiedSeconds / 3600.0,
-		"pass_probability":             passProbability,
-		"days_until_exam":              daysUntilExam,
-		"recommended_study_time_daily": 90,
-		"topic_mastery":                topicMastery,
-		"weak_topics":                  weakTopics,
-		"recent_activity":              recentActivity,
-	})
+	c.JSON(http.StatusOK, resp)
 }
 
 func (h *DashboardHandler) calculateTopicMastery(userID uuid.UUID) []gin.H {
@@ -534,4 +550,231 @@ func (h *DashboardHandler) GetAdminStatistics(c *gin.Context) {
 		"user_growth":          userGrowth,
 		"popular_topics":       popularTopics,
 	})
+}
+
+// Helper functions for the new GetDashboard implementation
+
+func (h *DashboardHandler) getUserStats(userID uuid.UUID) models.UserStats {
+	var stats models.UserStats
+	if err := h.db.Where("user_id = ?", userID).First(&stats).Error; err != nil {
+		// Create stats if they don't exist
+		stats = models.UserStats{
+			UserID:             userID,
+			QuestionsCompleted: 0,
+			QuestionsCorrect:   0,
+			PracticeTestsTaken: 0,
+			AverageTestScore:   0,
+			TimeStudiedSeconds: 0,
+		}
+		h.db.Create(&stats)
+	}
+	return stats
+}
+
+func (h *DashboardHandler) calculateScoreImprovement(userID uuid.UUID) float64 {
+	now := time.Now()
+	thirtyDaysAgo := now.AddDate(0, 0, -30)
+	sixtyDaysAgo := now.AddDate(0, 0, -60)
+
+	var recentAvg, previousAvg float64
+
+	h.db.Model(&models.PracticeTest{}).
+		Where("user_id = ? AND status = ? AND completed_at >= ?",
+			userID, "completed", thirtyDaysAgo).
+		Select("AVG(score)").Scan(&recentAvg)
+
+	h.db.Model(&models.PracticeTest{}).
+		Where("user_id = ? AND status = ? AND completed_at BETWEEN ? AND ?",
+			userID, "completed", sixtyDaysAgo, thirtyDaysAgo).
+		Select("AVG(score)").Scan(&previousAvg)
+
+	return recentAvg - previousAvg
+}
+
+func (h *DashboardHandler) getRecentTestsWithDeltas(userID uuid.UUID) []dto.RecentTestItem {
+	var tests []models.PracticeTest
+	h.db.Where("user_id = ? AND status = ?", userID, "completed").
+		Order("completed_at DESC").
+		Limit(5).
+		Find(&tests)
+
+	result := make([]dto.RecentTestItem, len(tests))
+
+	for i, test := range tests {
+		var prevTest models.PracticeTest
+		delta := 0.0
+
+		if err := h.db.Where("user_id = ? AND status = ? AND completed_at < ?",
+			userID, "completed", test.CompletedAt).
+			Order("completed_at DESC").
+			First(&prevTest).Error; err == nil {
+			delta = test.Score - prevTest.Score
+		}
+
+		result[i] = dto.RecentTestItem{
+			ID:         test.ID.String(),
+			Name:       h.formatTestName(test.TestType),
+			Date:       test.CompletedAt.Format("2006-01-02"),
+			Duration:   h.formatDuration(test.TimeSpentSeconds),
+			Questions:  test.TotalQuestions,
+			Score:      h.roundToDecimalPlaces(test.Score, 1),
+			Delta:      h.roundToDecimalPlaces(delta, 1),
+			ReviewLink: fmt.Sprintf("/tests/%s/review", test.ID.String()),
+		}
+	}
+
+	return result
+}
+
+func (h *DashboardHandler) getScoreProgression(userID uuid.UUID) []dto.ScorePoint {
+	var tests []models.PracticeTest
+	h.db.Where("user_id = ? AND status = ?", userID, "completed").
+		Order("completed_at ASC").
+		Limit(10).
+		Find(&tests)
+
+	result := make([]dto.ScorePoint, len(tests))
+	for i, test := range tests {
+		result[i] = dto.ScorePoint{
+			Label: fmt.Sprintf("Test #%d", i+1),
+			Score: h.roundToDecimalPlaces(test.Score, 1),
+		}
+	}
+	return result
+}
+
+func (h *DashboardHandler) getRecentAchievements(userID uuid.UUID) []dto.AchievementItem {
+	var achievements []models.Achievement
+	h.db.Where("user_id = ?", userID).
+		Order("earned_at DESC").
+		Limit(5).
+		Find(&achievements)
+
+	result := make([]dto.AchievementItem, len(achievements))
+	for i, achievement := range achievements {
+		result[i] = dto.AchievementItem{
+			Title:       achievement.Title,
+			Description: achievement.Description,
+			Icon:        achievement.Icon,
+			EarnedAt:    achievement.EarnedAt.Format("2006-01-02"),
+		}
+	}
+	return result
+}
+
+func (h *DashboardHandler) calculatePassReadiness(userID uuid.UUID) float64 {
+	var stats models.UserStats
+	if err := h.db.Where("user_id = ?", userID).First(&stats).Error; err != nil {
+		return 0.0
+	}
+
+	// Simple calculation based on test scores and completion
+	if stats.PracticeTestsTaken == 0 {
+		return 0.0
+	}
+
+	score := stats.AverageTestScore
+	completion := float64(stats.QuestionsCompleted) / 500.0
+	if completion > 1.0 {
+		completion = 1.0
+	}
+
+	return (score * 0.7) + (completion * 30.0)
+}
+
+func (h *DashboardHandler) calculateExamCountdown(examDate *time.Time) map[string]interface{} {
+	if examDate == nil {
+		return map[string]interface{}{
+			"days_left":      0,
+			"prep_time_used": 0.0,
+		}
+	}
+
+	daysLeft := int(time.Until(*examDate).Hours() / 24)
+	if daysLeft < 0 {
+		daysLeft = 0
+	}
+
+	// Prep time used calculation (simplified)
+	prepTimeUsed := 0.0 // TODO: implement based on actual study time
+
+	return map[string]interface{}{
+		"days_left":      daysLeft,
+		"prep_time_used": prepTimeUsed,
+	}
+}
+
+func (h *DashboardHandler) generateTestRecommendations(userID uuid.UUID) []dto.RecommendedTest {
+	// Simple recommendations based on user performance
+	recommendations := []dto.RecommendedTest{
+		{
+			Title:       "Full Practice Exam",
+			Questions:   110,
+			Duration:    "180 min",
+			Difficulty:  "Mixed",
+			Focus:       "Complete NPPE simulation",
+			Recommended: true,
+		},
+		{
+			Title:       "Weak Topics Review",
+			Questions:   20,
+			Duration:    "30 min",
+			Difficulty:  "Adaptive",
+			Focus:       "Areas needing improvement",
+			Recommended: false,
+		},
+	}
+
+	return recommendations
+}
+
+func (h *DashboardHandler) calculateAlmostThereSummary(userID uuid.UUID, stats models.UserStats) dto.AlmostThereSummaryBlock {
+	var testCount int64
+	h.db.Model(&models.PracticeTest{}).
+		Where("user_id = ? AND status = ?", userID, "completed").
+		Count(&testCount)
+
+	improvement := h.calculateScoreImprovement(userID)
+
+	var achievementCount int64
+	h.db.Model(&models.Achievement{}).
+		Where("user_id = ?", userID).
+		Count(&achievementCount)
+
+	return dto.AlmostThereSummaryBlock{
+		TestsCompleted:     int(testCount),
+		ImprovementPercent: h.roundToDecimalPlaces(improvement, 1),
+		AchievementsCount:  int(achievementCount),
+	}
+}
+
+// Utility functions
+
+func (h *DashboardHandler) formatTestName(testType string) string {
+	switch testType {
+	case "full_exam":
+		return "Full Practice Exam"
+	case "topic_specific":
+		return "Topic-Specific Test"
+	case "custom":
+		return "Custom Test"
+	default:
+		return "Practice Test"
+	}
+}
+
+func (h *DashboardHandler) formatDuration(seconds int) string {
+	minutes := seconds / 60
+	if minutes < 60 {
+		return fmt.Sprintf("%d min", minutes)
+	}
+	hours := minutes / 60
+	remainingMinutes := minutes % 60
+	return fmt.Sprintf("%dh %dm", hours, remainingMinutes)
+}
+
+// roundToDecimalPlaces rounds a float64 to the specified number of decimal places
+func (h *DashboardHandler) roundToDecimalPlaces(value float64, decimals int) float64 {
+	multiplier := math.Pow(10, float64(decimals))
+	return math.Round(value*multiplier) / multiplier
 }

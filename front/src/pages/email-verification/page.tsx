@@ -1,6 +1,5 @@
-
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import Card from '../../components/base/Card';
 import Button from '../../components/base/Button';
 import LoadingSpinner from '../../components/effects/LoadingSpinner';
@@ -11,7 +10,9 @@ export default function EmailVerification() {
   const [verificationStatus, setVerificationStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
-  const { token } = useParams();
+  const { token: pathToken } = useParams();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token') || pathToken;
 
   useEffect(() => {
     updateSEO({
@@ -48,12 +49,14 @@ export default function EmailVerification() {
     setVerificationStatus('loading');
     setErrorMessage('');
     
-    // Note: You'll need to implement a resend verification endpoint in the backend
-    // For now, we'll just show an error message
-    setTimeout(() => {
+    try {
+      await authService.sendVerificationEmail();
       setVerificationStatus('error');
-      setErrorMessage('Please contact support to resend verification email');
-    }, 1000);
+      setErrorMessage('Verification email sent. Please check your inbox.');
+    } catch (error) {
+      setVerificationStatus('error');
+      setErrorMessage('Failed to resend verification email. Please contact support.');
+    }
   };
 
   if (verificationStatus === 'loading') {

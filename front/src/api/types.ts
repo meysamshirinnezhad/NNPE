@@ -57,14 +57,14 @@ export interface User {
   exam_date?: string;
   is_verified: boolean;
   is_admin: boolean;
+	exam_attempts_left: number;
+	access_expires_at?: string;
   avatar_url?: string;
   study_streak: number;
   longest_streak: number;
   subscription_id?: string;
   created_at: string;
   updated_at: string;
-  exam_attempts_left?: number;
-  access_expires_at?: string;
 }
 
 export interface UserProfile extends User {
@@ -480,24 +480,8 @@ export interface LeaderboardStats {
   total_participants: number;
 }
 
-// Dashboard types
-export interface DashboardData {
-  overall_progress: number;
-  study_streak: number;
-  longest_streak: number;
-  questions_completed: number;
-  questions_correct: number;
-  accuracy_rate: number;
-  practice_tests_taken: number;
-  average_test_score: number;
-  time_studied_hours: number;
-  pass_probability: number;
-  days_until_exam: number;
-  recommended_study_time_daily: number;
-  topic_mastery: UserTopicMastery[];
-  weak_topics: WeakTopic[];
-  recent_activity: Activity[];
-}
+// Dashboard types - Updated to match new backend API
+export type { DashboardResponse as DashboardData } from '../types/dashboard';
 
 export interface WeakTopic {
   name: string;
@@ -621,12 +605,18 @@ export interface Bookmark {
   created_at: string;
 }
 
-// Coach types (mock implementation for now)
+// AI Coach types
 export interface CoachResponse {
-  id: string;
-  name: string;
-  specialization: string;
-  avatar_url?: string;
-  rating: number;
-  availability: 'available' | 'busy' | 'offline';
+  summary: string;
+  strengths: string[];
+  weaknesses: string[];
+  study_plan: StudyPlanBlock[];
+  recommended_tests: string[];
+  motivational_message: string;
+}
+
+export interface StudyPlanBlock {
+  title: string;
+  description: string;
+  actions: string[];
 }

@@ -28,8 +28,9 @@ func NewSubscriptionHandler(db *gorm.DB, cfg *config.Config) *SubscriptionHandle
 }
 
 type CreateSubscriptionRequest struct {
-	Plan            string `json:"plan" binding:"required,oneof=monthly annual"`
-	PaymentMethodID string `json:"payment_method_id" binding:"required"`
+	Plan            string  `json:"plan" binding:"required,oneof=monthly annual"`
+	PaymentMethodID string  `json:"payment_method_id" binding:"required"`
+	CouponCode      *string `json:"coupon_code,omitempty"`
 }
 
 // CreateSubscription creates a new Stripe subscription
@@ -53,6 +54,60 @@ func (h *SubscriptionHandler) CreateSubscription(c *gin.Context) {
 		return
 	}
 
+	// Determine base amount
+	var amount int
+	switch req.Plan {
+	case "monthly":
+		amount = 2999 // $29.99 in cents
+	case "annual":
+		amount = 29999 // $299.99 in cents
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid plan"})
+		return
+	}
+
+	// Validate coupon if provided
+	var coupon *models.Coupon
+	var discountAmount int
+	if req.CouponCode != nil && *req.CouponCode != "" {
+		if err := h.db.Where("code = ? AND is_active = true", *req.CouponCode).First(&coupon).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid coupon code"})
+				return
+			}
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate coupon"})
+			return
+		}
+
+		now := time.Now()
+		if now.Before(coupon.ValidFrom) || now.After(coupon.ValidUntil) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Coupon is not valid at this time"})
+			return
+		}
+
+		if coupon.MaxUses != -1 && coupon.UsedCount >= coupon.MaxUses {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Coupon has reached maximum uses"})
+			return
+		}
+
+		// Check if user already used this coupon
+		var existingUsage models.CouponUsage
+		if err := h.db.Where("coupon_id = ? AND user_id = ?", coupon.ID, userID).First(&existingUsage).Error; err == nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Coupon already used by this user"})
+			return
+		}
+
+		// Calculate discount
+		if coupon.DiscountType == "percentage" {
+			discountAmount = int(float64(amount) * (coupon.DiscountValue / 100))
+		} else if coupon.DiscountType == "fixed" {
+			discountAmount = int(coupon.DiscountValue * 100) // assuming fixed is in dollars
+		}
+		if discountAmount > amount {
+			discountAmount = amount
+		}
+	}
+
 	// Check if user already has active subscription
 	var existingSub models.Subscription
 	err := h.db.Where("user_id = ? AND status = ?", userID, "active").First(&existingSub).Error
@@ -71,15 +126,12 @@ func (h *SubscriptionHandler) CreateSubscription(c *gin.Context) {
 	// For now, create a mock subscription for testing
 	now := time.Now()
 	var periodEnd time.Time
-	var amount int
 
 	switch req.Plan {
 	case "monthly":
 		periodEnd = now.AddDate(0, 1, 0)
-		amount = 2999 // $29.99 in cents
 	case "annual":
 		periodEnd = now.AddDate(1, 0, 0)
-		amount = 29999 // $299.99 in cents
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid plan"})
 		return
@@ -103,11 +155,14 @@ func (h *SubscriptionHandler) CreateSubscription(c *gin.Context) {
 		return
 	}
 
+	// Apply discount if coupon used
+	finalAmount := amount - discountAmount
+
 	// Create payment record
 	payment := models.Payment{
 		UserID:          userID.(uuid.UUID),
 		SubscriptionID:  subscription.ID,
-		Amount:          amount,
+		Amount:          finalAmount,
 		Currency:        "CAD",
 		Status:          "succeeded",
 		StripePaymentID: fmt.Sprintf("pi_mock_%s", uuid.New().String()),
@@ -117,6 +172,22 @@ func (h *SubscriptionHandler) CreateSubscription(c *gin.Context) {
 	if err := h.db.Create(&payment).Error; err != nil {
 		log.Printf("Error creating payment: %v", err)
 		// Don't fail the request if payment record fails
+	}
+
+	// Record coupon usage if coupon was applied
+	if coupon != nil {
+		couponUsage := models.CouponUsage{
+			CouponID: coupon.ID,
+			UserID:   userID.(uuid.UUID),
+			OrderID:  &payment.ID,
+			UsedAt:   now,
+		}
+		if err := h.db.Create(&couponUsage).Error; err != nil {
+			log.Printf("Error recording coupon usage: %v", err)
+			// Don't fail the request
+		}
+		// Increment used count
+		h.db.Model(coupon).Update("used_count", coupon.UsedCount+1)
 	}
 
 	// Update user's subscription_id

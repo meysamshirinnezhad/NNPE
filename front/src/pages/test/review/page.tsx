@@ -296,44 +296,66 @@ export default function TestReview() {
 
                     {/* Answer Options */}
                     <div className="space-y-3">
-                      {question.options.map((option, optionIndex) => (
-                        <div
-                          key={optionIndex}
-                          className={`p-3 border-2 rounded-lg ${
-                            optionIndex === question.correctAnswer
-                              ? 'border-green-500 bg-green-50'
-                              : question.userAnswer === optionIndex && optionIndex !== question.correctAnswer
-                                ? 'border-red-500 bg-red-50'
-                                : 'border-gray-200'
-                          }`}
-                        >
-                          <div className="flex items-center space-x-3">
-                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                              optionIndex === question.correctAnswer
-                                ? 'border-green-500 bg-green-500'
-                                : question.userAnswer === optionIndex && optionIndex !== question.correctAnswer
-                                  ? 'border-red-500 bg-red-500'
-                                  : 'border-gray-300'
-                            }`}>
-                              {optionIndex === question.correctAnswer && (
-                                <i className="ri-check-line text-white text-sm"></i>
-                              )}
-                              {question.userAnswer === optionIndex && optionIndex !== question.correctAnswer && (
-                                <i className="ri-close-line text-white text-sm"></i>
-                              )}
+                      {question.options.map((option, optionIndex) => {
+                        const isCorrectAnswer = optionIndex === question.correctAnswer;
+                        const isUserAnswer = question.userAnswer === optionIndex;
+                        const isUserCorrect = isUserAnswer && isCorrectAnswer;
+                        const isUserIncorrect = isUserAnswer && !isCorrectAnswer;
+
+                        return (
+                          <div
+                            key={optionIndex}
+                            className={`p-3 border-2 rounded-lg ${
+                              isUserCorrect
+                                ? 'border-green-500 bg-green-50' // User selected correct answer
+                                : isUserIncorrect
+                                  ? 'border-red-500 bg-red-50'   // User selected wrong answer
+                                  : isCorrectAnswer
+                                    ? 'border-green-500 bg-green-50' // Correct answer (not selected by user)
+                                    : 'border-gray-200'             // Neutral option
+                            }`}
+                          >
+                            <div className="flex items-center space-x-3">
+                              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                                isUserCorrect
+                                  ? 'border-green-500 bg-green-500' // User selected correct
+                                  : isUserIncorrect
+                                    ? 'border-red-500 bg-red-500'   // User selected wrong
+                                    : isCorrectAnswer
+                                      ? 'border-green-500 bg-green-500' // Correct answer indicator
+                                      : 'border-gray-300'             // Neutral
+                              }`}>
+                                {isCorrectAnswer && (
+                                  <i className="ri-check-line text-white text-sm"></i>
+                                )}
+                                {isUserIncorrect && (
+                                  <i className="ri-close-line text-white text-sm"></i>
+                                )}
+                              </div>
+                              <span className="text-gray-800 flex-1">
+                                {option}
+                              </span>
+                              <div className="flex items-center space-x-2">
+                                {isCorrectAnswer && (
+                                  <span className="text-green-600 text-sm font-medium bg-green-100 px-2 py-1 rounded">
+                                    ✓ Correct Answer
+                                  </span>
+                                )}
+                                {isUserAnswer && !isCorrectAnswer && (
+                                  <span className="text-red-600 text-sm font-medium bg-red-100 px-2 py-1 rounded">
+                                    ✗ Your Answer
+                                  </span>
+                                )}
+                                {isUserCorrect && (
+                                  <span className="text-green-600 text-sm font-medium bg-green-100 px-2 py-1 rounded">
+                                    ✓ Your Answer (Correct)
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                            <span className="text-gray-800">
-                              {String.fromCharCode(65 + optionIndex)}. {option}
-                            </span>
-                            {optionIndex === question.correctAnswer && (
-                              <span className="text-green-600 text-sm font-medium">Correct Answer</span>
-                            )}
-                            {question.userAnswer === optionIndex && optionIndex !== question.correctAnswer && (
-                              <span className="text-red-600 text-sm font-medium">Your Answer</span>
-                            )}
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
 
                     {/* Explanation */}

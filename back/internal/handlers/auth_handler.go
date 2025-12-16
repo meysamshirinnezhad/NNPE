@@ -10,6 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/nppe-pro/api/config"
 	"github.com/nppe-pro/api/internal/models"
+	"github.com/nppe-pro/api/internal/services"
 	"github.com/nppe-pro/api/pkg/database"
 	"github.com/nppe-pro/api/pkg/jwt"
 	"golang.org/x/crypto/bcrypt"
@@ -17,18 +18,20 @@ import (
 )
 
 type AuthHandler struct {
-	db         *gorm.DB
-	redis      *database.RedisClient
-	jwtService *jwt.JWTService
-	config     *config.Config
+	db           *gorm.DB
+	redis        *database.RedisClient
+	jwtService   *jwt.JWTService
+	config       *config.Config
+	emailService *services.EmailService
 }
 
 func NewAuthHandler(db *gorm.DB, redis *database.RedisClient, jwtService *jwt.JWTService, cfg *config.Config) *AuthHandler {
 	return &AuthHandler{
-		db:         db,
-		redis:      redis,
-		jwtService: jwtService,
-		config:     cfg,
+		db:           db,
+		redis:        redis,
+		jwtService:   jwtService,
+		config:       cfg,
+		emailService: services.NewEmailService(cfg),
 	}
 }
 
@@ -121,8 +124,17 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	h.db.Create(&stats)
 
 	// Generate tokens
-	accessToken, _ := h.jwtService.GenerateToken(user.ID, user.Email, user.IsAdmin)
-	refreshToken, _ := h.jwtService.GenerateRefreshToken(user.ID)
+	accessToken, err := h.jwtService.GenerateToken(user.ID, user.Email, user.IsAdmin)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate access token"})
+		return
+	}
+
+	refreshToken, err := h.jwtService.GenerateRefreshToken(user.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate refresh token"})
+		return
+	}
 
 	// Store session in Redis
 	ctx := context.Background()
@@ -154,15 +166,17 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		RefreshToken: refreshToken,
 		ExpiresIn:    3600,
 		User: gin.H{
-			"id":           user.ID,
-			"email":        user.Email,
-			"first_name":   user.FirstName,
-			"last_name":    user.LastName,
-			"province":     user.Province,
-			"is_verified":  user.IsVerified,
-			"is_admin":     user.IsAdmin,
-			"avatar_url":   user.AvatarURL,
-			"study_streak": user.StudyStreak,
+			"id":                 user.ID,
+			"email":              user.Email,
+			"first_name":         user.FirstName,
+			"last_name":          user.LastName,
+			"province":           user.Province,
+			"is_verified":        user.IsVerified,
+			"is_admin":           user.IsAdmin,
+			"exam_attempts_left": user.ExamAttemptsLeft,
+			"access_expires_at":  user.AccessExpiresAt,
+			"avatar_url":         user.AvatarURL,
+			"study_streak":       user.StudyStreak,
 		},
 	})
 }
@@ -198,8 +212,17 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	}
 
 	// Generate tokens
-	accessToken, _ := h.jwtService.GenerateToken(user.ID, user.Email, user.IsAdmin)
-	refreshToken, _ := h.jwtService.GenerateRefreshToken(user.ID)
+	accessToken, err := h.jwtService.GenerateToken(user.ID, user.Email, user.IsAdmin)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate access token"})
+		return
+	}
+
+	refreshToken, err := h.jwtService.GenerateRefreshToken(user.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate refresh token"})
+		return
+	}
 
 	// Store session in Redis
 	ctx := context.Background()
@@ -231,15 +254,17 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		RefreshToken: refreshToken,
 		ExpiresIn:    3600,
 		User: gin.H{
-			"id":           user.ID,
-			"email":        user.Email,
-			"first_name":   user.FirstName,
-			"last_name":    user.LastName,
-			"province":     user.Province,
-			"is_verified":  user.IsVerified,
-			"is_admin":     user.IsAdmin,
-			"avatar_url":   user.AvatarURL,
-			"study_streak": user.StudyStreak,
+			"id":                 user.ID,
+			"email":              user.Email,
+			"first_name":         user.FirstName,
+			"last_name":          user.LastName,
+			"province":           user.Province,
+			"is_verified":        user.IsVerified,
+			"is_admin":           user.IsAdmin,
+			"exam_attempts_left": user.ExamAttemptsLeft,
+			"access_expires_at":  user.AccessExpiresAt,
+			"avatar_url":         user.AvatarURL,
+			"study_streak":       user.StudyStreak,
 		},
 	})
 }
@@ -266,8 +291,17 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 		return
 	}
 
-	accessToken, _ := h.jwtService.GenerateToken(user.ID, user.Email, user.IsAdmin)
-	newRefreshToken, _ := h.jwtService.GenerateRefreshToken(user.ID)
+	accessToken, err := h.jwtService.GenerateToken(user.ID, user.Email, user.IsAdmin)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate access token"})
+		return
+	}
+
+	newRefreshToken, err := h.jwtService.GenerateRefreshToken(user.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate refresh token"})
+		return
+	}
 
 	c.JSON(http.StatusOK, LoginResponse{
 		AccessToken:  accessToken,
@@ -295,16 +329,19 @@ func (h *AuthHandler) ForgotPassword(c *gin.Context) {
 	}
 
 	// Create reset token
-	resetToken := uuid.New().String()
-	passwordReset := models.PasswordReset{
-		UserID:    user.ID,
-		Token:     resetToken,
-		ExpiresAt: time.Now().Add(1 * time.Hour),
-	}
-	h.db.Create(&passwordReset)
+	resetToken := services.GenerateSecureToken(32)
+	resetTokenHash := services.HashToken(resetToken)
+	expiresAt := time.Now().Add(1 * time.Hour)
 
-	// TODO: Send email with reset link
-	// For now, just return success
+	// Update user with reset token
+	h.db.Model(&user).Updates(models.User{
+		EmailVerifyTokenHash: resetTokenHash,
+		EmailVerifyExpiresAt: &expiresAt,
+	})
+
+	// Send password reset email
+	go h.emailService.SendPasswordResetEmail(user.Email, user.FirstName, resetToken)
+
 	c.JSON(http.StatusOK, gin.H{"message": "If the email exists, a reset link will be sent"})
 }
 
@@ -319,9 +356,10 @@ func (h *AuthHandler) ResetPassword(c *gin.Context) {
 		return
 	}
 
-	// Find reset token
-	var reset models.PasswordReset
-	if err := h.db.Where("token = ? AND used_at IS NULL AND expires_at > ?", req.Token, time.Now()).First(&reset).Error; err != nil {
+	// Hash token and find user
+	tokenHash := services.HashToken(req.Token)
+	var user models.User
+	if err := h.db.Where("email_verify_token_hash = ? AND email_verify_expires_at > ?", tokenHash, time.Now()).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or expired reset token"})
 		return
 	}
@@ -333,27 +371,97 @@ func (h *AuthHandler) ResetPassword(c *gin.Context) {
 		return
 	}
 
-	// Update user password
-	now := time.Now()
-	h.db.Model(&models.User{}).Where("id = ?", reset.UserID).Update("password_hash", string(hashedPassword))
-	h.db.Model(&reset).Update("used_at", &now)
+	// Update user password and clear verification token
+	h.db.Model(&user).Updates(models.User{
+		PasswordHash:         string(hashedPassword),
+		EmailVerifyTokenHash: "",
+		EmailVerifyExpiresAt: nil,
+	})
 
 	c.JSON(http.StatusOK, gin.H{"message": "Password reset successful"})
 }
 
+// SendVerificationEmail sends a verification email to the user
+// @Summary Send verification email
+// @Description Send email verification link to user
+// @Tags auth
+// @Produce json
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Router /auth/send-verification [post]
+func (h *AuthHandler) SendVerificationEmail(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	var user models.User
+	if err := h.db.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	// Check if already verified
+	if user.IsVerified {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email already verified"})
+		return
+	}
+
+	// Check rate limiting - max 3 emails per hour
+	// For debugging/testing purposes, we'll reduce this to 1 minute
+	if user.EmailVerifySentAt != nil && time.Since(*user.EmailVerifySentAt) < time.Minute {
+		c.JSON(http.StatusTooManyRequests, gin.H{"error": "Please wait a moment before requesting another email"})
+		return
+	}
+
+	// Generate secure token
+	token := services.GenerateSecureToken(32)
+	tokenHash := services.HashToken(token)
+	expiresAt := time.Now().Add(1 * time.Hour)
+	now := time.Now()
+
+	// Update user with verification token
+	h.db.Model(&user).Updates(models.User{
+		EmailVerifyTokenHash: tokenHash,
+		EmailVerifyExpiresAt: &expiresAt,
+		EmailVerifySentAt:    &now,
+	})
+
+	// Send verification email
+	go h.emailService.SendVerificationEmail(user.Email, user.FirstName, token)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Verification email sent"})
+}
+
 // VerifyEmail handles email verification
+// @Summary Verify email
+// @Description Verify user email with token
+// @Tags auth
+// @Produce json
+// @Param token path string true "Verification token"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Router /auth/verify-email/{token} [get]
 func (h *AuthHandler) VerifyEmail(c *gin.Context) {
 	token := c.Param("token")
 
-	var verification models.EmailVerification
-	if err := h.db.Where("token = ? AND expires_at > ?", token, time.Now()).First(&verification).Error; err != nil {
+	// Hash token and find user
+	tokenHash := services.HashToken(token)
+	var user models.User
+	if err := h.db.Where("email_verify_token_hash = ? AND email_verify_expires_at > ?", tokenHash, time.Now()).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or expired verification token"})
 		return
 	}
 
-	// Update user
-	h.db.Model(&models.User{}).Where("id = ?", verification.UserID).Update("is_verified", true)
-	h.db.Delete(&verification)
+	// Update user as verified and clear tokens
+	now := time.Now()
+	h.db.Model(&user).Updates(models.User{
+		IsVerified:           true,
+		EmailVerifiedAt:      &now,
+		EmailVerifyTokenHash: "",
+		EmailVerifyExpiresAt: nil,
+	})
 
 	c.JSON(http.StatusOK, gin.H{"message": "Email verified successfully"})
 }
@@ -381,14 +489,52 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 		h.redis.Client.Del(ctx, sessionKey)
 	}
 
-	// Clear cookies
-	c.SetCookie("access_token", "", -1, "/", "", false, true)
-	c.SetCookie("refresh_token", "", -1, "/", "", false, true)
+	// Clear cookies with same security settings
+	c.SetSameSite(h.getSameSiteMode())
+	c.SetCookie("access_token", "", -1, "/", "", h.config.Server.CookieSecure, true)
+	c.SetCookie("refresh_token", "", -1, "/", "", h.config.Server.CookieSecure, true)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 }
 
+// ValidateToken checks if the current token is valid and returns basic validation info
+// @Summary Validate current token
+// @Description Check if the user's authentication token is valid
+// @Tags auth
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Failure 401 {object} map[string]string
+// @Router /auth/validate [get]
+func (h *AuthHandler) ValidateToken(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or missing token"})
+		return
+	}
+
+	// Verify user still exists
+	var user models.User
+	if err := h.db.Select("id, is_admin").First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"valid":    true,
+		"user_id":  userID,
+		"is_admin": user.IsAdmin,
+		"message":  "Token is valid",
+	})
+}
+
 // GetCurrentUser returns current authenticated user info
+// @Summary Get current user
+// @Description Get authenticated user information
+// @Tags auth
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Failure 401 {object} map[string]string
+// @Router /auth/me [get]
 func (h *AuthHandler) GetCurrentUser(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
@@ -403,16 +549,18 @@ func (h *AuthHandler) GetCurrentUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"id":           user.ID,
-		"email":        user.Email,
-		"first_name":   user.FirstName,
-		"last_name":    user.LastName,
-		"province":     user.Province,
-		"exam_date":    user.ExamDate,
-		"is_verified":  user.IsVerified,
-		"is_admin":     user.IsAdmin,
-		"avatar_url":   user.AvatarURL,
-		"study_streak": user.StudyStreak,
-		"created_at":   user.CreatedAt,
+		"id":                 user.ID,
+		"email":              user.Email,
+		"first_name":         user.FirstName,
+		"last_name":          user.LastName,
+		"province":           user.Province,
+		"is_verified":        user.IsVerified,
+		"is_admin":           user.IsAdmin,
+		"exam_attempts_left": user.ExamAttemptsLeft,
+		"access_expires_at":  user.AccessExpiresAt,
+		"avatar_url":         user.AvatarURL,
+		"study_streak":       user.StudyStreak,
+		"exam_date":          user.ExamDate,
+		"created_at":         user.CreatedAt,
 	})
 }

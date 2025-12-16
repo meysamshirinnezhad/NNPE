@@ -68,7 +68,7 @@ export default defineConfig({
   base,
   build: {
     sourcemap: true,
-    outDir: 'out',
+    outDir: 'dist',
   },
   resolve: {
     alias: {
@@ -78,6 +78,6 @@ export default defineConfig({
   server: {
     port: 3000,
     host: '0.0.0.0',
-    allowedHosts: ['nppe.mshtechlab.com', 'localhost', '127.0.0.1']
+    allowedHosts: ['procertflo.ca', 'localhost', '127.0.0.1']
   }
 })

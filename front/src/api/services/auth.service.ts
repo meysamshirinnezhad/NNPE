@@ -182,6 +182,19 @@ class AuthService {
   }
 
   /**
+   * Validate current token with backend
+   * Returns basic validation info without full user data
+   */
+  async validateToken(): Promise<{ valid: boolean; user_id: string; is_admin: boolean; message: string }> {
+    try {
+      const response = await apiClient.get<{ valid: boolean; user_id: string; is_admin: boolean; message: string }>('/auth/validate');
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
    * Get cached user from localStorage
    * Note: This may be stale; use validateSession() for fresh data
    */

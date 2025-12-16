@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../components/feature/Header';
 import MobileNavigation from '../../components/feature/MobileNavigation';
 import Card from '../../components/base/Card';
@@ -10,6 +11,7 @@ import { questionService } from '../../api';
 import type { Question, Topic } from '../../api/types';
 
 export default function Practice() {
+  const navigate = useNavigate();
   const [selectedTopic, setSelectedTopic] = useState('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<'easy' | 'medium' | 'hard' | 'all'>('all');
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -369,7 +371,12 @@ export default function Practice() {
                 <i className="ri-file-text-line text-2xl text-blue-600 mb-2 block"></i>
                 <h3 className="font-semibold text-gray-900 mb-1">Practice Test</h3>
                 <p className="text-sm text-gray-600 mb-3">Take a full-length exam simulation</p>
-                <Button variant="secondary" size="sm" className="w-full">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => navigate('/practice-test/new')}
+                >
                   Start Test
                 </Button>
               </Card>

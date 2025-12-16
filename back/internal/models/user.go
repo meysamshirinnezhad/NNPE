@@ -8,25 +8,34 @@ import (
 )
 
 type User struct {
-	ID             uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
-	Email          string         `gorm:"uniqueIndex;not null" json:"email"`
-	PasswordHash   string         `gorm:"not null" json:"-"`
-	FirstName      string         `gorm:"not null" json:"first_name"`
-	LastName       string         `gorm:"not null" json:"last_name"`
-	Province       string         `gorm:"not null" json:"province"`
-	ExamDate       *time.Time     `json:"exam_date,omitempty"`
-	IsVerified     bool           `gorm:"default:false" json:"is_verified"`
-	IsAdmin        bool           `gorm:"default:false" json:"is_admin"`
-	AvatarURL      string         `json:"avatar_url,omitempty"`
-	StudyStreak    int            `gorm:"default:0" json:"study_streak"`
-	LongestStreak  int            `gorm:"default:0" json:"longest_streak"`
-	LastStudyDate  *time.Time     `json:"last_study_date,omitempty"`
-	SubscriptionID *uuid.UUID     `json:"subscription_id,omitempty"`
-	OAuthProvider  string         `gorm:"type:varchar(20)" json:"oauth_provider,omitempty"`
-	OAuthID        string         `gorm:"index" json:"-"`
-	CreatedAt      time.Time      `json:"created_at"`
-	UpdatedAt      time.Time      `json:"updated_at"`
-	DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
+	ID                     uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	Email                  string         `gorm:"uniqueIndex;not null" json:"email"`
+	PasswordHash           string         `gorm:"not null" json:"-"`
+	FirstName              string         `gorm:"not null" json:"first_name"`
+	LastName               string         `gorm:"not null" json:"last_name"`
+	Province               string         `gorm:"not null" json:"province"`
+	ExamDate               *time.Time     `json:"exam_date,omitempty"`
+	IsVerified             bool           `gorm:"default:false" json:"is_verified"`
+	IsAdmin                bool           `gorm:"default:false" json:"is_admin"`
+	ExamAttemptsLeft       int            `gorm:"default:0" json:"exam_attempts_left"`
+	AccessExpiresAt        *time.Time     `json:"access_expires_at"`
+	AvatarURL              string         `json:"avatar_url,omitempty"`
+	StudyStreak            int            `gorm:"default:0" json:"study_streak"`
+	LongestStreak          int            `gorm:"default:0" json:"longest_streak"`
+	LastStudyDate          *time.Time     `json:"last_study_date,omitempty"`
+	SubscriptionID         *uuid.UUID     `json:"subscription_id,omitempty"`
+	OAuthProvider          string         `gorm:"type:varchar(20)" json:"oauth_provider,omitempty"`
+	OAuthID                string         `gorm:"index" json:"-"`
+	
+	// Email verification fields
+	EmailVerifiedAt        *time.Time     `json:"email_verified_at,omitempty"`
+	EmailVerifyTokenHash   string         `gorm:"uniqueIndex" json:"-"`
+	EmailVerifyExpiresAt   *time.Time     `json:"email_verify_expires_at,omitempty"`
+	EmailVerifySentAt      *time.Time     `json:"email_verify_sent_at,omitempty"`
+	
+	CreatedAt              time.Time      `json:"created_at"`
+	UpdatedAt              time.Time      `json:"updated_at"`
+	DeletedAt              gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 type UserStats struct {

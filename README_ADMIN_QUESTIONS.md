@@ -10,8 +10,8 @@ $env:PGPASSWORD = "StrongP@ss_123"; psql -U nppe -d nppe -h 127.0.0.1 -c "ALTER 
 ### Step 2: Start Services
 ```powershell
 # Terminal 1 - Backend
-cd back
-go run cmd/api/main.go
+cd back && go run cmd/api/main.go
+sudo systemctl restart nppe-api
 
 # Terminal 2 - Frontend  
 cd front

@@ -48,6 +48,24 @@ func (h *TestHandler) StartTest(c *gin.Context) {
 		return
 	}
 
+	// Check if user has exam attempts available
+	var user models.User
+	if err := h.db.First(&user, userID.(uuid.UUID)).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	now := time.Now()
+	if user.ExamAttemptsLeft <= 0 {
+		c.JSON(http.StatusPaymentRequired, gin.H{"error": "No exam attempts remaining. Please redeem a coupon to get more attempts."})
+		return
+	}
+
+	if user.AccessExpiresAt != nil && now.After(*user.AccessExpiresAt) {
+		c.JSON(http.StatusPaymentRequired, gin.H{"error": "Your exam access has expired. Please redeem a coupon to renew access."})
+		return
+	}
+
 	var req StartTestRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -130,6 +148,12 @@ func (h *TestHandler) StartTest(c *gin.Context) {
 
 	if err := h.db.Create(&testQuestions).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create test questions"})
+		return
+	}
+
+	// Decrement exam attempts
+	if err := h.db.Model(&user).Update("exam_attempts_left", user.ExamAttemptsLeft-1).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update exam attempts"})
 		return
 	}
 
@@ -385,6 +409,9 @@ func (h *TestHandler) CompleteTest(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user stats"})
 		return
 	}
+
+	// Check and award achievements
+	h.checkAndAwardAchievements(userID.(uuid.UUID), test, performanceByTopic)
 
 	c.JSON(http.StatusOK, gin.H{
 		"test_id":              test.ID.String(),
@@ -1016,4 +1043,115 @@ func (h *TestHandler) calculateImprovementMetrics(userID uuid.UUID, currentScore
 	}
 
 	return metrics
+}
+
+// checkAndAwardAchievements checks for new achievements and awards them to the user
+func (h *TestHandler) checkAndAwardAchievements(userID uuid.UUID, test models.PracticeTest, performanceByTopic []gin.H) {
+	achievementsToAward := make([]models.Achievement, 0)
+	now := time.Now()
+
+	// Check for "First Test" achievement
+	var testCount int64
+	h.db.Model(&models.PracticeTest{}).Where("user_id = ?", userID).Count(&testCount)
+	if testCount == 1 { // This is the first test
+		achievementsToAward = append(achievementsToAward, models.Achievement{
+			UserID:          userID,
+			AchievementType: "first_test",
+			Title:           "First Steps",
+			Description:     "Completed your first practice test",
+			Icon:            "play",
+			Rarity:          "common",
+			Points:          10,
+			EarnedAt:        now,
+		})
+	}
+
+	// Check for score-based achievements
+	if test.Score >= 90 {
+		// Check if already has this achievement
+		var existing int64
+		h.db.Model(&models.Achievement{}).Where("user_id = ? AND achievement_type = ?", userID, "score_90").Count(&existing)
+		if existing == 0 {
+			achievementsToAward = append(achievementsToAward, models.Achievement{
+				UserID:          userID,
+				AchievementType: "score_90",
+				Title:           "Excellence Award",
+				Description:     "Scored 90% or higher on a practice test",
+				Icon:            "trophy",
+				Rarity:          "rare",
+				Points:          100,
+				EarnedAt:        now,
+			})
+		}
+	}
+
+	if test.Score == 100 {
+		var existing int64
+		h.db.Model(&models.Achievement{}).Where("user_id = ? AND achievement_type = ?", userID, "perfect_score").Count(&existing)
+		if existing == 0 {
+			achievementsToAward = append(achievementsToAward, models.Achievement{
+				UserID:          userID,
+				AchievementType: "perfect_score",
+				Title:           "Perfect Score",
+				Description:     "Achieved 100% on a practice test",
+				Icon:            "star",
+				Rarity:          "legendary",
+				Points:          250,
+				EarnedAt:        now,
+			})
+		}
+	}
+
+	// Check for streak achievements
+	var user models.User
+	if err := h.db.Where("id = ?", userID).First(&user).Error; err == nil {
+		if user.StudyStreak >= 7 {
+			var existing int64
+			h.db.Model(&models.Achievement{}).Where("user_id = ? AND achievement_type = ?", userID, "streak_7").Count(&existing)
+			if existing == 0 {
+				achievementsToAward = append(achievementsToAward, models.Achievement{
+					UserID:          userID,
+					AchievementType: "streak_7",
+					Title:           "Week Warrior",
+					Description:     "Maintained a 7-day study streak",
+					Icon:            "calendar",
+					Rarity:          "rare",
+					Points:          75,
+					EarnedAt:        now,
+				})
+			}
+		}
+	}
+
+	// Check for perfect topic achievements
+	for _, topic := range performanceByTopic {
+		percentage := float64(topic["percentage"].(int))
+		if percentage == 100.0 {
+			topicName := topic["topic_name"].(string)
+			achievementType := "perfect_topic_" + topicName
+
+			var existing int64
+			h.db.Model(&models.Achievement{}).Where("user_id = ? AND achievement_type = ?", userID, achievementType).Count(&existing)
+			if existing == 0 {
+				achievementsToAward = append(achievementsToAward, models.Achievement{
+					UserID:          userID,
+					AchievementType: achievementType,
+					Title:           "Perfect Score - " + topicName,
+					Description:     "Answered all " + topicName + " questions correctly",
+					Icon:            "star",
+					Rarity:          "epic",
+					Points:          150,
+					EarnedAt:        now,
+				})
+			}
+		}
+	}
+
+	// Award achievements
+	for _, achievement := range achievementsToAward {
+		if err := h.db.Create(&achievement).Error; err != nil {
+			// Log error but don't fail the test completion
+			continue
+		}
+	}
 }

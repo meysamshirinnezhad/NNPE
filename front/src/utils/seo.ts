@@ -96,14 +96,14 @@ const addSchemaMarkup = (schema: object) => {
 // Predefined SEO data for different pages
 export const seoData = {
   landing: {
-    title: 'NPPE Pro - Professional Engineering Exam Preparation Platform',
+    title: 'ProCertFlo - Professional Engineering Exam Preparation Platform',
     description: 'Pass your NPPE exam with confidence. Comprehensive study materials, practice tests, and analytics for professional engineers. 95% pass rate, 500+ questions.',
     keywords: 'NPPE exam, professional engineering, exam preparation, practice tests, engineering certification, professional engineer',
     canonical: `${import.meta.env.VITE_SITE_URL || 'https://example.com'}/`,
     schema: {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "name": "NPPE Pro",
+      "name": "ProCertFlo",
       "description": "Professional Engineering Exam Preparation Platform",
       "url": `${import.meta.env.VITE_SITE_URL || 'https://example.com'}`,
       "potentialAction": {
@@ -116,7 +116,7 @@ export const seoData = {
       },
       "publisher": {
         "@type": "Organization",
-        "name": "NPPE Pro",
+        "name": "ProCertFlo",
         "logo": {
           "@type": "ImageObject",
           "url": `${import.meta.env.VITE_SITE_URL || 'https://example.com'}/logo.png`
@@ -125,14 +125,14 @@ export const seoData = {
     }
   },
   dashboard: {
-    title: 'Dashboard - NPPE Pro',
+    title: 'Dashboard - ProCertFlo',
     description: 'Track your NPPE exam preparation progress with detailed analytics, performance metrics, and personalized study recommendations.',
     keywords: 'NPPE dashboard, exam progress, study analytics, performance tracking',
     canonical: `${import.meta.env.VITE_SITE_URL || 'https://example.com'}/dashboard`,
     schema: {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      "name": "NPPE Pro Dashboard",
+      "name": "ProCertFlo Dashboard",
       "description": "Professional Engineering Exam Preparation Dashboard",
       "url": `${import.meta.env.VITE_SITE_URL || 'https://example.com'}/dashboard`,
       "applicationCategory": "EducationalApplication",
@@ -145,27 +145,27 @@ export const seoData = {
     }
   },
   home: {
-    title: 'Home - NPPE Pro',
-    description: 'Welcome to NPPE Pro - Your comprehensive platform for professional engineering exam preparation.',
+    title: 'Home - ProCertFlo',
+    description: 'Welcome to ProCertFlo - Your comprehensive platform for professional engineering exam preparation.',
     keywords: 'NPPE home, engineering exam, professional certification',
     canonical: `${import.meta.env.VITE_SITE_URL || 'https://example.com'}/home`
   },
   about: {
-    title: 'About Us - NPPE Pro | Leading NPPE Exam Preparation Platform',
-    description: 'Learn about NPPE Pro\'s mission to help engineers pass the National Professional Practice Examination. Founded by engineers, for engineers.',
-    keywords: 'NPPE Pro team, engineering exam preparation, professional engineers, company mission, engineering education',
-    ogTitle: 'About NPPE Pro - Empowering Engineers to Achieve Excellence',
-    ogDescription: 'Founded by engineers, for engineers. Discover how NPPE Pro has helped over 10,000 engineers achieve their P.Eng designation.',
+    title: 'About Us - ProCertFlo | Leading NPPE Exam Preparation Platform',
+    description: 'Learn about ProCertFlo\'s mission to help engineers pass the National Professional Practice Examination. Founded by engineers, for engineers.',
+    keywords: 'ProCertFlo team, engineering exam preparation, professional engineers, company mission, engineering education',
+    ogTitle: 'About ProCertFlo - Empowering Engineers to Achieve Excellence',
+    ogDescription: 'Founded by engineers, for engineers. Discover how ProCertFlo has helped over 10,000 engineers achieve their P.Eng designation.',
     ogImage: 'https://readdy.ai/api/search-image?query=professional%20engineering%20team%20collaboration%20office%20environment&width=1200&height=630&seq=about-og&orientation=landscape',
     schema: {
       "@context": "https://schema.org",
       "@type": "AboutPage",
-      "name": "About NPPE Pro",
-      "description": "Learn about NPPE Pro's mission to help engineers pass the National Professional Practice Examination",
+      "name": "About ProCertFlo",
+      "description": "Learn about ProCertFlo's mission to help engineers pass the National Professional Practice Examination",
       "url": `${import.meta.env.VITE_SITE_URL}/about`,
       "mainEntity": {
         "@type": "Organization",
-        "name": "NPPE Pro",
+        "name": "ProCertFlo",
         "description": "Leading NPPE exam preparation platform for professional engineers",
         "foundingDate": "2020",
         "numberOfEmployees": "10-50",
@@ -177,21 +177,21 @@ export const seoData = {
     }
   },
   features: {
-    title: 'Features - NPPE Pro | Comprehensive NPPE Exam Preparation Tools',
-    description: 'Discover NPPE Pro\'s powerful features: 500+ practice questions, realistic tests, advanced analytics, study paths, and mobile learning.',
+    title: 'Features - ProCertFlo | Comprehensive NPPE Exam Preparation Tools',
+    description: 'Discover ProCertFlo\'s powerful features: 500+ practice questions, realistic tests, advanced analytics, study paths, and mobile learning.',
     keywords: 'NPPE exam features, practice questions, study tools, engineering exam preparation, mobile learning, analytics',
-    ogTitle: 'NPPE Pro Features - Everything You Need to Pass the NPPE',
+    ogTitle: 'ProCertFlo Features - Everything You Need to Pass the NPPE',
     ogDescription: 'Comprehensive tools, expert content, and proven strategies designed specifically for Canadian engineering professionals.',
     ogImage: 'https://readdy.ai/api/search-image?query=modern%20engineering%20study%20workspace%20features&width=1200&height=630&seq=features-og&orientation=landscape',
     schema: {
       "@context": "https://schema.org",
       "@type": "WebPage",
-      "name": "NPPE Pro Features",
+      "name": "ProCertFlo Features",
       "description": "Comprehensive NPPE exam preparation tools and features",
       "url": `${import.meta.env.VITE_SITE_URL}/features`,
       "mainEntity": {
         "@type": "SoftwareApplication",
-        "name": "NPPE Pro",
+        "name": "ProCertFlo",
         "applicationCategory": "EducationalApplication",
         "operatingSystem": "Web, iOS, Android",
         "offers": {
@@ -203,16 +203,16 @@ export const seoData = {
     }
   },
   pricing: {
-    title: 'Pricing - NPPE Pro | Flexible Plans for NPPE Exam Success',
+    title: 'Pricing - ProCertFlo | Flexible Plans for NPPE Exam Success',
     description: 'Choose from Basic ($39/month), Professional ($79/month), or Premium ($159/month) plans. 14-day free trial included.',
     keywords: 'NPPE exam pricing, subscription plans, engineering exam costs, free trial, professional engineer preparation',
-    ogTitle: 'NPPE Pro Pricing - Choose Your Path to Success',
+    ogTitle: 'ProCertFlo Pricing - Choose Your Path to Success',
     ogDescription: 'Flexible pricing plans designed to fit your study needs and budget. Start with a 14-day free trial.',
     ogImage: 'https://readdy.ai/api/search-image?query=pricing%20plans%20comparison%20professional&width=1200&height=630&seq=pricing-og&orientation=landscape',
     schema: {
       "@context": "https://schema.org",
       "@type": "WebPage",
-      "name": "NPPE Pro Pricing",
+      "name": "ProCertFlo Pricing",
       "description": "Flexible pricing plans for NPPE exam preparation",
       "url": `${import.meta.env.VITE_SITE_URL}/pricing`,
       "mainEntity": [
@@ -241,86 +241,86 @@ export const seoData = {
     }
   },
   login: {
-    title: 'Login - NPPE Pro | Access Your NPPE Exam Preparation',
-    description: 'Sign in to your NPPE Pro account to continue your professional engineering exam preparation journey.',
-    keywords: 'NPPE Pro login, sign in, engineering exam account, professional engineer preparation',
-    ogTitle: 'Login to NPPE Pro',
+    title: 'Login - ProCertFlo | Access Your NPPE Exam Preparation',
+    description: 'Sign in to your ProCertFlo account to continue your professional engineering exam preparation journey.',
+    keywords: 'ProCertFlo login, sign in, engineering exam account, professional engineer preparation',
+    ogTitle: 'Login to ProCertFlo',
     ogDescription: 'Access your personalized NPPE exam preparation dashboard and continue your journey to professional engineering success.',
     ogImage: 'https://readdy.ai/api/search-image?query=professional%20login%20interface%20engineering&width=1200&height=630&seq=login-og&orientation=landscape',
     schema: {
       "@context": "https://schema.org",
       "@type": "WebPage",
-      "name": "NPPE Pro Login",
+      "name": "ProCertFlo Login",
       "description": "Sign in to access your NPPE exam preparation account",
       "url": `${import.meta.env.VITE_SITE_URL}/login`
     }
   },
   signup: {
-    title: 'Sign Up - NPPE Pro | Start Your NPPE Exam Preparation',
-    description: 'Create your NPPE Pro account and start your journey to professional engineering success. 14-day free trial included.',
-    keywords: 'NPPE Pro signup, create account, engineering exam registration, professional engineer preparation, free trial',
-    ogTitle: 'Join NPPE Pro - Start Your Engineering Success Journey',
+    title: 'Sign Up - ProCertFlo | Start Your NPPE Exam Preparation',
+    description: 'Create your ProCertFlo account and start your journey to professional engineering success. 14-day free trial included.',
+    keywords: 'ProCertFlo signup, create account, engineering exam registration, professional engineer preparation, free trial',
+    ogTitle: 'Join ProCertFlo - Start Your Engineering Success Journey',
     ogDescription: 'Create your account and get access to comprehensive NPPE exam preparation tools. 14-day free trial included.',
     ogImage: 'https://readdy.ai/api/search-image?query=professional%20signup%20registration%20engineering&width=1200&height=630&seq=signup-og&orientation=landscape',
     schema: {
       "@context": "https://schema.org",
       "@type": "WebPage",
-      "name": "NPPE Pro Sign Up",
+      "name": "ProCertFlo Sign Up",
       "description": "Create your account to start NPPE exam preparation",
       "url": `${import.meta.env.VITE_SITE_URL}/signup`,
       "potentialAction": {
         "@type": "RegisterAction",
         "target": `${import.meta.env.VITE_SITE_URL}/signup`,
-        "name": "Sign up for NPPE Pro"
+        "name": "Sign up for ProCertFlo"
       }
     }
   },
   onboarding: {
-    title: 'Welcome - NPPE Pro | Setup Your Account',
-    description: 'Complete your NPPE Pro account setup and personalize your exam preparation experience.',
-    keywords: 'NPPE onboarding, account setup, personalization, engineering exam preparation',
+    title: 'Welcome - ProCertFlo | Setup Your Account',
+    description: 'Complete your ProCertFlo account setup and personalize your exam preparation experience.',
+    keywords: 'ProCertFlo onboarding, account setup, personalization, engineering exam preparation',
     canonical: `${import.meta.env.VITE_SITE_URL || 'https://example.com'}/onboarding`
   },
   achievements: {
-    title: 'Achievements - NPPE Pro',
+    title: 'Achievements - ProCertFlo',
     description: 'Track your achievements and milestones in your NPPE exam preparation journey.',
     keywords: 'NPPE achievements, exam milestones, study progress',
     canonical: `${import.meta.env.VITE_SITE_URL || 'https://example.com'}/achievements`
   },
   blog: {
-    title: 'Blog - NPPE Pro',
+    title: 'Blog - ProCertFlo',
     description: 'Read the latest articles and insights about NPPE exam preparation.',
     keywords: 'NPPE blog, engineering articles, exam tips',
     canonical: `${import.meta.env.VITE_SITE_URL || 'https://example.com'}/blog`
   },
   contact: {
-    title: 'Contact Us - NPPE Pro',
+    title: 'Contact Us - ProCertFlo',
     description: 'Get in touch with our team for support and inquiries.',
-    keywords: 'NPPE contact, support, customer service',
+    keywords: 'ProCertFlo contact, support, customer service',
     canonical: `${import.meta.env.VITE_SITE_URL || 'https://example.com'}/contact`
   },
   forum: {
-    title: 'Forum - NPPE Pro',
+    title: 'Forum - ProCertFlo',
     description: 'Join the community discussion about NPPE exam preparation.',
     keywords: 'NPPE forum, community, discussion',
     canonical: `${import.meta.env.VITE_SITE_URL || 'https://example.com'}/forum`
   },
   help: {
-    title: 'Help Center - NPPE Pro',
-    description: 'Find answers to common questions and get help with NPPE Pro.',
-    keywords: 'NPPE help, FAQ, support center',
+    title: 'Help Center - ProCertFlo',
+    description: 'Find answers to common questions and get help with ProCertFlo.',
+    keywords: 'ProCertFlo help, FAQ, support center',
     canonical: `${import.meta.env.VITE_SITE_URL || 'https://example.com'}/help`
   },
   privacyPolicy: {
-    title: 'Privacy Policy - NPPE Pro',
+    title: 'Privacy Policy - ProCertFlo',
     description: 'Read our privacy policy to understand how we protect your data.',
-    keywords: 'privacy policy, data protection, NPPE Pro privacy',
+    keywords: 'privacy policy, data protection, ProCertFlo privacy',
     canonical: `${import.meta.env.VITE_SITE_URL || 'https://example.com'}/privacy-policy`
   },
   termsOfService: {
-    title: 'Terms of Service - NPPE Pro',
+    title: 'Terms of Service - ProCertFlo',
     description: 'Read our terms of service and conditions of use.',
-    keywords: 'terms of service, conditions, NPPE Pro terms',
+    keywords: 'terms of service, conditions, ProCertFlo terms',
     canonical: `${import.meta.env.VITE_SITE_URL || 'https://example.com'}/terms-of-service`
   }
 };

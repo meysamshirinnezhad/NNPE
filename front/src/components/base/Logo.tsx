@@ -21,38 +21,26 @@ export default function Logo({ size = 'medium', variant = 'full', className = ''
 
   if (variant === 'icon') {
     return (
-      <div className={`${iconSize[size]} ${className} flex items-center justify-center`}>
-        <div className="relative">
-          {/* Gear icon */}
-          <div className="w-full h-full rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-            <i className="ri-settings-3-line text-white text-lg"></i>
-          </div>
-          {/* Graduation cap overlay */}
-          <div className="absolute -top-1 -right-1 w-4 h-4 bg-secondary rounded-full flex items-center justify-center">
-            <i className="ri-graduation-cap-line text-white text-xs"></i>
-          </div>
-        </div>
-      </div>
+      <img
+        src="/images/logos/Logo.png"
+        alt="ProCertFlo Logo"
+        className={`${iconSize[size]} ${className} object-contain`}
+      />
     );
   }
 
   return (
     <div className={`flex items-center space-x-3 ${className}`}>
-      {/* Icon */}
-      <div className={`${iconSize[size]} flex items-center justify-center`}>
-        <div className="relative">
-          <div className="w-full h-full rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-            <i className="ri-settings-3-line text-white text-lg"></i>
-          </div>
-          <div className="absolute -top-1 -right-1 w-4 h-4 bg-secondary rounded-full flex items-center justify-center">
-            <i className="ri-graduation-cap-line text-white text-xs"></i>
-          </div>
-        </div>
-      </div>
-      
+      {/* Logo Image */}
+      <img
+        src="/images/logos/Logo.png"
+        alt="ProCertFlo Logo"
+        className={`${iconSize[size]} object-contain`}
+      />
+
       {/* Text */}
-      <div className={`font-bold text-gray-900 ${textSize[size]}`}>
-        NPPE Pro
+      <div className={`font-bold text-white ${textSize[size]} animate-fade-in`}>
+        ProCertFlo
       </div>
     </div>
   );

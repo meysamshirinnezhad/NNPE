@@ -1,304 +1,327 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Button from '../../components/base/Button';
-import { updateSEO, seoData } from '../../utils/seo';
+import Logo from '../../components/base/Logo';
 
-/**
- * HIGH-CONVERTING LANDING PAGE
- *
- * Design Principles Applied:
- * 1. Single conversion goal: Start free practice test
- * 2. Minimal distractions: No navigation menu
- * 3. Benefit-focused copy: What users GET, not what we HAVE
- * 4. Under 150 lines of content
- * 5. Two CTA buttons max (hero + bottom)
- * 6. No fake social proof (we have 0 sales)
- * 7. Clear value proposition above the fold
- */
-
-export default function ConversionFocusedLanding() {
+export default function LandingPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentFeature, setCurrentFeature] = useState(0);
+
+  const features = [
+    'Real NPPE Exam Questions',
+    'Instant Performance Analytics',
+    'Adaptive Learning System'
+  ];
 
   useEffect(() => {
-    updateSEO(seoData.landing);
+    const interval = setInterval(() => {
+      setCurrentFeature((prev) => (prev + 1) % features.length);
+    }, 3000);
+    return () => clearInterval(interval);
   }, []);
 
-  const handleStartFreeTrial = () => {
-    if (email) {
-      navigate(`/signup?email=${encodeURIComponent(email)}`);
-    } else {
+  const handleStartTest = () => {
+    setIsLoading(true);
+    setTimeout(() => {
       navigate('/signup');
-    }
+    }, 1500);
   };
 
+  // Generate grid cells for animated background
+  const gridCells = Array.from({ length: 120 }, (_, i) => i);
+
   return (
-    <div className="min-h-screen bg-white">
-      {/* Minimal Header - Logo + Login Only */}
-      <header className="absolute top-0 left-0 right-0 z-10">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <i className="ri-settings-3-line text-[#0277BD] text-2xl"></i>
-            <span className="text-xl font-bold text-gray-900">NPPE Pro</span>
-          </div>
-          <a
-            href="/login"
-            className="text-gray-600 hover:text-[#0277BD] transition-colors text-sm font-medium"
-          >
-            Login
-          </a>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white overflow-hidden relative">
+      {/* Animated Grid Background with Lights */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 grid grid-cols-12 grid-rows-10 gap-1 p-4 opacity-30">
+          {gridCells.map((cell) => (
+            <div
+              key={cell}
+              className="light-cell rounded-sm"
+              style={{
+                animationDelay: `${Math.random() * 5}s`,
+                animationDuration: `${2 + Math.random() * 3}s`
+              }}
+            />
+          ))}
         </div>
+      </div>
+
+      {/* Animated Gradient Orbs */}
+      <div className="absolute top-20 left-10 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s' }} />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '5s', animationDelay: '2s' }} />
+
+      {/* Floating Tech Icons */}
+      <div className="absolute top-1/4 left-1/4 animate-float opacity-20">
+        <i className="ri-code-s-slash-line text-6xl text-cyan-400" />
+      </div>
+      <div className="absolute top-2/3 right-1/4 animate-float opacity-20" style={{ animationDelay: '1s' }}>
+        <i className="ri-brain-line text-6xl text-blue-400" />
+      </div>
+      <div className="absolute bottom-1/4 left-1/3 animate-float opacity-20" style={{ animationDelay: '2s' }}>
+        <i className="ri-lightbulb-flash-line text-6xl text-purple-400" />
+      </div>
+
+      {/* Header */}
+      <header className="relative z-10 flex justify-between items-center px-8 py-6">
+        <Logo size="large" className="scale-125" />
+        <button
+          onClick={() => navigate('/login')}
+          className="px-6 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 rounded-lg transition-all duration-300 hover:scale-105 whitespace-nowrap cursor-pointer"
+        >
+          Login
+        </button>
       </header>
 
-      {/* HERO SECTION - Above the Fold */}
-      <section className="pt-32 pb-20 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Headline: One benefit-driven statement */}
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Pass Your NPPE Exam with Confidence
+      {/* Main Content */}
+      <main className="relative z-10 max-w-6xl mx-auto px-8 py-20">
+        {/* Hero Section */}
+        <div className="text-center mb-20 animate-fade-in">
+          <div className="inline-block mb-6 px-6 py-2 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 backdrop-blur-sm border border-blue-400/30 rounded-full">
+            <span className="text-cyan-400 font-semibold">🚀 Canada's #1 NPPE Prep Platform</span>
+          </div>
+          
+          <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent animate-gradient leading-tight">
+            Pass Your NPPE Exam<br />With Confidence
           </h1>
-
-          {/* Subheadline: One supporting sentence */}
-          <p className="text-xl md:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto">
-            Unlimited practice exams that show exactly where you need to study
+          
+          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+            Practice with real exam questions, get instant feedback, and track your progress with our AI-powered learning platform
           </p>
 
-          {/* Primary CTA */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="px-6 py-4 text-lg border-2 border-gray-300 rounded-lg w-full sm:w-80 focus:outline-none focus:border-[#0277BD] transition-colors"
-            />
-            <Button
-              size="lg"
-              onClick={handleStartFreeTrial}
-              className="w-full sm:w-auto px-8 py-4 text-lg font-semibold whitespace-nowrap bg-[#0277BD] hover:bg-[#025A8C] transition-colors"
+          {/* Rotating Feature Highlight */}
+          <div className="h-8 mb-10 flex items-center justify-center">
+            <div className="flex items-center gap-2 text-cyan-400">
+              <i className="ri-checkbox-circle-fill text-2xl" />
+              <span className="text-lg font-semibold animate-fade-in" key={currentFeature}>
+                {features[currentFeature]}
+              </span>
+            </div>
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="flex gap-4 justify-center items-center">
+            <button
+              onClick={handleStartTest}
+              disabled={isLoading}
+              className="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 rounded-lg font-semibold text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/50 whitespace-nowrap cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Start Free Practice Test
-              <i className="ri-arrow-right-line ml-2"></i>
-            </Button>
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <i className="ri-loader-4-line animate-spin" />
+                  Loading...
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  Start Free Mock Test
+                  <i className="ri-arrow-right-line group-hover:translate-x-1 transition-transform" />
+                </span>
+              )}
+            </button>
           </div>
 
-          <p className="text-sm text-gray-500">
-            No credit card required • Instant access • 7 days free
-          </p>
-
-          {/* Hero Visual - Screenshot */}
-          <div className="mt-16 rounded-lg shadow-2xl overflow-hidden border-4 border-gray-200">
-            <div className="bg-gradient-to-br from-blue-50 to-gray-50 p-8">
-              {/* Mock screenshot of results dashboard */}
-              <div className="bg-white rounded-lg shadow-lg p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-bold text-gray-900">Practice Test Results</h3>
-                  <div className="text-3xl font-bold text-green-600">85%</div>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-700">Professional Practice</span>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-32 bg-gray-200 rounded-full h-3">
-                        <div className="bg-green-500 h-3 rounded-full" style={{ width: '90%' }}></div>
-                      </div>
-                      <span className="font-semibold">90%</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-700">Ethics</span>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-32 bg-gray-200 rounded-full h-3">
-                        <div className="bg-green-500 h-3 rounded-full" style={{ width: '85%' }}></div>
-                      </div>
-                      <span className="font-semibold">85%</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-700">Law for Engineers</span>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-32 bg-gray-200 rounded-full h-3">
-                        <div className="bg-yellow-500 h-3 rounded-full" style={{ width: '65%' }}></div>
-                      </div>
-                      <span className="font-semibold text-yellow-600">65% - Practice More</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <p className="text-sm text-gray-400 mt-4">No credit card required • 7-day free trial</p>
         </div>
-      </section>
 
-      {/* PROBLEM SECTION */}
-      <section className="py-16 px-6 bg-gray-50">
-        <div className="max-w-3xl mx-auto text-center">
-          <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
-            <span className="font-semibold text-gray-900">Not knowing if you're ready for the NPPE creates anxiety.</span>
-            {' '}Most engineers study blindly without knowing their weak areas until exam day—when it's too late.
-          </p>
-        </div>
-      </section>
-
-      {/* SOLUTION SECTION - How It Works */}
-      <section className="py-20 px-6">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-16">
-            How It Works
-          </h2>
-
-          <div className="grid md:grid-cols-3 gap-12">
-            {/* Step 1 */}
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#0277BD] text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                1
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                Take Realistic NPPE Mock Exams
-              </h3>
-              <p className="text-gray-600">
-                Questions mirror actual NPPE format and difficulty
-              </p>
-            </div>
-
-            {/* Step 2 */}
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#0277BD] text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                2
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                Get Instant Feedback on Weak Topics
-              </h3>
-              <p className="text-gray-600">
-                Smart analysis pinpoints exactly which topics to review
-              </p>
-            </div>
-
-            {/* Step 3 */}
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#0277BD] text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                3
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                Track Progress Until You're Confident
-              </h3>
-              <p className="text-gray-600">
-                Unlimited attempts—practice until you're ready to pass
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* BENEFITS SECTION */}
-      <section className="py-16 px-6 bg-blue-50">
-        <div className="max-w-3xl mx-auto">
-          <div className="space-y-6">
-            {/* Benefit 1 */}
-            <div className="flex items-start space-x-4">
-              <div className="flex-shrink-0">
-                <i className="ri-checkbox-circle-fill text-3xl text-green-600"></i>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                  Questions mirror actual NPPE format and difficulty
-                </h3>
-                <p className="text-gray-600">
-                  Practice with questions designed by P.Eng holders who've passed the exam
-                </p>
-              </div>
-            </div>
-
-            {/* Benefit 2 */}
-            <div className="flex items-start space-x-4">
-              <div className="flex-shrink-0">
-                <i className="ri-checkbox-circle-fill text-3xl text-green-600"></i>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                  Smart analysis pinpoints exactly which topics to review
-                </h3>
-                <p className="text-gray-600">
-                  Stop wasting time on topics you've mastered. Focus on what matters.
-                </p>
-              </div>
-            </div>
-
-            {/* Benefit 3 */}
-            <div className="flex items-start space-x-4">
-              <div className="flex-shrink-0">
-                <i className="ri-checkbox-circle-fill text-3xl text-green-600"></i>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                  Unlimited attempts—practice until confident
-                </h3>
-                <p className="text-gray-600">
-                  No limits. Take as many practice tests as you need to feel ready.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FINAL CTA SECTION */}
-      <section className="py-20 px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-            Know Your Score Before the Real Exam
-          </h2>
-
-          <p className="text-xl text-gray-600 mb-10">
-            Start practicing today—7 days free, no credit card required
-          </p>
-
-          {/* Repeat Primary CTA */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="px-6 py-4 text-lg border-2 border-gray-300 rounded-lg w-full sm:w-80 focus:outline-none focus:border-[#0277BD] transition-colors"
-            />
-            <Button
-              size="lg"
-              onClick={handleStartFreeTrial}
-              className="w-full sm:w-auto px-8 py-4 text-lg font-semibold whitespace-nowrap bg-[#0277BD] hover:bg-[#025A8C] transition-colors"
+        {/* Stats Section */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+          {[
+            { icon: 'ri-trophy-line', value: '95%', label: 'Pass Rate', color: 'from-yellow-400 to-orange-400' },
+            { icon: 'ri-team-line', value: '10,000+', label: 'Engineers Trained', color: 'from-blue-400 to-cyan-400' },
+            { icon: 'ri-question-answer-line', value: '500+', label: 'Practice Questions', color: 'from-purple-400 to-pink-400' }
+          ].map((stat, index) => (
+            <div
+              key={index}
+              className="group p-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:border-cyan-400/50 animate-slide-up cursor-pointer"
+              style={{ animationDelay: `${index * 0.1}s` }}
             >
-              Start My Free Test
-              <i className="ri-arrow-right-line ml-2"></i>
-            </Button>
-          </div>
+              <div className={`w-16 h-16 mx-auto mb-4 bg-gradient-to-br ${stat.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                <i className={`${stat.icon} text-3xl text-white`} />
+              </div>
+              <div className={`text-4xl font-bold mb-2 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
+                {stat.value}
+              </div>
+              <div className="text-gray-400">{stat.label}</div>
+            </div>
+          ))}
+        </div>
 
-          <p className="text-sm text-gray-500">
-            Join engineers preparing for their NPPE exam
+        {/* Social Proof */}
+        <div className="mb-20">
+          <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+            Trusted by Engineers Across Canada
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                name: 'Sarah Chen',
+                role: 'Mechanical Engineer',
+                text: 'Passed on my first attempt! The mock tests were incredibly similar to the actual exam.',
+                rating: 5
+              },
+              {
+                name: 'Michael Rodriguez',
+                role: 'Civil Engineer',
+                text: 'The analytics helped me focus on my weak areas. Best investment for my career.',
+                rating: 5
+              },
+              {
+                name: 'Priya Patel',
+                role: 'Electrical Engineer',
+                text: 'Comprehensive question bank and excellent explanations. Highly recommend!',
+                rating: 5
+              }
+            ].map((testimonial, index) => (
+              <div
+                key={index}
+                className="p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl hover:bg-white/10 transition-all duration-300 hover:scale-105 animate-slide-up cursor-pointer"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="flex gap-1 mb-4">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <i key={i} className="ri-star-fill text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-gray-300 mb-4 italic">&ldquo;{testimonial.text}&rdquo;</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-xl font-bold">
+                    {testimonial.name.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="font-semibold text-white">{testimonial.name}</div>
+                    <div className="text-sm text-gray-400">{testimonial.role}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Final CTA */}
+        <div className="text-center p-12 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 backdrop-blur-sm border border-blue-400/30 rounded-2xl animate-slide-up">
+          <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+            Ready to Start Your Journey?
+          </h2>
+          <p className="text-xl text-gray-300 mb-8">
+            Join thousands of engineers who have successfully passed their NPPE exam
           </p>
+          <button
+            onClick={handleStartTest}
+            disabled={isLoading}
+            className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 rounded-lg font-semibold text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/50 whitespace-nowrap cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <i className="ri-loader-4-line animate-spin" />
+                Loading...
+              </span>
+            ) : (
+              <span className="flex items-center gap-2">
+                Start Free Mock Test
+                <i className="ri-arrow-right-line group-hover:translate-x-1 transition-transform" />
+              </span>
+            )}
+          </button>
         </div>
-      </section>
+      </main>
 
-      {/* MINIMAL FOOTER */}
-      <footer className="bg-gray-900 text-white py-12 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <div className="flex items-center space-x-2">
-              <i className="ri-settings-3-line text-[#0277BD] text-xl"></i>
-              <span className="font-semibold">NPPE Pro</span>
-            </div>
-
-            <div className="flex space-x-6 text-sm text-gray-400">
-              <a href="/privacy-policy" className="hover:text-white transition-colors">Privacy</a>
-              <a href="/terms-of-service" className="hover:text-white transition-colors">Terms</a>
-              <a href="/contact" className="hover:text-white transition-colors">Contact</a>
-            </div>
-          </div>
-
-          <div className="text-center text-sm text-gray-500 mt-8">
-            © 2024 NPPE Pro. All rights reserved.
-          </div>
-        </div>
+      {/* Footer */}
+      <footer className="relative z-10 text-center py-8 text-gray-400 text-sm border-t border-white/10">
+        <p>&copy; 2024 NPPE Pro. All rights reserved.</p>
       </footer>
+
+      <style>{`
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes slide-up {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-20px) rotate(5deg);
+          }
+        }
+
+        @keyframes gradient {
+          0%, 100% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+        }
+
+        @keyframes light-pulse {
+          0%, 100% {
+            background-color: rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+          }
+          50% {
+            background-color: rgba(6, 182, 212, 0.3);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.6);
+          }
+        }
+
+        .animate-fade-in {
+          animation: fade-in 1s ease-out;
+        }
+
+        .animate-slide-up {
+          animation: slide-up 0.8s ease-out;
+        }
+
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+
+        .animate-gradient {
+          background-size: 200% 200%;
+          animation: gradient 3s ease infinite;
+        }
+
+        .light-cell {
+          background-color: rgba(59, 130, 246, 0.05);
+          animation: light-pulse infinite ease-in-out;
+        }
+
+        .light-cell:nth-child(3n) {
+          animation-delay: 0.5s;
+        }
+
+        .light-cell:nth-child(5n) {
+          animation-delay: 1s;
+        }
+
+        .light-cell:nth-child(7n) {
+          animation-delay: 1.5s;
+        }
+
+        .light-cell:nth-child(11n) {
+          animation-delay: 2s;
+        }
+      `}</style>
     </div>
   );
 }

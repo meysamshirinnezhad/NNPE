@@ -1,5 +1,5 @@
-
 import type { RouteObject } from "react-router-dom";
+import { RequireAuth, RequireAdmin } from "./guards";
 import NotFound from "../pages/NotFound";
 import Home from "../pages/home/page";
 import Landing from "../pages/landing/ConversionFocusedLanding";
@@ -55,10 +55,13 @@ import Error from "../pages/error/page";
 import Maintenance from "../pages/maintenance/page";
 
 const routes: RouteObject[] = [
+  // Root redirect
   {
     path: "/",
     element: <RootRedirect />,
   },
+  
+  // Public routes (NO AUTH REQUIRED)
   {
     path: "/landing",
     element: <Landing />,
@@ -116,153 +119,12 @@ const routes: RouteObject[] = [
     element: <ResetPassword />,
   },
   {
-    path: "/verify-email/:token",
+    path: "/verify-email",  // THIS IS THE CRITICAL ROUTE
     element: <EmailVerification />,
   },
   {
     path: "/onboarding",
     element: <Onboarding />,
-  },
-  {
-    path: "/dashboard",
-    element: <Dashboard />,
-  },
-  {
-    path: "/practice",
-    element: <Practice />,
-  },
-  {
-    path: "/practice/:questionId",
-    element: <QuestionReview />,
-  },
-  {
-    path: "/bookmarks",
-    element: <Bookmarks />,
-  },
-  {
-    path: "/practice-test/new",
-    element: <PracticeTestNew />,
-  },
-  {
-    path: "/practice-test/take/:testId",
-    element: <PracticeTestTake />,
-  },
-  {
-    path: "/test/:testId/results",
-    element: <TestResults />,
-  },
-  {
-    path: "/test/:testId/review",
-    element: <TestReview />,
-  },
-  // Backward-compatible alias routes for query param URLs
-  {
-    path: "/test/results",
-    element: <TestResults />,
-  },
-  {
-    path: "/test/review",
-    element: <TestReview />,
-  },
-  {
-    path: "/practice-tests",
-    element: <PracticeTests />,
-  },
-  {
-    path: "/study-path",
-    element: <StudyPath />,
-  },
-  {
-    path: "/study-path/module/:moduleId",
-    element: <ModuleDetail />,
-  },
-  {
-    path: "/topics",
-    element: <Topics />,
-  },
-  {
-    path: "/topics/:topicId",
-    element: <TopicDetail />,
-  },
-  {
-    path: "/analytics",
-    element: <Analytics />,
-  },
-  {
-    path: "/weaknesses",
-    element: <Weaknesses />,
-  },
-  {
-    path: "/forum",
-    element: <Forum />,
-  },
-  {
-    path: "/forum/post/:postId",
-    element: <ForumPost />,
-  },
-  {
-    path: "/forum/new",
-    element: <ForumNew />,
-  },
-  {
-    path: "/study-groups",
-    element: <StudyGroups />,
-  },
-  {
-    path: "/study-groups/:groupId",
-    element: <StudyGroupDetail />,
-  },
-  {
-    path: "/profile",
-    element: <Profile />,
-  },
-  {
-    path: "/settings/account",
-    element: <AccountSettings />,
-  },
-  {
-    path: "/settings/subscription",
-    element: <Subscription />,
-  },
-  {
-    path: "/settings/notifications",
-    element: <NotificationSettings />,
-  },
-  {
-    path: "/achievements",
-    element: <Achievements />,
-  },
-  {
-    path: "/support",
-    element: <Support />,
-  },
-  {
-    path: "/admin",
-    element: <AdminDashboard />,
-  },
-  {
-    path: "/admin/users",
-    element: <AdminUsers />,
-  },
-  {
-    path: "/admin/questions",
-    element: <AdminQuestions />,
-  },
-  {
-    path: "/admin/questions/new",
-    element: <AdminQuestionEditor />,
-  },
-  {
-    path: "/admin/questions/edit/:id",
-    element: <AdminQuestionEditor />,
-  },
-  {
-    path: "/admin/analytics",
-    element: <AdminAnalytics />,
-  },
-  {
-    path: "/admin/subscriptions",
-    element: <AdminSubscriptions />,
   },
   {
     path: "/offline",
@@ -280,6 +142,165 @@ const routes: RouteObject[] = [
     path: "/404",
     element: <NotFound />,
   },
+
+  // Protected routes requiring authentication
+  {
+    path: "/",
+    element: <RequireAuth />,
+    children: [
+      {
+        path: "/dashboard",
+        element: <Dashboard />,
+      },
+      {
+        path: "/practice",
+        element: <Practice />,
+      },
+      {
+        path: "/practice/:questionId",
+        element: <QuestionReview />,
+      },
+      {
+        path: "/bookmarks",
+        element: <Bookmarks />,
+      },
+      {
+        path: "/practice-test/new",
+        element: <PracticeTestNew />,
+      },
+      {
+        path: "/practice-test/take/:testId",
+        element: <PracticeTestTake />,
+      },
+      {
+        path: "/test/:testId/results",
+        element: <TestResults />,
+      },
+      {
+        path: "/test/:testId/review",
+        element: <TestReview />,
+      },
+      // Backward-compatible alias routes for query param URLs
+      {
+        path: "/test/results",
+        element: <TestResults />,
+      },
+      {
+        path: "/test/review",
+        element: <TestReview />,
+      },
+      {
+        path: "/practice-tests",
+        element: <PracticeTests />,
+      },
+      {
+        path: "/study-path",
+        element: <StudyPath />,
+      },
+      {
+        path: "/study-path/module/:moduleId",
+        element: <ModuleDetail />,
+      },
+      {
+        path: "/topics",
+        element: <Topics />,
+      },
+      {
+        path: "/topics/:topicId",
+        element: <TopicDetail />,
+      },
+      {
+        path: "/analytics",
+        element: <Analytics />,
+      },
+      {
+        path: "/weaknesses",
+        element: <Weaknesses />,
+      },
+      {
+        path: "/forum",
+        element: <Forum />,
+      },
+      {
+        path: "/forum/post/:postId",
+        element: <ForumPost />,
+      },
+      {
+        path: "/forum/new",
+        element: <ForumNew />,
+      },
+      {
+        path: "/study-groups",
+        element: <StudyGroups />,
+      },
+      {
+        path: "/study-groups/:groupId",
+        element: <StudyGroupDetail />,
+      },
+      {
+        path: "/profile",
+        element: <Profile />,
+      },
+      {
+        path: "/settings/account",
+        element: <AccountSettings />,
+      },
+      {
+        path: "/settings/subscription",
+        element: <Subscription />,
+      },
+      {
+        path: "/settings/notifications",
+        element: <NotificationSettings />,
+      },
+      {
+        path: "/achievements",
+        element: <Achievements />,
+      },
+      {
+        path: "/support",
+        element: <Support />,
+      },
+    ],
+  },
+
+  // Admin routes requiring admin privileges
+  {
+    path: "/",
+    element: <RequireAdmin />,
+    children: [
+      {
+        path: "/admin",
+        element: <AdminDashboard />,
+      },
+      {
+        path: "/admin/users",
+        element: <AdminUsers />,
+      },
+      {
+        path: "/admin/questions",
+        element: <AdminQuestions />,
+      },
+      {
+        path: "/admin/questions/new",
+        element: <AdminQuestionEditor />,
+      },
+      {
+        path: "/admin/questions/edit/:id",
+        element: <AdminQuestionEditor />,
+      },
+      {
+        path: "/admin/analytics",
+        element: <AdminAnalytics />,
+      },
+      {
+        path: "/admin/subscriptions",
+        element: <AdminSubscriptions />,
+      },
+    ],
+  },
+
+  // CATCH-ALL ROUTE - MUST BE LAST
   {
     path: "*",
     element: <NotFound />,
