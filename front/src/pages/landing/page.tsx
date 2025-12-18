@@ -229,7 +229,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="relative z-10 text-center py-8 text-gray-400 text-sm border-t border-white/10">
-        <p>&copy; 2024 NPPE Pro. All rights reserved.</p>
+        <p>&copy; 2024 ProcertFlo. All rights reserved.</p>
       </footer>
 
       <style>{`
